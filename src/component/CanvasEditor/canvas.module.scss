@@ -1,0 +1,196 @@
+// CanvasEditor.module.scss
+.editorWrapper {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.canvas {
+  border: 1px solid #ddd;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+// ——— Floating Toolbar ———
+.toolbar {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e5e5;
+  overflow: hidden;
+  z-index: 1000;
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+}
+
+.toolbarTabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+}
+
+.tabButton {
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #666;
+
+  &.active {
+    color: #007aff;
+    background: #f0f7ff;
+  }
+
+  &.colorTab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .colorPreview {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+    }
+  }
+}
+
+.closeButton {
+  margin-left: auto;
+  padding: 14px 20px;
+  font-size: 20px;
+  color: #999;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    color: #333;
+  }
+}
+
+.toolbarContent {
+  padding: 20px;
+  max-width: 90vw;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+// Font buttons
+.fontList {
+  display: flex;
+  gap: 12px;
+  padding-bottom: 8px;
+}
+
+.fontButton {
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: #f5f5f5;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #e5e5e5;
+  }
+
+  &.active {
+    background: #007aff;
+    color: white;
+  }
+}
+
+// Color picker
+.colorGrid {
+  display: flex;
+  gap: 14px;
+}
+
+.colorButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  border: 4px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+
+  &.active {
+    border-color: #007aff;
+    transform: scale(1.15);
+  }
+}
+
+// Size picker
+.sizeGrid {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.sizeButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: #f5f5f5;
+  border: none;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #e5e5e5;
+  }
+
+  &.active {
+    background: #007aff;
+    color: white;
+  }
+}
+
+// ——— Edit Button (when not editing) ———
+.editButton {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  background: #007aff;
+  color: white;
+  padding: 16px 32px;
+  border-radius: 50px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0, 122, 255, 0.3);
+  cursor: pointer;
+  z-index: 900;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #0060df;
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 15px 30px rgba(0, 122, 255, 0.4);
+  }
+}

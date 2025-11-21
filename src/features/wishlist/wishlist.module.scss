@@ -1,0 +1,16 @@
+.wishlist_main {
+    padding: 2rem 3rem;
+
+    h1{
+        text-align: center;
+    }
+
+  .cardGrid {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 4rem;
+    justify-items: center;
+    animation: fadeIn 0.5s ease;
+  }
+}

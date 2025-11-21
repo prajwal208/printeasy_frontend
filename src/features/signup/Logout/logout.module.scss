@@ -1,0 +1,81 @@
+.logoutContainer {
+  max-width: 500px;
+  width: 100%;
+}
+
+.logoutTitle {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 1rem 0;
+}
+
+.logoutMessage {
+  font-size: 1rem;
+  color: #4a4a4a;
+  margin: 0 0 2rem 0;
+  line-height: 1.5;
+}
+
+.logoutActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btn {
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btnCancel {
+  background-color: #2d2d2d;
+  color: #ffffff;
+
+  &:hover {
+    background-color: #1a1a1a;
+  }
+}
+
+.btnLogout {
+  background-color: #ef4444;
+  color: #ffffff;
+
+  &:hover {
+    background-color: #dc2626;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .logoutContainer {
+    padding: 1.5rem;
+  }
+
+  .logoutTitle {
+    font-size: 1.5rem;
+  }
+
+  .logoutActions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,52 @@
+.featured_categories {
+  margin-top: 3.5rem;
+
+  h3 {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  .gridWrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  /* Skeleton shimmer loader */
+  .skeletonCard {
+    height: 300px;
+    border-radius: 8px;
+    background: #ffe0b2; /* light orange base */
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -150px;
+      width: 150px;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 123, 0, 0.2),
+        transparent
+      );
+      animation: shimmer 1.5s infinite;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}

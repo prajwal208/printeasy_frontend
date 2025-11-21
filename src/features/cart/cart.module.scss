@@ -1,0 +1,176 @@
+.cartPage {
+  min-height: 100vh;
+  background-color: #f8f8f8;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.cartContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+
+  @media (min-width: 992px) {
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
+  }
+}
+
+/* LEFT COLUMN */
+.cartItems {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* RIGHT COLUMN */
+.rightSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 100px;
+}
+
+/* Cart Item */
+.cartItem {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+  }
+}
+
+.itemImage {
+  width: 200px;
+  height: 250px;
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+
+  @media (max-width: 767px) {
+    width: 100%;
+    height: 300px;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.itemDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.itemName {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #999;
+  transition: color 0.3s;
+
+  &:hover {
+    color: #666;
+  }
+}
+
+.itemMeta {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.quantitySelector {
+  display: flex;
+  align-items: center;
+
+  select {
+    margin-left: 5px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.itemFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wishlistBtn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: opacity 0.3s;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.itemPrice {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Checkout Button */
+.checkoutBtn {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s;
+
+  &:hover {
+    background-color: #005ad3;
+  }
+}
+
+

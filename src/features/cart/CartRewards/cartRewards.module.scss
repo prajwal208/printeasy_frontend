@@ -1,0 +1,82 @@
+.rewardsContainer {
+  padding: 20px 25px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #222;
+}
+
+.progressBar {
+  position: relative;
+  margin: 50px 0 10px;
+}
+
+.progressLine {
+  position: relative;
+  height: 4px;
+  background-color: #e0e0e0;
+  border-radius: 2px;
+}
+
+.progressFill {
+  height: 4px;
+  background-color: #e67e22;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.milestones {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  top: -12px;
+}
+
+.milestone {
+  text-align: center;
+  color: #aaa;
+
+  .iconCircle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #d8d8d8;
+    margin: 0 auto 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+  }
+
+  &.active .iconCircle {
+    background: #e67e22;
+    color: white;
+    box-shadow: 0 0 6px rgba(230, 126, 34, 0.6);
+  }
+
+  .iconCircle.empty {
+    background: #e67e22;
+    border: 2px solid #d8d8d8;
+  }
+
+  .amount {
+    font-size: 13px;
+  }
+}
+
+.rewardText {
+  color: #555;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.rewardTextSuccess {
+  color: #4caf50;
+  font-weight: 600;
+  margin-top: 10px;
+}

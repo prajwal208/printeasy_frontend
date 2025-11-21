@@ -1,0 +1,314 @@
+.container {
+  display: flex;
+  gap: 3rem;
+  padding: 2rem 4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+
+  @media (max-width: 1200px) {
+    padding: 2rem 3rem;
+    gap: 2rem;
+  }
+
+  @media (max-width: 992px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  @media (max-width: 600px) {
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+}
+
+/* IMAGE OR CANVAS SECTION */
+.imageSection {
+  flex: 1;
+  min-width: 320px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .mainImage {
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    object-fit: contain;
+
+    @media (max-width: 768px) {
+      max-width: 100%;
+    }
+  }
+}
+
+/* INFO SECTION */
+.infoSection {
+  flex: 1;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+
+    @media (max-width: 992px) {
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 1.3rem;
+    }
+  }
+
+  .subtitle {
+    color: #666;
+    font-size: 1rem;
+    text-align: left;
+
+    @media (max-width: 992px) {
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      font-size: 0.95rem;
+    }
+  }
+
+  /* Price Section */
+  .priceSection {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+
+    .discountedPrice {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ff6b00;
+    }
+
+    .basePrice {
+      font-size: 1.3rem;
+      color: #777;
+      text-decoration: line-through;
+    }
+
+    .price {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+  }
+
+  /* Size Selection */
+  .sizes {
+    margin-top: 1.2rem;
+
+    h4 {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+
+      @media (max-width: 600px) {
+        text-align: center;
+      }
+    }
+
+    .sizeOptions {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+
+      @media (max-width: 600px) {
+        justify-content: center;
+      }
+    }
+
+    .sizeBtn {
+      border: 1px solid #000;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.9rem;
+      border-radius: 4px;
+
+      &:hover {
+        background: #f8f8f8;
+      }
+
+      @media (max-width: 480px) {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    .activeSize {
+      border: 2px solid #c55f17;
+      background: #fff4ec;
+    }
+  }
+  .buttonsWrapper {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+    }
+  }
+
+  .addToWishlist {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1.5rem;
+    background: #fff;
+    border: 1px solid black;
+    padding: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+
+    &:hover {
+      background: #dfd7d1;
+      border: none
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.8rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  .addToCart {
+    margin-top: 1.5rem;
+    background: #ff6b00;
+    color: #fff;
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+
+    &:hover {
+      background: #c55f17;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.8rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Accordion Section */
+  .accordion {
+    border-top: 1px solid #eee;
+    margin-top: 1.5rem;
+
+    .accordionItem {
+      border-bottom: 1px solid #eee;
+      padding: 1rem 0;
+
+      .accordionHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+
+        h3 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #000;
+        }
+
+        svg {
+          transition: transform 0.3s ease;
+        }
+
+        &:hover {
+          color: #c55f17;
+        }
+      }
+
+      .accordionContent {
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-5px);
+        transition: all 0.35s ease;
+
+        &.active {
+          max-height: 500px;
+          opacity: 1;
+          transform: translateY(0);
+          margin-top: 0.8rem;
+        }
+
+        p {
+          color: #444;
+          font-size: 0.95rem;
+          line-height: 1.5;
+
+          @media (max-width: 480px) {
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  }
+
+  /* Shimmer loader */
+.shimmerWrapper {
+  width: 100%;
+  height: 500px;
+  background: #f6f0ec;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.shimmer {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    #f6f0ec 0%,
+    #ffe1b3 50%,
+    #f6f0ec 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+}
+
+
+
