@@ -1,4 +1,57 @@
 // CanvasEditor.module.scss
+@import url("https://fonts.cdnfonts.com/css/the-wild-one");
+@import url("https://fonts.cdnfonts.com/css/sweet-dreams");
+@import url("https://fonts.cdnfonts.com/css/summershine");
+@import url("https://fonts.cdnfonts.com/css/pink-rose");
+@import url("https://fonts.cdnfonts.com/css/rainbow-dreams");
+
+// Meanwhile (close match: CC Meanwhile - use for handwritten style)
+@import url("https://fonts.cdnfonts.com/css/cc-meanwhile");
+
+// Monkey (exact match)
+@import url("https://fonts.cdnfonts.com/css/monkey-2");
+
+// MoreLove (exact match)
+@import url("https://fonts.cdnfonts.com/css/morelove");
+
+// Reality (exact match)
+@import url("https://fonts.cdnfonts.com/css/reality");
+
+// Scramble (close match: Scramble Storm)
+@import url("https://fonts.cdnfonts.com/css/scramble-storm");
+
+// Somekind (no exact; use Indie Flower from Google as fallback)
+@import url("https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap");
+
+// SourSlushy (no match; use local TTF)
+
+// Sunlight (exact match)
+@import url("https://fonts.cdnfonts.com/css/sunlight");
+
+// All other fonts from your list with CDN matches:
+@import url("https://fonts.cdnfonts.com/css/asteroid-type"); // Asteroid (close)
+@import url("https://fonts.cdnfonts.com/css/beachside"); // Beachside (exact, from search)
+@import url("https://fonts.cdnfonts.com/css/cakepop"); // Cakepop (exact)
+@import url("https://fonts.cdnfonts.com/css/california"); // California (exact)
+@import url("https://fonts.cdnfonts.com/css/firefly"); // Firefly (exact)
+@import url("https://fonts.cdnfonts.com/css/forever"); // Forever (exact)
+@import url("https://fonts.cdnfonts.com/css/freshlemonade"); // FreshLemonade (exact)
+@import url("https://fonts.cdnfonts.com/css/frozen"); // Frozen (exact)
+@import url("https://fonts.cdnfonts.com/css/heysugar"); // HeySugar (exact)
+@import url("https://fonts.cdnfonts.com/css/honey"); // Honey (exact)
+@import url("https://fonts.cdnfonts.com/css/honeycomb"); // Honeycomb (exact)
+@import url("https://fonts.cdnfonts.com/css/honeycomb-script-personal-use"); // However (no exact; skip or local)
+@import url("https://fonts.cdnfonts.com/css/ice-cream-cake"); // IceCream (close: Ice Cream Cake)
+@import url("https://fonts.cdnfonts.com/css/jade-skies"); // Jade Skies (exact)
+@import url("https://fonts.cdnfonts.com/css/joyful"); // Joyful (exact)
+@import url("https://fonts.cdnfonts.com/css/sexy-love-hearts"); // Love Hearts (close: Sexy Love Hearts)
+@import url("https://fonts.cdnfonts.com/css/love-vibes"); // Love Vibes (exact)
+@import url("https://fonts.cdnfonts.com/css/love-and-honey"); // LoveAndHoney (exact)
+@import url("https://fonts.cdnfonts.com/css/thinker"); // Thinker (exact)
+@import url("https://fonts.cdnfonts.com/css/thinker-historic"); // Thoughtful (close: Thinker Historic)
+@import url("https://fonts.cdnfonts.com/css/tigerland"); // TigerLand (exact)
+@import url("https://fonts.cdnfonts.com/css/tigerlily"); // Tigerlily (exact)
+
 .editorWrapper {
   position: relative;
   width: fit-content;
@@ -8,6 +61,30 @@
 .canvas {
   border: 1px solid #ddd;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  @media screen and (max-width: 708px) {
+    width: 80% !important;
+    height: 80% !important;
+    margin: 20px auto;
+    position: relative;
+    right: 20px !important;
+    left: 20px !important;
+  }
+  @media screen and (max-width: 490px) {
+    width: 70% !important;
+  }
+  @media screen and (max-width: 440px) {
+    width: 60% !important;
+    height: 60% !important;
+  }
+  @media screen and (max-width: 420px) {
+    width: 55% !important;
+  }
+  @media screen and (max-width: 330px) {
+    width: 50% !important;
+  }
+  @media screen and (max-width: 310px) {
+    width: 48% !important;
+  }
 }
 
 // ——— Floating Toolbar ———
@@ -24,6 +101,9 @@
   z-index: 1000;
   animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
 
+  @media screen and (max-width: 330px) {
+    width: 95%;
+  }
   @keyframes slideUp {
     from {
       opacity: 0;
@@ -48,9 +128,12 @@
   background: none;
   border: none;
   cursor: pointer;
+
   transition: all 0.2s;
   color: #666;
-
+  @media screen and (max-width: 330px) {
+    padding: 10px 14px;
+  }
   &.active {
     color: #007aff;
     background: #f0f7ff;
@@ -78,7 +161,9 @@
   background: none;
   border: none;
   cursor: pointer;
-
+  @media screen and (max-width: 330px) {
+    padding: 10px 14px;
+  }
   &:hover {
     color: #333;
   }
@@ -91,11 +176,15 @@
   white-space: nowrap;
 }
 
+.toolbarContent::-webkit-scrollbar {
+  display: none;
+}
+
 // Font buttons
 .fontList {
   display: flex;
   gap: 12px;
-  padding-bottom: 8px;
+  height: 2rem;
 }
 
 .fontButton {
@@ -121,24 +210,39 @@
 // Color picker
 .colorGrid {
   display: flex;
-  gap: 14px;
+  gap: 16px;
+  padding: 8px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  // Optional: smooth scrolling
+  scroll-behavior: smooth;
+}
+
+.colorGrid::-webkit-scrollbar {
+  display: none;
 }
 
 .colorButton {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  border: 4px solid transparent;
+  flex: 0 0 72px; // Fixed square size
+  width: 70px;
+  height: 55px;
+  border-radius: 10px;
+  border: 5px solid transparent;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    transform: scale(1.15);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
   }
 
   &.active {
     border-color: #007aff;
     transform: scale(1.15);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.25);
+    z-index: 10;
   }
 }
 
@@ -159,6 +263,7 @@
   font-size: 15px;
   cursor: pointer;
   transition: all 0.2s;
+  padding: 1rem;
 
   &:hover {
     background: #e5e5e5;
@@ -176,9 +281,9 @@
   left: 50%;
   bottom: 32px;
   transform: translateX(-50%);
-  background: #007aff;
+  background: #ff6b00;
   color: white;
-  padding: 16px 32px;
+  padding: 10px 32px;
   border-radius: 50px;
   border: none;
   font-size: 16px;
@@ -189,7 +294,7 @@
   transition: all 0.2s;
 
   &:hover {
-    background: #0060df;
+    background: #de620a;
     transform: translateX(-50%) translateY(-2px);
     box-shadow: 0 15px 30px rgba(0, 122, 255, 0.4);
   }

@@ -2,22 +2,25 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { nanoid } from "nanoid";
 import { Plus, Minus, Heart } from "lucide-react";
 import Image from "next/image";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Cookies from "js-cookie";
 
 import styles from "./ProductDetails.module.scss";
 import CanvasEditor from "@/component/CanvasEditor/CanvasEditor";
 import api from "@/axiosInstance/axiosInstance";
+import AddToBagLoader from "@/component/AddToBagLoader/AddToBagLoader";
+import DynamicModal from "@/component/Modal/Modal";
+import ProductDetailsShimmer from "@/component/ProductDetailsShimmer/ProductDetailsShimmer";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);  // initially true
   const [activeSection, setActiveSection] = useState(null);
   const [designPng, setDesignPng] = useState("");
   const [printingImg, setPrintingImg] = useState({
@@ -26,15 +29,15 @@ const ProductDetails = () => {
     printText: "",
     fontSize: "",
   });
+  const [loader, setLoader] = useState(false);
 
-  console.log(product,"jjshshsbvvvc")
-
+  const accessToken = Cookies.get("idToken");
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
+  // ---- Fetch product ----
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        setLoading(true);
         const res = await api.get(`/v2/product/${id}`, {
           headers: {
             "x-api-key":
@@ -49,10 +52,22 @@ const ProductDetails = () => {
         setLoading(false);
       }
     };
+
     if (id) fetchProduct();
   }, [id, apiUrl]);
 
+  // ---- Shimmer Loader ----
+if (loading && !product) {
+  return <ProductDetailsShimmer />;
+}
+
+  // ---- Add to Cart ----
   const addToCart = async () => {
+    if (!accessToken) {
+      toast.warning("Please login to Add to Cart");
+      return;
+    }
+
     if (product?.configuration?.length > 0 && !selectedSize) {
       toast.warning("Please select a size.");
       return;
@@ -77,14 +92,12 @@ const ProductDetails = () => {
       },
       options: [
         {
-          id: "",
           label: "Size",
           value: "size",
           options:
             product.configuration?.[0]?.options
               ?.filter((opt) => opt.value === selectedSize)
               .map((opt) => ({
-                id: "",
                 label: opt.label,
                 value: opt.value,
                 options: opt.options || [],
@@ -96,55 +109,58 @@ const ProductDetails = () => {
     };
 
     try {
+      setLoader(true);
       setLoading(true);
       const res = await api.post(`${apiUrl}/v1/cart`, payload, {
         headers: {
+          Authorization: `Bearer ${accessToken}`,
           "x-api-key":
             "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
         },
       });
+
       if (res.status === 200) toast.success("Added to bag!");
     } catch (err) {
       console.error("❌ Error adding to cart:", err);
       toast.error(err?.response?.data?.message || "Failed to add to bag");
     } finally {
       setLoading(false);
+      setLoader(false);
     }
   };
 
+  // ---- Wishlist ----
   const addToWishlist = async () => {
+    if (!accessToken) {
+      toast.warning("Please login to Add to Wishlist");
+      return;
+    }
+
     try {
       const res = await api.post(
         `${apiUrl}/v2/wishlist`,
         { productId: product.id },
         {
           headers: {
+            Authorization: `Bearer ${accessToken}`,
             "x-api-key":
               "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
           },
         }
       );
+
       if (res.status === 200) toast.success("Added to wishlist!");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to add to wishlist");
     }
   };
 
-  const handleDesignChange = (designDataURL) => {
-    setDesignPng(designDataURL);
-  };
-
-  if (loading && !product) {
-    return (
-      <div className={styles.shimmerWrapper}>
-        <div className={styles.shimmer}></div>
-      </div>
-    );
-  }
-
+  const handleDesignChange = (designDataURL) => setDesignPng(designDataURL);
+  console.log(product,"xxxxx")
   return (
     <div className={styles.container}>
       <ToastContainer position="top-right" autoClose={2000} />
+
       {product?.isCustomizable ? (
         <CanvasEditor
           product={product}
@@ -152,13 +168,15 @@ const ProductDetails = () => {
           setPrintingImg={setPrintingImg}
         />
       ) : (
+        <div style={{marginBottom:"14rem"}}>
         <Image
-          src={product?.canvasImage}
+          src={product?.productImages[0]}
           alt="product"
           width={500}
           height={600}
           className={styles.mainImage}
         />
+        </div>
       )}
 
       <div className={styles.infoSection}>
@@ -168,9 +186,7 @@ const ProductDetails = () => {
         <div className={styles.priceSection}>
           {product?.discountedPrice ? (
             <>
-              <p className={styles.discountedPrice}>
-                ₹ {product?.discountedPrice}
-              </p>
+              <p className={styles.discountedPrice}>₹ {product?.discountedPrice}</p>
               <p className={styles.basePrice}>₹ {product?.basePrice}</p>
             </>
           ) : (
@@ -198,47 +214,20 @@ const ProductDetails = () => {
         )}
 
         <div className={styles.buttonsWrapper}>
-          <button
-            className={styles.addToCart}
-            onClick={addToCart}
-            disabled={loading}
-          >
+          <button className={styles.addToCart} onClick={addToCart} disabled={loading}>
             {loading ? "ADDING..." : "ADD TO BAG"}
           </button>
+
           <button className={styles.addToWishlist} onClick={addToWishlist}>
             <Heart size={18} style={{ marginRight: "6px" }} />
             WISHLIST
           </button>
         </div>
-
-        <div className={styles.accordion}>
-          {[
-            { title: "DETAILS", content: product?.description },
-            { title: "CARE", content: product?.care },
-          ].map((sec) => (
-            <div key={sec.title} className={styles.accordionItem}>
-              <div
-                className={styles.accordionHeader}
-                onClick={() =>
-                  setActiveSection(
-                    activeSection === sec.title ? null : sec.title
-                  )
-                }
-              >
-                <h3>{sec.title}</h3>
-                {activeSection === sec.title ? <Minus /> : <Plus />}
-              </div>
-              <div
-                className={`${styles.accordionContent} ${
-                  activeSection === sec.title ? styles.active : ""
-                }`}
-              >
-                <p>{sec.content || "No information available."}</p>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
+
+      <DynamicModal open={loader} onClose={() => setLoader(false)}>
+        <AddToBagLoader />
+      </DynamicModal>
     </div>
   );
 };

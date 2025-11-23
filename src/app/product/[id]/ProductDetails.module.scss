@@ -1,26 +1,40 @@
 .container {
   display: flex;
+
   gap: 3rem;
   padding: 2rem 4rem;
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-
-  @media (max-width: 1200px) {
-    padding: 2rem 3rem;
-    gap: 2rem;
-  }
-
-  @media (max-width: 992px) {
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
-    padding: 2rem;
-  }
-
+  overflow: hidden;
   @media (max-width: 600px) {
-    padding: 1.5rem;
-    gap: 1.5rem;
+    padding: 1.1rem;
+  }
+}
+
+.pageShimmerWrapper {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.pageShimmerBox {
+  height: 120px;
+  background: linear-gradient(90deg, #eeeeee 25%, #dddddd 50%, #eeeeee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 12px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }
 
@@ -42,16 +56,29 @@
     @media (max-width: 768px) {
       max-width: 100%;
     }
+    @media screen and (max-width: 330px) {
+      min-width: 100%;
+    }
   }
 }
 
 /* INFO SECTION */
 .infoSection {
   flex: 1;
-  min-width: 320px;
+  min-width: 300px;
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+
+  @media screen and (max-width: 700px) {
+    margin-top: -100px;
+  }
+  @media screen and (max-width: 450px) {
+    margin-top: -250px;
+  }
+  @media screen and (max-width: 330px) {
+    min-width: 100%;
+  }
 
   h1 {
     font-size: 2rem;
@@ -108,6 +135,7 @@
       font-weight: bold;
       margin-top: 0.5rem;
     }
+
   }
 
   /* Size Selection */
@@ -163,7 +191,6 @@
     display: flex;
     gap: 1rem;
     margin-top: 1.5rem;
-    
 
     @media (max-width: 600px) {
       flex-direction: column;
@@ -187,7 +214,7 @@
 
     &:hover {
       background: #dfd7d1;
-      border: none
+      border: none;
     }
 
     @media (max-width: 480px) {
@@ -278,37 +305,37 @@
   }
 
   /* Shimmer loader */
-.shimmerWrapper {
-  width: 100%;
-  height: 500px;
-  background: #f6f0ec;
-  position: relative;
-  overflow: hidden;
-  border-radius: 10px;
-}
-
-.shimmer {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    #f6f0ec 0%,
-    #ffe1b3 50%,
-    #f6f0ec 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
+  .shimmerWrapper {
+    width: 100%;
+    height: 500px;
+    background: #f6f0ec;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
   }
-  100% {
-    background-position: 200% 0;
+
+  .shimmer {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #f6f0ec 0%, #ffe1b3 50%, #f6f0ec 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
   }
 }
+
+@media screen and (max-width:600px){
+  .priceSection{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
-
-
-

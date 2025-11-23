@@ -46,6 +46,28 @@
     }
   }
 
+  .iconWrapper {
+  position: relative; // needed for absolute badge positioning
+}
+
+.cartCount {
+  position: absolute;
+  top: -12px;
+  right: -10px;
+  background-color: #e67e22; // orange
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  pointer-events: none;
+}
+
+
   .hamburger {
     display: none;
     cursor: pointer;

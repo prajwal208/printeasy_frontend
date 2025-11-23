@@ -18,10 +18,13 @@ import LoginForm from "@/features/signup/LogIn/LoginForm";
 import Logout from "@/features/signup/Logout/Logout";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import axios from "axios";
+import api from "@/axiosInstance/axiosInstance";
 
 const Navbar = () => {
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [count, setCount] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
@@ -83,6 +86,21 @@ const Navbar = () => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [menuOpen]);
 
+  const getCartCount = async () => {
+    const res = await api.get("/v1/cart/count", {
+      headers: {
+        "x-api-key":
+          "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+      },
+    });
+    setCount(res?.data?.data?.count);
+    console.log(res?.data?.data?.count, "ooiiyyetrer");
+  };
+
+  useEffect(() => {
+    getCartCount();
+  }, []);
+
   return (
     <>
       <nav className={styles.nav}>
@@ -111,13 +129,20 @@ const Navbar = () => {
           </li>
 
           {/* Other nav items */}
+          {/* Other nav items */}
           {navItems.map(({ icon: Icon, label, link }, index) => (
             <li
               key={index}
               onClick={() => handleIconClick(label, link)}
               className={styles.iconItem}
             >
-              <Icon size={20} />
+              <div className={styles.iconWrapper}>
+                <Icon size={20} />
+                {/* Show count only for cart */}
+                {label === "Cart" && count > 0 && (
+                  <span className={styles.cartCount}>{count}</span>
+                )}
+              </div>
               <span>{label}</span>
             </li>
           ))}
