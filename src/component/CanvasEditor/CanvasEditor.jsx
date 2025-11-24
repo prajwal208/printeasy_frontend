@@ -401,97 +401,107 @@ export default function CanvasEditor({ product, setPrintingImg }) {
         className={styles.canvas}
       />
 
-      {isEditing ? (
-  <div className={styles.floatingToolbar}>
-    {/* Font Size Button */}
-    <button
-      onClick={() => setActiveTab(activeTab === "size" ? null : "size")}
-      className={`${styles.toolButton} ${activeTab === "size" ? styles.activeTool : ""}`}
-    >
-      <span className={styles.iconAa}>Aa</span>
-      <span className={styles.toolLabel}>Font Size</span>
-    </button>
-
-    {/* Color Button */}
-    <button
-      onClick={() => setActiveTab(activeTab === "color" ? null : "color")}
-      className={`${styles.toolButton} ${activeTab === "color" ? styles.activeTool : ""}`}
-    >
-      <span className={styles.iconColorA}>A</span>
-      <span className={styles.toolLabel}>Colour</span>
-    </button>
-
-    {/* Font Family Button */}
-    <button
-      onClick={() => setActiveTab(activeTab === "font" ? null : "font")}
-      className={`${styles.toolButton} ${activeTab === "font" ? styles.activeTool : ""}`}
-    >
-      <span className={styles.iconF}>f</span>
-      <span className={styles.toolLabel}>Fonts</span>
-    </button>
-
-    {/* Keyboard Icon (just visual, no function needed) */}
-    <div className={styles.toolButton}>
-      <span className={styles.iconKeyboard}>⌨</span>
-      <span className={styles.toolLabel}>Edit</span>
-    </div>
-
-    {/* Close Button */}
-    <button onClick={() => setIsEditing(false)} className={styles.closeToolbarBtn}>
-      ×
-    </button>
-
-    {/* Inline Options Panel - shows based on activeTab */}
-    <div className={styles.optionsPanel}>
-      {activeTab === "font" && (
-        <div className={styles.fontOptions}>
-          {FONTS.map((fontName) => {
-            const mapped = fontMap[fontName] || fontName;
-            const isActive = selectedFont === mapped;
-            return (
-              <button
-                key={fontName}
-                onClick={() => onFontSelect(fontName)}
-                className={`${styles.fontOption} ${isActive ? styles.activeFont : ""}`}
-                style={{ fontFamily: `'${mapped}', cursive` }}
-              >
-                {fontName}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {activeTab === "color" && (
-        <div className={styles.colorOptions}>
-          {COLORS.map((c) => (
+      {isEditing && (
+        <div className={styles.toolbar}>
+          <div className={styles.toolbarTabs}>
             <button
-              key={c}
-              onClick={() => onColorSelect(c)}
-              className={`${styles.colorSwatch} ${selectedColor === c ? styles.activeColor : ""}`}
-              style={{ backgroundColor: c }}
-            />
-          ))}
-        </div>
-      )}
-
-      {activeTab === "size" && (
-        <div className={styles.sizeOptions}>
-          {SIZES.map((s) => (
-            <button
-              key={s}
-              onClick={() => onSizeSelect(s)}
-              className={`${styles.sizeBtn} ${selectedSize === s ? styles.activeSize : ""}`}
+              onClick={() => setActiveTab("font")}
+              className={`${styles.tabButton} ${
+                activeTab === "font" ? styles.active : ""
+              }`}
             >
-              {s}
+              Font
             </button>
-          ))}
+            <button
+              onClick={() => setActiveTab("color")}
+              className={`${styles.tabButton} ${
+                activeTab === "color" ? styles.active : ""
+              } ${styles.colorTab}`}
+            >
+              <span
+                className={styles.colorPreview}
+                style={{ backgroundColor: selectedColor }}
+              />
+              Color
+            </button>
+            <button
+              onClick={() => setActiveTab("size")}
+              className={`${styles.tabButton} ${
+                activeTab === "size" ? styles.active : ""
+              }`}
+            >
+              Size
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              className={styles.closeButton}
+            >
+              ×
+            </button>
+          </div>
+
+          <div className={styles.toolbarContent}>
+            {activeTab === "font" && (
+              <div className={styles.fontList}>
+                {FONTS.map((fontName) => {
+                  const mapped = fontMap[fontName] || fontName;
+                  return (
+                    <div key={fontName} className="font-item">
+                      <p
+                        onClick={() => onFontSelect(fontName)}
+                        style={{
+                          fontFamily: `'${mapped}', cursive`,
+                          fontSize: "0.875rem",
+                          cursor: "pointer",
+                          opacity: selectedFont === mapped ? 1 : 0.9,
+                          fontWeight: selectedFont === mapped ? 600 : 400,
+                        }}
+                      >
+                        {fontName}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {activeTab === "color" && (
+              <div className={styles.colorGrid}>
+                {COLORS.map((c) => (
+                  <div
+                    key={c}
+                    style={{ backgroundColor: c }}
+                    onClick={() => onColorSelect(c)}
+                    className={`${styles.colorButton} ${
+                      selectedColor === c ? styles.active : ""
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {activeTab === "size" && (
+              <div className={styles.sizeGrid}>
+                {SIZES.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => onSizeSelect(s)}
+                    className={`${styles.sizeButton} ${
+                      selectedSize === s ? styles.active : ""
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
-    </div>
-  </div>
-) : (
-  <button onClick={() => {
+
+      {!isEditing && (
+        <button
+          onClick={() => {
             const canvas = fabricCanvasRef.current;
             const text = canvas?.getObjects().find((o) => o.type === "textbox");
             if (text) {
@@ -501,10 +511,12 @@ export default function CanvasEditor({ product, setPrintingImg }) {
               activeTextRef.current = text;
               setIsEditing(true);
             }
-          }} className={styles.editButton}>
-    Edit Text
-  </button>
-)}
+          }}
+          className={styles.editButton}
+        >
+          Edit Text
+        </button>
+      )}
     </div>
   );
 }

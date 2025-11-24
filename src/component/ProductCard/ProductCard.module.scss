@@ -75,3 +75,18 @@
 
   
 }
+
+
+
+@media screen and (max-width:760px){
+  .card {
+  width: 176px;
+  padding-bottom: 0;
+
+  .imageContainer{
+    height: 282px;
+  }
+
+  
+}
+}

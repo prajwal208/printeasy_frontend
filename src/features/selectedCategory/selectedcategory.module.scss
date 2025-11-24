@@ -7,3 +7,12 @@
   margin-bottom: 2rem;
   padding: 2rem;
 }
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+  .cardGrid {
+    grid-template-columns: repeat(2, 1fr);   /* 🔥 Two items per row */
+    gap: 0;
+    padding: 0;
+  }
+}

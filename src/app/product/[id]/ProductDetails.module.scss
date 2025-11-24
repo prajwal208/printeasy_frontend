@@ -30,13 +30,10 @@
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+  0% { background-position: 200% 0 }
+  100% { background-position: -200% 0 }
 }
+
 
 /* IMAGE OR CANVAS SECTION */
 .imageSection {
@@ -135,7 +132,6 @@
       font-weight: bold;
       margin-top: 0.5rem;
     }
-
   }
 
   /* Size Selection */
@@ -329,13 +325,5 @@
     100% {
       background-position: 200% 0;
     }
-  }
-}
-
-@media screen and (max-width:600px){
-  .priceSection{
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 }

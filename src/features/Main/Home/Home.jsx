@@ -8,6 +8,8 @@ import HeroWords from "../HeroWords/HeroWords";
 import ProductSection from "../ProductSection/ProductSection";
 import OfferMarquee from "@/component/OfferMarquee/OfferMarquee";
 
+import styles from "./home.module.scss";
+
 const Home = () => {
   const [showOffer, setShowOffer] = useState(false);
 
@@ -19,9 +21,12 @@ const Home = () => {
   }, []);
 
   return (
-    <main>
-      {showOffer && <OfferMarquee />}
-      <CustomCarousel />
+    <main className={styles.homeContainer}>
+      <div className={styles.offerCarouselWrapper}>
+        {showOffer && <OfferMarquee />}
+        <CustomCarousel />
+      </div>
+
       <CategoryGrid />
       <HeroWords />
       <ProductSection />

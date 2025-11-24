@@ -156,7 +156,7 @@ if (loading && !product) {
   };
 
   const handleDesignChange = (designDataURL) => setDesignPng(designDataURL);
-  console.log(product,"xxxxx")
+
   return (
     <div className={styles.container}>
       <ToastContainer position="top-right" autoClose={2000} />
@@ -168,15 +168,13 @@ if (loading && !product) {
           setPrintingImg={setPrintingImg}
         />
       ) : (
-        <div style={{marginBottom:"14rem"}}>
         <Image
-          src={product?.productImages[0]}
+          src={product?.canvasImage}
           alt="product"
           width={500}
           height={600}
           className={styles.mainImage}
         />
-        </div>
       )}
 
       <div className={styles.infoSection}>

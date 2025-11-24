@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 const CategoryGrid = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true); // 🔹 loader state
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   const getData = async () => {

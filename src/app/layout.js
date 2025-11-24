@@ -18,7 +18,9 @@ export default function RootLayout({ children }) {
         <link src="https://checkout.razorpay.com/v1/checkout.js"></link>
       </head>
       <body>
-        <Navbar />
+         <div className="navbar-wrapper">
+    <Navbar />
+  </div>
         {children}
         <Footer />
       </body>

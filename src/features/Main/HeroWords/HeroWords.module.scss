@@ -52,3 +52,12 @@
     transform: translateY(5px) rotate(-1deg);
   }
 }
+
+
+@media screen and (max-width:760px){
+  .heroword_main_wrap{
+    h1{
+      font-size: 1.3rem;
+    }
+  }
+}

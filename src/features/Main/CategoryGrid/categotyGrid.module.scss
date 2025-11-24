@@ -20,7 +20,7 @@
   .skeletonCard {
     height: 300px;
     border-radius: 8px;
-    background: #ffe0b2; /* light orange base */
+    background: #ffe0b2; // light orange base
     position: relative;
     overflow: hidden;
 
@@ -47,6 +47,46 @@
     }
     100% {
       transform: translateX(100%);
+    }
+  }
+
+  /* ---------- MOBILE VIEW (Force 3 columns) ---------- */
+  @media (max-width: 768px) {
+    .featured_categories{
+      margin-top: 1rem !important;
+
+      h3{
+        margin-top:0 I !important;
+      }
+    }
+
+    .gridWrapper {
+      grid-template-columns: repeat(3, 1fr); // Always 3
+      gap: 0.8rem; // Reduced gap
+      padding: 1rem 0.5rem;
+    }
+
+    .skeletonCard {
+      height: 120px; // Reduce height for mobile
+    }
+  }
+
+  @media (max-width: 480px) {
+    .featured_categories{
+      margin-top: 1rem !important;
+
+      h3{
+        margin-top:0 I !important;
+      }
+    }
+    
+    .gridWrapper {
+      grid-template-columns: repeat(3, 1fr); // Still 3 columns
+      gap: 0.5rem;
+    }
+
+    .skeletonCard {
+      height: 100px;
     }
   }
 }
