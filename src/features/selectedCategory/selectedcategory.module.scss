@@ -8,11 +8,19 @@
   padding: 2rem;
 }
 
+.mobileHeader {
+  display: none;
+}
+
 /* Mobile Layout */
 @media (max-width: 768px) {
   .cardGrid {
-    grid-template-columns: repeat(2, 1fr);   /* 🔥 Two items per row */
+    grid-template-columns: repeat(2, 1fr); 
     gap: 0;
     padding: 0;
+  }
+
+  .mobileHeader {
+    display: block;
   }
 }

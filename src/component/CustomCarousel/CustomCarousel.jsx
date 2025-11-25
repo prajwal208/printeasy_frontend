@@ -165,7 +165,7 @@ const CustomCarousel = () => {
                         <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
                         <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                       </svg>
-                      <input type="text" placeholder="Search" className={styles.searchInput}/>
+                      <input type="text" placeholder="Search" className={styles.searchInput} onClick={() => router.push('/search')}/>
                     </div>
 
                     {/* Cart Icon */}

@@ -9,67 +9,101 @@ import api from "@/axiosInstance/axiosInstance";
 const ProductSection = () => {
   const [categoryList, setCategoryList] = useState([]);
   const [product, setProduct] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("aZRFftKgh2F1UedB02Uv");
+  const [filter,setFilter]= useState([])
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  const getSubCategoriesList = async () => {
-    try {
-      const res = await api.get(
-        `/v1/categories/H8SZ4VfsFXa4C9cUeonB/subcategories`,
-        {
-          headers: {
-            "x-api-key":
-              "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-          },
-        }
-      );
 
-      const fetchedCategories = res?.data?.data || [];
-      setCategoryList([{ id: "All", name: "All" }, ...fetchedCategories]);
-    } catch (error) {
-      console.error("Error fetching subcategories:", error);
+  console.log(categoryList,"sjsjuueterwwwxxx")
+
+  // const getSubCategoriesList = async () => {
+  //   try {
+  //     const res = await api.get(
+  //       `/v1/categories/H8SZ4VfsFXa4C9cUeonB/subcategories`,
+  //       {
+  //         headers: {
+  //           "x-api-key":
+  //             "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+  //         },
+  //       }
+  //     );
+
+  //     const fetchedCategories = res?.data?.data || [];
+  //     setCategoryList([{ id: "All", name: "All" }, ...fetchedCategories]);
+  //   } catch (error) {
+  //     console.error("Error fetching subcategories:", error);
+  //   }
+  // };
+
+  const getData = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/v1/categories/all`, {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      });
+      setFilter(res?.data?.data?.[0].collections || []);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    } finally {
+      setLoading(false); // 🔹 stop loader
     }
   };
 
-  const getProductList = async () => {
-    try {
-      const res = await api.get(
-        `/v2/product/category/H8SZ4VfsFXa4C9cUeonB`,
-        {
-          headers: {
-            "x-api-key":
-              "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-          },
-        }
-      );
-      setProduct(res?.data?.data || []);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
+
+  const getCategoryListData = async (id) => {
+    const res = await api.get(
+      `${apiUrl}/v2/product/collections?categoryId=H8SZ4VfsFXa4C9cUeonB&identifier=${id ? id :"aZRFftKgh2F1UedB02Uv"}`,
+      {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      }
+    );
+    setCategoryList(res?.data?.data);
+    console.log(res, "sjsjshyyy");
   };
+
+  // const getProductList = async () => {
+  //   try {
+  //     const res = await api.get(
+  //       `/v2/product/category/H8SZ4VfsFXa4C9cUeonB`,
+  //       {
+  //         headers: {
+  //           "x-api-key":
+  //             "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+  //         },
+  //       }
+  //     );
+  //     setProduct(res?.data?.data || []);
+  //   } catch (error) {
+  //     console.error("Error fetching products:", error);
+  //   }
+  // };
 
   useEffect(() => {
-    getSubCategoriesList();
-    getProductList();
+    // getSubCategoriesList();
+    // getProductList();
+    getData();
+    getCategoryListData();
   }, []);
-
-  const filteredProducts =
-    selectedCategory === "All"
-      ? product
-      : product.filter((p) => p.subcategoryId === selectedCategory);
 
   return (
     <div className={styles.wrapper}>
       <h2 className={styles.heading}>NEW AND POPULAR</h2>
 
       <div className={styles.filters}>
-        {categoryList.map((cat) => (
+        {filter?.map((cat) => (
           <button
             key={cat.id}
             className={`${styles.filterBtn} ${
               selectedCategory === cat.id ? styles.active : ""
             }`}
-            onClick={() => setSelectedCategory(cat.id)}
+            onClick={() => {getCategoryListData(cat.id)
+              setSelectedCategory(cat?.id)
+            }}
           >
             {cat?.name}
           </button>
@@ -77,8 +111,8 @@ const ProductSection = () => {
       </div>
 
       <div className={styles.cardGrid}>
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((item) => (
+        {categoryList?.length > 0 ? (
+          categoryList?.map((item) => (
             <ProductCard key={item.id} item={item} />
           ))
         ) : (

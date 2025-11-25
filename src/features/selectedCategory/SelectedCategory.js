@@ -5,12 +5,13 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import ProductCard from "@/component/ProductCard/ProductCard";
 import api from "@/axiosInstance/axiosInstance";
+import Header from "@/component/header/Header";
 
 const SelectedCategory = () => {
   const [categoryList, setCategoryList] = useState([]);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const { slug } = useParams();
-  console.log(slug, "sjsjsjsjuuu");
+  
   const getCategoryListData = async () => {
     const res = await api.get(
       `${apiUrl}/v2/product/collections?categoryId=H8SZ4VfsFXa4C9cUeonB&identifier=${slug}`,
@@ -22,7 +23,6 @@ const SelectedCategory = () => {
       }
     );
     setCategoryList(res?.data?.data);
-    console.log(res, "sjsjshyyy");
   };
 
   useEffect(() => {
@@ -31,10 +31,15 @@ const SelectedCategory = () => {
 
   return (
     <>
+      {/* Visible only on mobile */}
+      <div className={styles.mobileHeader}>
+        <Header />
+      </div>
+
       <div className={styles.cardGrid}>
-        {categoryList?.map((item) => {
-          return <ProductCard item={item} />;
-        })}
+        {categoryList?.map((item) => (
+          <ProductCard key={item.id} item={item} />
+        ))}
       </div>
     </>
   );

@@ -12,6 +12,8 @@ const CategoryGrid = () => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  console.log(categories,"shshuueyrtrerxxx")
+
   const getData = async () => {
     try {
       const res = await axios.get(`${apiUrl}/v1/categories/all`, {
@@ -32,8 +34,9 @@ const CategoryGrid = () => {
     getData();
   }, []);
 
-  const handleCardClick = (id) => {
+  const handleCardClick = (id,name) => {
     router.push(`/selectedcategory/${id}`);
+    localStorage.setItem("name",name)
   };
 
   // Number of skeleton cards to show
@@ -48,7 +51,7 @@ const CategoryGrid = () => {
               <div key={i} className={styles.skeletonCard}></div>
             ))
           : categories.map((item) => (
-              <div key={item?.id} onClick={() => handleCardClick(item?.id)}>
+              <div key={item?.id} onClick={() => handleCardClick(item?.id,item?.name)}>
                 <CategoryCard image={item.image} title={item.name} />
               </div>
             ))}

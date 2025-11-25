@@ -1,57 +1,41 @@
-// CanvasEditor.module.scss
 @import url("https://fonts.cdnfonts.com/css/the-wild-one");
 @import url("https://fonts.cdnfonts.com/css/sweet-dreams");
 @import url("https://fonts.cdnfonts.com/css/summershine");
 @import url("https://fonts.cdnfonts.com/css/pink-rose");
 @import url("https://fonts.cdnfonts.com/css/rainbow-dreams");
-
-// Meanwhile (close match: CC Meanwhile - use for handwritten style)
 @import url("https://fonts.cdnfonts.com/css/cc-meanwhile");
-
-// Monkey (exact match)
 @import url("https://fonts.cdnfonts.com/css/monkey-2");
-
-// MoreLove (exact match)
 @import url("https://fonts.cdnfonts.com/css/morelove");
-
-// Reality (exact match)
 @import url("https://fonts.cdnfonts.com/css/reality");
-
-// Scramble (close match: Scramble Storm)
 @import url("https://fonts.cdnfonts.com/css/scramble-storm");
-
-// Somekind (no exact; use Indie Flower from Google as fallback)
 @import url("https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap");
-
-// SourSlushy (no match; use local TTF)
-
-// Sunlight (exact match)
 @import url("https://fonts.cdnfonts.com/css/sunlight");
+@import url("https://fonts.cdnfonts.com/css/asteroid-type");
+@import url("https://fonts.cdnfonts.com/css/beachside");
+@import url("https://fonts.cdnfonts.com/css/cakepop");
+@import url("https://fonts.cdnfonts.com/css/california");
+@import url("https://fonts.cdnfonts.com/css/firefly");
+@import url("https://fonts.cdnfonts.com/css/forever");
+@import url("https://fonts.cdnfonts.com/css/freshlemonade");
+@import url("https://fonts.cdnfonts.com/css/frozen");
+@import url("https://fonts.cdnfonts.com/css/heysugar");
+@import url("https://fonts.cdnfonts.com/css/honey");
+@import url("https://fonts.cdnfonts.com/css/honeycomb");
+@import url("https://fonts.cdnfonts.com/css/honeycomb-script-personal-use");
+@import url("https://fonts.cdnfonts.com/css/ice-cream-cake");
+@import url("https://fonts.cdnfonts.com/css/jade-skies");
+@import url("https://fonts.cdnfonts.com/css/joyful");
+@import url("https://fonts.cdnfonts.com/css/sexy-love-hearts");
+@import url("https://fonts.cdnfonts.com/css/love-vibes");
+@import url("https://fonts.cdnfonts.com/css/love-and-honey");
+@import url("https://fonts.cdnfonts.com/css/thinker");
+@import url("https://fonts.cdnfonts.com/css/thinker-historic");
+@import url("https://fonts.cdnfonts.com/css/tigerland");
+@import url("https://fonts.cdnfonts.com/css/tigerlily");
 
-// All other fonts from your list with CDN matches:
-@import url("https://fonts.cdnfonts.com/css/asteroid-type"); // Asteroid (close)
-@import url("https://fonts.cdnfonts.com/css/beachside"); // Beachside (exact, from search)
-@import url("https://fonts.cdnfonts.com/css/cakepop"); // Cakepop (exact)
-@import url("https://fonts.cdnfonts.com/css/california"); // California (exact)
-@import url("https://fonts.cdnfonts.com/css/firefly"); // Firefly (exact)
-@import url("https://fonts.cdnfonts.com/css/forever"); // Forever (exact)
-@import url("https://fonts.cdnfonts.com/css/freshlemonade"); // FreshLemonade (exact)
-@import url("https://fonts.cdnfonts.com/css/frozen"); // Frozen (exact)
-@import url("https://fonts.cdnfonts.com/css/heysugar"); // HeySugar (exact)
-@import url("https://fonts.cdnfonts.com/css/honey"); // Honey (exact)
-@import url("https://fonts.cdnfonts.com/css/honeycomb"); // Honeycomb (exact)
-@import url("https://fonts.cdnfonts.com/css/honeycomb-script-personal-use"); // However (no exact; skip or local)
-@import url("https://fonts.cdnfonts.com/css/ice-cream-cake"); // IceCream (close: Ice Cream Cake)
-@import url("https://fonts.cdnfonts.com/css/jade-skies"); // Jade Skies (exact)
-@import url("https://fonts.cdnfonts.com/css/joyful"); // Joyful (exact)
-@import url("https://fonts.cdnfonts.com/css/sexy-love-hearts"); // Love Hearts (close: Sexy Love Hearts)
-@import url("https://fonts.cdnfonts.com/css/love-vibes"); // Love Vibes (exact)
-@import url("https://fonts.cdnfonts.com/css/love-and-honey"); // LoveAndHoney (exact)
-@import url("https://fonts.cdnfonts.com/css/thinker"); // Thinker (exact)
-@import url("https://fonts.cdnfonts.com/css/thinker-historic"); // Thoughtful (close: Thinker Historic)
-@import url("https://fonts.cdnfonts.com/css/tigerland"); // TigerLand (exact)
-@import url("https://fonts.cdnfonts.com/css/tigerlily"); // Tigerlily (exact)
-
+// ──────────────────────────────
+// Layout
+// ──────────────────────────────
 .editorWrapper {
   position: relative;
   width: fit-content;
@@ -69,212 +53,203 @@
     right: 20px !important;
     left: 20px !important;
   }
-  @media screen and (max-width: 490px) {
-    width: 70% !important;
-  }
-  @media screen and (max-width: 440px) {
-    width: 60% !important;
-    height: 60% !important;
-  }
-  @media screen and (max-width: 420px) {
-    width: 55% !important;
-  }
-  @media screen and (max-width: 330px) {
-    width: 50% !important;
-  }
-  @media screen and (max-width: 310px) {
-    width: 48% !important;
-  }
+  @media screen and (max-width: 490px) { width: 70% !important; }
+  @media screen and (max-width: 440px) { width: 60% !important; height: 60% !important; }
+  @media screen and (max-width: 420px) { width: 55% !important; }
+  @media screen and (max-width: 330px) { width: 50% !important; }
+  @media screen and (max-width: 310px) { width: 48% !important; }
 }
 
-// ——— Floating Toolbar ———
-.toolbar {
+// ──────────────────────────────
+// Main Floating Toolbar (Always visible)
+// ──────────────────────────────
+.floatingToolbar {
   position: fixed;
   left: 50%;
   bottom: 32px;
   transform: translateX(-50%);
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e5e5e5;
-  overflow: hidden;
-  z-index: 1000;
-  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-
-  @media screen and (max-width: 330px) {
-    width: 95%;
-  }
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateX(-50%) translateY(40px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-  }
-}
-
-.toolbarTabs {
-  display: flex;
-  border-bottom: 1px solid #eee;
-}
-
-.tabButton {
+  background: #fdf1e4;
+  border-radius: 50px;
   padding: 14px 24px;
-  font-size: 14px;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 2px solid #ffe0c2;
+  z-index: 1000;
+  animation: slideUp 0.4s ease;
+
+  @media (max-width: 480px) {
+    gap: 18px;
+    padding: 16px;
+    justify-content: center;
+  }
+}
+
+.toolButton {
   background: none;
   border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
   cursor: pointer;
+  padding: 2px;
+  border-radius: 24px;
+  transition: all 0.25s;
 
-  transition: all 0.2s;
+  &:hover { background: rgba(255, 255, 255, 0.6); }
+  &.active { background: white; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12); }
+}
+
+.iconAa { font-size: 32px; font-weight: 900; color: #333; }
+.iconColorA {
+  font-size: 32px;
+  font-weight: 900;
+  background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.iconF { font-size: 32px; font-style: italic; font-weight: 900; color: #333; }
+.iconKeyboard { font-size: 26px; }
+
+.toolLabel {
+  font-size: 11px;
   color: #666;
-  @media screen and (max-width: 330px) {
-    padding: 10px 14px;
-  }
-  &.active {
-    color: #007aff;
-    background: #f0f7ff;
-  }
-
-  &.colorTab {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .colorPreview {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid #ccc;
-    }
-  }
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
-.closeButton {
+.closeToolbarBtn {
   margin-left: auto;
-  padding: 14px 20px;
-  font-size: 20px;
-  color: #999;
-  background: none;
+  background: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   border: none;
+  font-size: 30px;
+  color: #999;
   cursor: pointer;
-  @media screen and (max-width: 330px) {
-    padding: 10px 14px;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+
   &:hover {
-    color: #333;
+    background: #ff6b00;
+    color: white;
   }
 }
 
-.toolbarContent {
-  padding: 20px;
-  max-width: 90vw;
-  overflow-x: auto;
-  white-space: nowrap;
+// ──────────────────────────────
+// Dropdown Panel (Appears above toolbar)
+// ──────────────────────────────
+.optionsPanel {
+  position: absolute;
+  bottom: 120px;                    // Just above the toolbar
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 28px;
+  padding: 0 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+  border: 3px solid #ff8b3d;
+  z-index: 1001;
+  width: calc(100vw - 40px);       // Responsive width
+  max-width: 560px;                // Max on large screens
+  animation: popUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.5);
+
+  // Hide scrollbars everywhere inside
+  &::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-top: 16px solid white;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  }
 }
 
-.toolbarContent::-webkit-scrollbar {
-  display: none;
+// ──────────────────────────────
+// Content Grids (Responsive & No Scrollbar)
+// ──────────────────────────────
+.fontOptions,
+.colorOptions,
+.sizeOptions {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  padding: 8px 0;
+
+  // Hide scrollbar but allow scrolling
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
 }
 
 // Font buttons
-.fontList {
-  display: flex;
-  gap: 12px;
-  height: 2rem;
-}
-
-.fontButton {
-  padding: 10px 16px;
-  border-radius: 20px;
-  background: #f5f5f5;
+.fontOption {
+  background: #fff;
   border: none;
-  font-weight: 600;
+  border-radius: 24px;
   font-size: 14px;
+  white-space: nowrap;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: 0.2s;
 
-  &:hover {
-    background: #e5e5e5;
-  }
-
+  &:hover { background: #e8e8e8; }
   &.active {
-    background: #007aff;
+    background: #ff6b00;
     color: white;
   }
 }
 
-// Color picker
-.colorGrid {
-  display: flex;
-  gap: 16px;
-  padding: 8px 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  // Optional: smooth scrolling
-  scroll-behavior: smooth;
-}
-
-.colorGrid::-webkit-scrollbar {
-  display: none;
-}
-
-.colorButton {
-  flex: 0 0 72px; // Fixed square size
-  width: 70px;
-  height: 55px;
-  border-radius: 10px;
-  border: 5px solid transparent;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
-  }
-
-  &.active {
-    border-color: #007aff;
-    transform: scale(1.15);
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.25);
-    z-index: 10;
-  }
-}
-
-// Size picker
-.sizeGrid {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.sizeButton {
-  width: 48px;
-  height: 48px;
+// Color swatches
+.colorSwatch {
+  width: 52px;
+  height: 52px;
   border-radius: 16px;
-  background: #f5f5f5;
+  border: 4px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s;
+  padding:20px;
+
+  &:hover { transform: scale(1.1); }
+  &.active {
+    border-color: #ff6b00;
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.3);
+  }
+}
+
+// Size buttons
+.sizeBtn {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  background: #fff;
   border: none;
   font-weight: bold;
-  font-size: 15px;
+  font-size: 16px;
+  color: #333;
   cursor: pointer;
   transition: all 0.2s;
-
-  &:hover {
-    background: #e5e5e5;
-  }
-
-  &.active {
-    background: #007aff;
-    color: white;
-  }
 }
 
-// ——— Edit Button (when not editing) ———
+// ──────────────────────────────
+// Edit Button (when not editing)
+// ──────────────────────────────
 .editButton {
   position: fixed;
   left: 50%;
@@ -282,19 +257,50 @@
   transform: translateX(-50%);
   background: #ff6b00;
   color: white;
-  padding: 10px 32px;
+  padding: 12px 36px;
   border-radius: 50px;
   border: none;
   font-size: 16px;
   font-weight: 600;
-  box-shadow: 0 10px 25px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(255, 107, 0, 0.4);
   cursor: pointer;
   z-index: 900;
-  transition: all 0.2s;
+  transition: all 0.3s;
 
   &:hover {
-    background: #de620a;
-    transform: translateX(-50%) translateY(-2px);
-    box-shadow: 0 15px 30px rgba(0, 122, 255, 0.4);
+    background: #e55a00;
+    transform: translateX(-50%) translateY(-3px);
+  }
+}
+
+// ──────────────────────────────
+// Animations
+// ──────────────────────────────
+@keyframes slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(40px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes popUp {
+  from { opacity: 0; transform: translateX(-50%) scale(0.92) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
+}
+
+
+@media screen and (max-width:600px){
+  .toolButton {
+  padding: 5px;
+  }
+}
+
+@media screen and (max-width:400px){
+  .toolButton {
+  padding: 5px;
+  }
+}
+
+@media screen and (max-width:300px){
+  .toolButton {
+  padding: 5px;
   }
 }

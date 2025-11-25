@@ -13,11 +13,11 @@
 /* Filter Buttons */
 .filters {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; 
   gap: 1rem;
   margin-bottom: 2rem;
   overflow-x: auto;
-  padding: 0 1rem; // keeps centered on mobile
+  padding: 0 1rem;
 }
 
 .filters::-webkit-scrollbar {
@@ -55,6 +55,13 @@
   animation: fadeIn 0.5s ease;
 }
 
+.noProducts{
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  white-space: noWrap;
+  padding: 1rem;
+}
+
 /* ---------- MOBILE VIEW ---------- */
 @media screen and (max-width: 760px) {
   .wrapper {
@@ -67,19 +74,21 @@
     margin-top: 2.5rem;
   }
 
-  .filters {
-    justify-content: center;
+ .filters {
+    display: flex;
     gap: 0.6rem;
-    padding: 0 0.5rem; 
+    overflow-x: auto;
+    padding: 0 0.5rem;
     margin-bottom: 0;
-    padding-left: 2rem;
+    padding-left: 1rem;
+    justify-content: flex-start; 
   }
 
   .filterBtn {
     padding: 0.2rem 0.8rem;
     font-size: 0.8rem;
+    white-space: nowrap;
   }
-
   .cardGrid {
     grid-template-columns: repeat(2, 1fr); // Always 2 items per row
     column-gap: 0.8rem;
