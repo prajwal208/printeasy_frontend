@@ -216,10 +216,10 @@ if (loading && !product) {
             {loading ? "ADDING..." : "ADD TO BAG"}
           </button>
 
-          <button className={styles.addToWishlist} onClick={addToWishlist}>
+          {/* <button className={styles.addToWishlist} onClick={addToWishlist}>
             <Heart size={18} style={{ marginRight: "6px" }} />
             WISHLIST
-          </button>
+          </button> */}
         </div>
       </div>
 

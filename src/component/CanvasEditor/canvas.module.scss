@@ -1,3 +1,6 @@
+
+
+
 @import url("https://fonts.cdnfonts.com/css/the-wild-one");
 @import url("https://fonts.cdnfonts.com/css/sweet-dreams");
 @import url("https://fonts.cdnfonts.com/css/summershine");
@@ -33,40 +36,46 @@
 @import url("https://fonts.cdnfonts.com/css/tigerland");
 @import url("https://fonts.cdnfonts.com/css/tigerlily");
 
-// ──────────────────────────────
-// Layout
-// ──────────────────────────────
+
 .editorWrapper {
   position: relative;
   width: fit-content;
   margin: 0 auto;
+   @media (max-width: 768px) {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 .canvas {
   border: 1px solid #ddd;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  @media screen and (max-width: 708px) {
-    width: 80% !important;
-    height: 80% !important;
-    margin: 20px auto;
+
+ @media screen and (max-width: 708px) {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 auto;
     position: relative;
-    right: 20px !important;
-    left: 20px !important;
+    right: 0px !important;
+    left: 00px !important;
   }
-  @media screen and (max-width: 490px) { width: 70% !important; }
-  @media screen and (max-width: 440px) { width: 60% !important; height: 60% !important; }
-  @media screen and (max-width: 420px) { width: 55% !important; }
-  @media screen and (max-width: 330px) { width: 50% !important; }
-  @media screen and (max-width: 310px) { width: 48% !important; }
+  @media screen and (max-width: 490px) {
+    width: 100% !important;
+    margin-top: -100px;
+  }
+  @media screen and (max-width: 440px) {
+    width: 80% !important;
+    height: 600px!important;
+    // object-fit: cover;
+  }
 }
 
-// ──────────────────────────────
-// Main Floating Toolbar (Always visible)
-// ──────────────────────────────
 .floatingToolbar {
-  position: fixed;
+  position: absolute;
   left: 50%;
-  bottom: 32px;
+  bottom: 0;
   transform: translateX(-50%);
   background: #fdf1e4;
   border-radius: 50px;
@@ -74,15 +83,26 @@
   display: flex;
   align-items: center;
   gap: 28px;
+  border: 3px solid green;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   border: 2px solid #ffe0c2;
   z-index: 1000;
   animation: slideUp 0.4s ease;
-
   @media (max-width: 480px) {
     gap: 18px;
     padding: 16px;
     justify-content: center;
+
+    .floatingToolbar{
+      bottom: 100px;
+    }
+
+  }
+   @media (max-width: 440px) {
+    gap: 18px;
+    padding: 16px;
+    justify-content: center;
+      bottom: 0;
   }
 }
 
@@ -149,6 +169,7 @@
   position: absolute;
   bottom: 120px;                    // Just above the toolbar
   left: 50%;
+  border: 3px solid orange;
   transform: translateX(-50%);
   background: white;
   border-radius: 28px;
@@ -302,5 +323,132 @@
 @media screen and (max-width:300px){
   .toolButton {
   padding: 5px;
+  }
+}
+
+.mobileIconsContainer {
+  display: none; // Hidden by default (desktop)
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  width: calc(100% - 20px);
+  justify-content: flex-end;
+  align-items: flex-start;
+  z-index: 100;
+  pointer-events: none; // Allow clicks to pass through container
+  
+  @media screen and (max-width: 768px) {
+    display: flex;
+  }
+
+  @media screen and (max-width: 480px) {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    width: calc(100% - 16px);
+  }
+
+  @media screen and (max-width: 440px) {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    width: calc(100% - 10px);
+  }
+}
+
+.mobileIconLeft {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #333;
+
+  &:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @media screen and (max-width: 480px) {
+    width: 36px;
+    height: 36px;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.mobileIconsRight {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+  pointer-events: auto;
+
+  @media screen and (max-width: 480px) {
+    gap: 10px;
+  margin-right: 10px;
+  }
+  // @media screen and (max-width: 432px) {
+  //   gap: 10px;
+  // margin-right: 1px;
+  // }
+  // @media screen and (max-width: 391px) {
+  //   gap: 10px;
+  // margin-right: 120px;
+  // }
+  // @media screen and (max-width: 376px) {
+  //   gap: 10px;
+  // margin-right: 120px;
+  // }
+}
+
+.mobileIcon {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #333;
+
+  &:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @media screen and (max-width: 480px) {
+    width: 36px;
+    height: 36px;
+    
+    svg {
+      width: 18px;
+      height: 18px;
+    }
   }
 }

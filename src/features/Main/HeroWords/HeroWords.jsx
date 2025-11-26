@@ -39,7 +39,7 @@ const HeroWords = () => {
     const getNonOverlappingPosition = () => {
       let top, left;
       let tries = 0;
-      const minDistance = 80; // distance between words
+      const minDistance = 80;
 
       while (tries < 200) {
         top = Math.random() * 80;

@@ -50,7 +50,6 @@
     }
   }
 
-  /* ---------- MOBILE VIEW (Force 3 columns) ---------- */
   @media (max-width: 768px) {
     .featured_categories{
       margin-top: 1rem !important;
@@ -62,12 +61,12 @@
 
     .gridWrapper {
       grid-template-columns: repeat(3, 1fr); // Always 3
-      gap: 0.8rem; // Reduced gap
+      gap: 0.8rem;
       padding: 1rem 0.5rem;
     }
 
     .skeletonCard {
-      height: 120px; // Reduce height for mobile
+      height: 120px; 
     }
   }
 
@@ -81,7 +80,7 @@
     }
     
     .gridWrapper {
-      grid-template-columns: repeat(3, 1fr); // Still 3 columns
+      grid-template-columns: repeat(3, 1fr);
       gap: 0.5rem;
     }
 

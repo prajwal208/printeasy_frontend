@@ -10,6 +10,7 @@ const CategoryGrid = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const skeletonCount = 12;
   const router = useRouter();
 
   console.log(categories,"shshuueyrtrerxxx")
@@ -26,7 +27,7 @@ const CategoryGrid = () => {
     } catch (err) {
       console.error("Error fetching categories:", err);
     } finally {
-      setLoading(false); // 🔹 stop loader
+      setLoading(false);
     }
   };
 
@@ -39,8 +40,8 @@ const CategoryGrid = () => {
     localStorage.setItem("name",name)
   };
 
-  // Number of skeleton cards to show
-  const skeletonCount = 12;
+
+  
 
   return (
     <main className={styles.featured_categories}>

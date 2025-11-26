@@ -59,23 +59,24 @@
   }
 }
 
-/* INFO SECTION */
+
 .infoSection {
   flex: 1;
   min-width: 300px;
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  
 
-  @media screen and (max-width: 700px) {
-    margin-top: -100px;
+  // @media screen and (max-width: 700px) {
+  //   margin-top: -100px;
+  // }
+  @media screen and (max-width: 435px) {
+    margin-top: -200px;
   }
-  @media screen and (max-width: 450px) {
-    margin-top: -250px;
-  }
-  @media screen and (max-width: 330px) {
-    min-width: 100%;
-  }
+  // @media screen and (max-width: 330px) {
+  //   min-width: 100%;
+  // }
 
   h1 {
     font-size: 2rem;
@@ -231,6 +232,15 @@
     width: 100%;
     border-radius: 6px;
     letter-spacing: 0.5px;
+   
+    @media (max-width:450px) {
+      position: fixed;
+      bottom: 0;
+      z-index: 9999;
+      right: 10px;
+      left: 0px;
+      
+    }
 
     &:hover {
       background: #c55f17;
