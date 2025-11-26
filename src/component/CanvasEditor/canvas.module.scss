@@ -1,6 +1,3 @@
-
-
-
 @import url("https://fonts.cdnfonts.com/css/the-wild-one");
 @import url("https://fonts.cdnfonts.com/css/sweet-dreams");
 @import url("https://fonts.cdnfonts.com/css/summershine");
@@ -162,12 +159,10 @@
   }
 }
 
-// ──────────────────────────────
-// Dropdown Panel (Appears above toolbar)
-// ──────────────────────────────
+
 .optionsPanel {
   position: absolute;
-  bottom: 120px;                    // Just above the toolbar
+  bottom: 120px;                    
   left: 50%;
   border: 3px solid orange;
   transform: translateX(-50%);
@@ -202,9 +197,6 @@
   }
 }
 
-// ──────────────────────────────
-// Content Grids (Responsive & No Scrollbar)
-// ──────────────────────────────
 .fontOptions,
 .colorOptions,
 .sizeOptions {
@@ -220,7 +212,6 @@
   &::-webkit-scrollbar { display: none; }
 }
 
-// Font buttons
 .fontOption {
   background: #fff;
   border: none;
@@ -237,7 +228,6 @@
   }
 }
 
-// Color swatches
 .colorSwatch {
   width: 52px;
   height: 52px;
@@ -254,7 +244,6 @@
   }
 }
 
-// Size buttons
 .sizeBtn {
   width: 58px;
   height: 58px;
@@ -268,9 +257,7 @@
   transition: all 0.2s;
 }
 
-// ──────────────────────────────
-// Edit Button (when not editing)
-// ──────────────────────────────
+
 .editButton {
   position: fixed;
   left: 50%;
@@ -294,9 +281,6 @@
   }
 }
 
-// ──────────────────────────────
-// Animations
-// ──────────────────────────────
 @keyframes slideUp {
   from { opacity: 0; transform: translateX(-50%) translateY(40px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -336,7 +320,7 @@
   justify-content: flex-end;
   align-items: flex-start;
   z-index: 100;
-  pointer-events: none; // Allow clicks to pass through container
+  pointer-events: none;
   
   @media screen and (max-width: 768px) {
     display: flex;
