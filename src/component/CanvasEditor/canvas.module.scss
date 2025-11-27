@@ -1,3 +1,6 @@
+
+
+
 @import url("https://fonts.cdnfonts.com/css/the-wild-one");
 @import url("https://fonts.cdnfonts.com/css/sweet-dreams");
 @import url("https://fonts.cdnfonts.com/css/summershine");
@@ -76,7 +79,7 @@
   transform: translateX(-50%);
   background: #fdf1e4;
   border-radius: 50px;
-  padding: 14px 24px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   gap: 28px;
@@ -86,20 +89,20 @@
   z-index: 1000;
   animation: slideUp 0.4s ease;
   @media (max-width: 480px) {
-    gap: 18px;
-    padding: 16px;
+    gap: 28px;
+    padding: 0 16px;
     justify-content: center;
 
     .floatingToolbar{
-      bottom: 100px;
+      bottom: 160px;
     }
 
   }
    @media (max-width: 440px) {
-    gap: 18px;
-    padding: 16px;
+    gap: 28px;
+    padding: 0 16px;
     justify-content: center;
-      bottom: 0;
+      bottom: 34;
   }
 }
 
@@ -116,7 +119,7 @@
   transition: all 0.25s;
 
   &:hover { background: rgba(255, 255, 255, 0.6); }
-  &.active { background: white; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12); }
+  &.active { background: none }
 }
 
 .iconAa { font-size: 32px; font-weight: 900; color: #333; }
@@ -159,21 +162,18 @@
   }
 }
 
-
+// ──────────────────────────────
+// Dropdown Panel (Appears above toolbar)
+// ──────────────────────────────
 .optionsPanel {
   position: absolute;
-  bottom: 120px;                    
+  bottom: 100px;                   
   left: 50%;
-  border: 3px solid orange;
+  background-color: #f3d4a7;
   transform: translateX(-50%);
-  background: white;
-  border-radius: 28px;
-  padding: 0 20px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
-  border: 3px solid #ff8b3d;
   z-index: 1001;
-  width: calc(100vw - 40px);       // Responsive width
-  max-width: 560px;                // Max on large screens
+  width:100%;             
   animation: popUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.5);
 
   // Hide scrollbars everywhere inside
@@ -183,27 +183,19 @@
   }
   -ms-overflow-style: none;
   scrollbar-width: none;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-left: 16px solid transparent;
-    border-right: 16px solid transparent;
-    border-top: 16px solid white;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-  }
 }
 
+// ──────────────────────────────
+// Content Grids (Responsive & No Scrollbar)
+// ──────────────────────────────
 .fontOptions,
 .colorOptions,
 .sizeOptions {
   display: flex;
   gap: 14px;
-  justify-content: center;
+  justify-content: left;
   padding: 8px 0;
+  background-color: #fff2de;
 
   // Hide scrollbar but allow scrolling
   overflow-x: auto;
@@ -212,14 +204,16 @@
   &::-webkit-scrollbar { display: none; }
 }
 
+// Font buttons
 .fontOption {
-  background: #fff;
+  background: #ffd392;
   border: none;
-  border-radius: 24px;
+  border-radius:5px;
   font-size: 14px;
   white-space: nowrap;
   cursor: pointer;
   transition: 0.2s;
+  padding: 0 4px;
 
   &:hover { background: #e8e8e8; }
   &.active {
@@ -228,6 +222,7 @@
   }
 }
 
+// Color swatches
 .colorSwatch {
   width: 52px;
   height: 52px;
@@ -244,10 +239,11 @@
   }
 }
 
+// Size buttons
 .sizeBtn {
   width: 58px;
   height: 58px;
-  border-radius: 20px;
+  border-radius:8px;
   background: #fff;
   border: none;
   font-weight: bold;
@@ -255,9 +251,12 @@
   color: #333;
   cursor: pointer;
   transition: all 0.2s;
+  padding: 15px;
 }
 
-
+// ──────────────────────────────
+// Edit Button (when not editing)
+// ──────────────────────────────
 .editButton {
   position: fixed;
   left: 50%;
@@ -281,6 +280,9 @@
   }
 }
 
+// ──────────────────────────────
+// Animations
+// ──────────────────────────────
 @keyframes slideUp {
   from { opacity: 0; transform: translateX(-50%) translateY(40px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -320,7 +322,7 @@
   justify-content: flex-end;
   align-items: flex-start;
   z-index: 100;
-  pointer-events: none;
+  pointer-events: none; // Allow clicks to pass through container
   
   @media screen and (max-width: 768px) {
     display: flex;

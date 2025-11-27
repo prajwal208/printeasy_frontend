@@ -20,7 +20,7 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [loading, setLoading] = useState(true);  // initially true
+  const [loading, setLoading] = useState(true); // initially true
   const [activeSection, setActiveSection] = useState(null);
   const [designPng, setDesignPng] = useState("");
   const [printingImg, setPrintingImg] = useState({
@@ -57,9 +57,9 @@ const ProductDetails = () => {
   }, [id, apiUrl]);
 
   // ---- Shimmer Loader ----
-if (loading && !product) {
-  return <ProductDetailsShimmer />;
-}
+  if (loading && !product) {
+    return <ProductDetailsShimmer />;
+  }
 
   // ---- Add to Cart ----
   const addToCart = async () => {
@@ -151,7 +151,9 @@ if (loading && !product) {
 
       if (res.status === 200) toast.success("Added to wishlist!");
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to add to wishlist");
+      toast.error(
+        error?.response?.data?.message || "Failed to add to wishlist"
+      );
     }
   };
 
@@ -178,23 +180,16 @@ if (loading && !product) {
       )}
 
       <div className={styles.infoSection}>
-        <h1>{product?.name}</h1>
-        <p className={styles.subtitle}>{product?.subtitle}</p>
+        {/* <p className={styles.subtitle}>{product?.subtitle}</p> */}
 
         <div className={styles.priceSection}>
-          {product?.discountedPrice ? (
-            <>
-              <p className={styles.discountedPrice}>₹ {product?.discountedPrice}</p>
-              <p className={styles.basePrice}>₹ {product?.basePrice}</p>
-            </>
-          ) : (
-            <p className={styles.price}>₹ {product?.basePrice}</p>
-          )}
+          <h1>{product?.name}</h1>
+          <p className={styles.discountedPrice}>₹ {product?.discountedPrice}</p>
         </div>
 
         {product?.configuration?.[0]?.options?.length > 0 && (
           <div className={styles.sizes}>
-            <h4>Sizes</h4>
+            <h4>SELECT SIZE</h4>
             <div className={styles.sizeOptions}>
               {product?.configuration[0].options.map((s) => (
                 <button
@@ -212,7 +207,11 @@ if (loading && !product) {
         )}
 
         <div className={styles.buttonsWrapper}>
-          <button className={styles.addToCart} onClick={addToCart} disabled={loading}>
+          <button
+            className={styles.addToCart}
+            onClick={addToCart}
+            disabled={loading}
+          >
             {loading ? "ADDING..." : "ADD TO BAG"}
           </button>
 
@@ -222,6 +221,26 @@ if (loading && !product) {
           </button> */}
         </div>
       </div>
+
+     <div className={styles.accordion}>
+  {[
+    { title: "DETAILS", content: product?.description },
+    { title: "CARE", content:product.care  },
+  ].map((item, i) => (
+    <div key={i} className={styles.accordionItem} onClick={() => setActiveSection(activeSection === i ? null : i)}>
+      
+      <div className={styles.accordionHeader}>
+        <h3>{item.title}</h3>
+        {activeSection === i ? <Minus size={20} /> : <Plus size={20} />}
+      </div>
+
+      <div className={`${styles.accordionContent} ${activeSection === i ? styles.active : ""}`}>
+        <p>{item.content}</p>
+      </div>
+    </div>
+  ))}
+</div>
+
 
       <DynamicModal open={loader} onClose={() => setLoader(false)}>
         <AddToBagLoader />
