@@ -220,27 +220,35 @@ const ProductDetails = () => {
             WISHLIST
           </button> */}
         </div>
+
+         <div className={styles.accordion}>
+        {[
+          { title: "DETAILS", content: product?.description },
+          { title: "CARE", content: product.care },
+        ].map((item, i) => (
+          <div
+            key={i}
+            className={styles.accordionItem}
+            onClick={() => setActiveSection(activeSection === i ? null : i)}
+          >
+            <div className={styles.accordionHeader}>
+              <h3>{item.title}</h3>
+              {activeSection === i ? <Minus size={20} /> : <Plus size={20} />}
+            </div>
+
+            <div
+              className={`${styles.accordionContent} ${
+                activeSection === i ? styles.active : ""
+              }`}
+            >
+              <p>{item.content}</p>
+            </div>
+          </div>
+        ))}
+      </div>
       </div>
 
-     <div className={styles.accordion}>
-  {[
-    { title: "DETAILS", content: product?.description },
-    { title: "CARE", content:product.care  },
-  ].map((item, i) => (
-    <div key={i} className={styles.accordionItem} onClick={() => setActiveSection(activeSection === i ? null : i)}>
-      
-      <div className={styles.accordionHeader}>
-        <h3>{item.title}</h3>
-        {activeSection === i ? <Minus size={20} /> : <Plus size={20} />}
-      </div>
-
-      <div className={`${styles.accordionContent} ${activeSection === i ? styles.active : ""}`}>
-        <p>{item.content}</p>
-      </div>
-    </div>
-  ))}
-</div>
-
+     
 
       <DynamicModal open={loader} onClose={() => setLoader(false)}>
         <AddToBagLoader />

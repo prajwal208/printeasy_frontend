@@ -4,21 +4,42 @@ import { ChevronLeft, ShoppingBag, Heart, Share2 } from "lucide-react";
 import styles from "./canvas.module.scss";
 import { COLORS, fontMap, FONTS, SIZES } from "@/constants";
 
-
 export default function CanvasEditor({ product, setPrintingImg }) {
+  console.log(product, "oiiiososo");
   const canvasRef = useRef(null);
   const fabricCanvasRef = useRef(null);
   const activeTextRef = useRef(null);
   const scriptRef = useRef(null);
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [selectedFont, setSelectedFont] = useState("Arial");
   const [selectedColor, setSelectedColor] = useState("#000000");
   const [selectedSize, setSelectedSize] = useState(28);
   const [activeTab, setActiveTab] = useState("font");
-  
+
+  const loadFont = async (fontName) => {
+    if (!fontName) return;
+
+    const font = new FontFace(
+      fontName,
+      `url(https://fonts.cdnfonts.com/s/${fontName})`
+    );
+
+    try {
+      await font.load();
+      document.fonts.add(font);
+    } catch (e) {
+      console.warn("Font failed loading:", fontName);
+    }
+  };
+
+  const defaultFontSize = product?.fontSize || selectedSize;
+  const defaultFontFamily =
+    fontMap[product?.fontFamily] || product?.fontFamily || selectedFont;
+  const defaultFontColor = product?.fontColor || selectedColor;
+
   const SAFE = { left: 140, top: 260, width: 260, height: 180 };
-  
+
   const getRealImageUrl = (img) => {
     if (!img) return null;
     if (typeof img === "object" && img.src) return img.src;
@@ -29,7 +50,7 @@ export default function CanvasEditor({ product, setPrintingImg }) {
         return real ? decodeURIComponent(real) : img;
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
     return img;
   };
@@ -116,8 +137,8 @@ export default function CanvasEditor({ product, setPrintingImg }) {
       shirtUrl,
       (shirtImg) => {
         if (!shirtImg.width) return;
-        const scale = canvas.width / shirtImg.width;
-        shirtImg.set({ scaleX: scale, scaleY: scale, top: 0, left: 0 });
+        const scale = (canvas.width / shirtImg.width) *  0.80;
+        shirtImg.set({ scaleX: scale, scaleY: scale, top: 100, left: 50 });
         canvas.setBackgroundImage(shirtImg, () => {
           canvas.renderAll();
           if (illustrationUrl) {
@@ -130,9 +151,8 @@ export default function CanvasEditor({ product, setPrintingImg }) {
                 const scale = Math.min(scaleX, scaleY);
                 illuImg.set({
                   left:
-                    SAFE.left + (SAFE.width - illuImg.width * scale) / 2 + 30,
-                  top:
-                    SAFE.top + (SAFE.height - illuImg.height * scale) / 2 ,
+                    SAFE.left + (SAFE.width - illuImg.width * scale) / 2 + 20,
+                  top: SAFE.top + (SAFE.height - illuImg.height * scale) / 4 + 30,
                   scaleX: scale,
                   scaleY: scale,
                   selectable: false,
@@ -152,20 +172,32 @@ export default function CanvasEditor({ product, setPrintingImg }) {
     );
   };
 
-  const addTextBelowIllustration = (canvas, illustration) => {
+  useEffect(() => {
+  Object.values(fontMap).forEach(font => {
+    document.fonts.load(`16px ${font}`);
+  });
+}, []);
+
+  const addTextBelowIllustration = async (canvas, illustration) => {
     const topPos = illustration
       ? illustration.top + illustration.getScaledHeight() + 5
       : SAFE.top + SAFE.height / 2 - selectedSize / 2;
 
+    const fontName =
+      fontMap[product?.fontFamily] || product?.fontFamily || selectedFont;
+
+    await document.fonts.load(`16px ${fontName}`);
+    await loadFont(fontName);
+
     const text = new window.fabric.Textbox(
       product?.presetText || "YOUR TEXT HERE",
       {
-        left: SAFE.left + 30,
+        left: SAFE.left + 20,
         top: topPos,
         width: SAFE.width,
-        fontSize: selectedSize,
-        fontFamily: selectedFont,
-        fill: selectedColor,
+        fontSize: defaultFontSize,
+        fontFamily: defaultFontFamily,
+        fill: defaultFontColor,
         textAlign: "center",
         fontWeight: "normal",
         splitByGrapheme: true,
@@ -287,28 +319,13 @@ export default function CanvasEditor({ product, setPrintingImg }) {
     <div className={styles.editorWrapper}>
       <div className={styles.mobileIconsContainer}>
         <div className={styles.mobileIconsRight}>
-          <button
-            className={styles.mobileIcon}
-            onClick={() => {
-              
-            }}
-          >
+          <button className={styles.mobileIcon} onClick={() => {}}>
             <ShoppingBag size={20} />
           </button>
-          <button
-            className={styles.mobileIcon}
-            onClick={() => {
-            
-            }}
-          >
+          <button className={styles.mobileIcon} onClick={() => {}}>
             <Heart size={20} />
           </button>
-          <button
-            className={styles.mobileIcon}
-            onClick={() => {
-          
-            }}
-          >
+          <button className={styles.mobileIcon} onClick={() => {}}>
             <Share2 size={20} />
           </button>
         </div>
@@ -372,16 +389,20 @@ export default function CanvasEditor({ product, setPrintingImg }) {
                   const mapped = fontMap[fontName] || fontName;
                   const isActive = selectedFont === mapped;
                   return (
+                    <>
                     <button
                       key={fontName}
                       onClick={() => onFontSelect(fontName)}
                       className={`${styles.fontOption} ${
-                        isActive ? styles.activeFont : ""
+                        isActive ? styles.active : ""
                       }`}
                       style={{ fontFamily: `'${mapped}', cursive` }}
                     >
                       {fontName}
+                     
                     </button>
+                     <div style={{border:"1px solid #b3a99b"}}></div>
+                     </>
                   );
                 })}
               </div>
