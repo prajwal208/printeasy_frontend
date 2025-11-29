@@ -24,6 +24,7 @@ const ProductDetails = () => {
   const [activeSection, setActiveSection] = useState(null);
   const [designPng, setDesignPng] = useState("");
   const [sizeInfo, setSizeInfo] = useState(null);
+  const [count, setCount] = useState(null);
   const [printingImg, setPrintingImg] = useState({
     textColor: "",
     fontFamily: "",
@@ -35,9 +36,7 @@ const ProductDetails = () => {
   console.log(sizeInfo?.options.length, "uuuttt");
 
   const accessToken = Cookies.get("idToken");
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  // ---- Fetch product ----
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -57,14 +56,12 @@ const ProductDetails = () => {
     };
 
     if (id) fetchProduct();
-  }, [id, apiUrl]);
+  }, [id]);
 
-  // ---- Shimmer Loader ----
   if (loading && !product) {
     return <ProductDetailsShimmer />;
   }
 
-  // ---- Add to Cart ----
   const addToCart = async () => {
     if (!accessToken) {
       toast.warning("Please login to Add to Cart");
@@ -132,7 +129,6 @@ const ProductDetails = () => {
     }
   };
 
-  // ---- Wishlist ----
   const addToWishlist = async () => {
     if (!accessToken) {
       toast.warning("Please login to Add to Wishlist");
@@ -173,7 +169,7 @@ const ProductDetails = () => {
     console.log(match, "ieyyerersxxx");
 
     setSizeInfo(match || null);
-  };
+  };  
 
   return (
     <div className={styles.container}>
@@ -224,11 +220,9 @@ const ProductDetails = () => {
               <div className={styles.sizeDetailsBox}>
                 <span>Chest: {sizeInfo?.options[0]?.value} cm</span>
                 <span>Length: {sizeInfo?.options[1]?.value} cm</span>
-                {
-                  sizeInfo?.options.length > 2 &&
+                {sizeInfo?.options.length > 2 && (
                   <span>Sleeves Length: {sizeInfo?.options[2]?.value} cm</span>
-                }
-                
+                )}
               </div>
             )}
 

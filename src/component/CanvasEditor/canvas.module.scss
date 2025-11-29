@@ -1,37 +1,4 @@
-@import url("https://fonts.cdnfonts.com/css/the-wild-one");
-@import url("https://fonts.cdnfonts.com/css/sweet-dreams");
-@import url("https://fonts.cdnfonts.com/css/summershine");
-@import url("https://fonts.cdnfonts.com/css/pink-rose");
-@import url("https://fonts.cdnfonts.com/css/rainbow-dreams");
-@import url("https://fonts.cdnfonts.com/css/cc-meanwhile");
-@import url("https://fonts.cdnfonts.com/css/monkey-2");
-@import url("https://fonts.cdnfonts.com/css/morelove");
-@import url("https://fonts.cdnfonts.com/css/reality");
-@import url("https://fonts.cdnfonts.com/css/scramble-storm");
-@import url("https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap");
-@import url("https://fonts.cdnfonts.com/css/sunlight");
-@import url("https://fonts.cdnfonts.com/css/asteroid-type");
-@import url("https://fonts.cdnfonts.com/css/beachside");
-@import url("https://fonts.cdnfonts.com/css/cakepop");
-@import url("https://fonts.cdnfonts.com/css/california");
-@import url("https://fonts.cdnfonts.com/css/firefly");
-@import url("https://fonts.cdnfonts.com/css/forever");
-@import url("https://fonts.cdnfonts.com/css/freshlemonade");
-@import url("https://fonts.cdnfonts.com/css/frozen");
-@import url("https://fonts.cdnfonts.com/css/heysugar");
-@import url("https://fonts.cdnfonts.com/css/honey");
-@import url("https://fonts.cdnfonts.com/css/honeycomb");
-@import url("https://fonts.cdnfonts.com/css/honeycomb-script-personal-use");
-@import url("https://fonts.cdnfonts.com/css/ice-cream-cake");
-@import url("https://fonts.cdnfonts.com/css/jade-skies");
-@import url("https://fonts.cdnfonts.com/css/joyful");
-@import url("https://fonts.cdnfonts.com/css/sexy-love-hearts");
-@import url("https://fonts.cdnfonts.com/css/love-vibes");
-@import url("https://fonts.cdnfonts.com/css/love-and-honey");
-@import url("https://fonts.cdnfonts.com/css/thinker");
-@import url("https://fonts.cdnfonts.com/css/thinker-historic");
-@import url("https://fonts.cdnfonts.com/css/tigerland");
-@import url("https://fonts.cdnfonts.com/css/tigerlily");
+
 
 .editorWrapper {
   position: relative;
@@ -106,14 +73,14 @@
     justify-content: center;
 
     .floatingToolbar {
-      bottom: 160px;
+      bottom: 180px;
     }
   }
   @media (max-width: 440px) {
     gap: 28px;
     padding: 0 16px;
     justify-content: center;
-    bottom: 100;
+    bottom: 180;
   }
 }
 
@@ -229,7 +196,7 @@
   display: flex;
   gap: 4px;
   justify-content: left;
-  padding: 8px 0;
+  padding: 8px;
   background-color: #fff2de;
 
   // Hide scrollbar but allow scrolling
@@ -246,7 +213,7 @@
   background: transparent;
   border: none;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 20px;
   white-space: nowrap;
   cursor: pointer;
   transition: 0.2s;
@@ -465,36 +432,39 @@
 }
 
 .mobileIcon {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ddd;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   color: #333;
 
-  &:hover {
-    background: rgba(255, 255, 255, 1);
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
+  .badge {
+  position: absolute;
+  top: 0px;
+  right: -16px;
+  font-size: 10px;
+  font-weight: 500;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
   @media screen and (max-width: 480px) {
     width: 36px;
     height: 36px;
 
     svg {
-      width: 18px;
-      height: 18px;
+      width: 24px;
+      height: 24px;
     }
   }
 }

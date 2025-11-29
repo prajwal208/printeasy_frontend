@@ -4,13 +4,15 @@ import { ChevronLeft, ShoppingBag, Heart, Share2 } from "lucide-react";
 import styles from "./canvas.module.scss";
 import { COLORS, fontMap, FONTS, SIZES } from "@/constants";
 import { useRouter } from "next/navigation";
+import bag from "../../assessts/bag.svg"
+import share from "../../assessts/share.svg"
+import Image from "next/image";
 
 export default function CanvasEditor({
   product,
   setPrintingImg,
   addToWishlist,
 }) {
-  console.log(product, "oiiiososo");
   const canvasRef = useRef(null);
   const fabricCanvasRef = useRef(null);
   const activeTextRef = useRef(null);
@@ -22,32 +24,48 @@ export default function CanvasEditor({
   const [selectedSize, setSelectedSize] = useState(28);
   const [activeTab, setActiveTab] = useState("font");
   const [isWishlisted, setIsWishlisted] = useState(product?.isInWishlist);
-  const router = useRouter()
+  const [fonts, setFonts] = useState([]);
+  const router = useRouter();
+  const count = localStorage.getItem("count")
 
-  console.log(isMobile);
-  console.log(window.innerWidth, "window.innerWidth");
   const loadFont = async (fontName) => {
     if (!fontName) return;
 
+    // Use fontMap to match correct system name if needed
+    const fileName = fontMap[fontName] || fontName;
+
     const font = new FontFace(
-      fontName,
-      `url(https://fonts.cdnfonts.com/s/${fontName})`
+      fileName,
+      `url(/fonts/${fileName}.ttf)` // <-- Local font loading
     );
 
     try {
       await font.load();
       document.fonts.add(font);
     } catch (e) {
-      console.warn("Font failed loading:", fontName);
+      console.warn("Local font failed loading:", fileName, e);
     }
   };
+
+  useEffect(() => {
+    const fetchFonts = async () => {
+      const res = await fetch("/api/fonts");
+      const data = await res.json();
+
+      data.forEach((font) => loadFont(font));
+
+      setFonts(data);
+    };
+
+    fetchFonts();
+  }, []);
 
   const defaultFontSize = product?.fontSize || selectedSize;
   const defaultFontFamily =
     fontMap[product?.fontFamily] || product?.fontFamily || selectedFont;
   const defaultFontColor = product?.fontColor || selectedColor;
 
-  const SAFE = { left: 140, top: 260, width: 260, height: 180 };
+  const SAFE = { left: 170, top: 260, width: 220, height: 180 };
 
   const getRealImageUrl = (img) => {
     if (!img) return null;
@@ -160,7 +178,7 @@ export default function CanvasEditor({
                 const scale = Math.min(scaleX, scaleY);
                 illuImg.set({
                   left:
-                    SAFE.left + (SAFE.width - illuImg.width * scale) / 2 + 40,
+                    SAFE.left + (SAFE.width - illuImg.width * scale) / 2 + 30,
                   top: SAFE.top + (SAFE.height - illuImg.height * scale) / 2,
                   scaleX: scale,
                   scaleY: scale,
@@ -183,7 +201,7 @@ export default function CanvasEditor({
 
   useEffect(() => {
     Object.values(fontMap).forEach((font) => {
-      document.fonts.load(`16px ${font}`);
+      loadFont(font);
     });
   }, []);
 
@@ -224,7 +242,7 @@ export default function CanvasEditor({
       {
         left: SAFE.left + 33,
         top: topPos - 10,
-        width: SAFE.width,
+        width: SAFE.width - 10,
         fontSize: defaultFontSize,
         fontFamily: defaultFontFamily,
         fill: defaultFontColor,
@@ -329,8 +347,10 @@ export default function CanvasEditor({
     });
   };
 
-  const onFontSelect = (fontName) => {
+  const onFontSelect = async (fontName) => {
     const mapped = fontMap[fontName] || fontName;
+
+    await loadFont(mapped);
     setSelectedFont(mapped);
     applyToActiveText({ fontFamily: mapped });
   };
@@ -348,7 +368,9 @@ export default function CanvasEditor({
   const handleWishlistClick = async () => {
     try {
       const res = await addToWishlist();
-      setIsWishlisted(true);
+      if(res?.status === 200){
+        setIsWishlisted(true);
+      }
     } catch (err) {
       console.log("Failed to add wishlist:", err);
     }
@@ -362,17 +384,18 @@ export default function CanvasEditor({
       <div className={styles.mobileIconsContainer}>
         <div className={styles.mobileIconsRight}>
           <button className={styles.mobileIcon} onClick={() => {}}>
-            <ShoppingBag size={20} />
+             {count > "0" && <span className={styles.badge}>{count}</span>}
+            <Image src={bag}/>
           </button>
           <button className={styles.mobileIcon} onClick={handleWishlistClick}>
             <Heart
-              size={20}
+              size={40}
               stroke={isWishlisted ? "red" : "black"}
               fill={isWishlisted ? "red" : "transparent"}
             />
           </button>
           <button className={styles.mobileIcon} onClick={handleShare}>
-            <Share2 size={20} />
+            <Image src={share}/>
           </button>
         </div>
       </div>
@@ -431,23 +454,23 @@ export default function CanvasEditor({
           <div className={styles.optionsPanel}>
             {activeTab === "font" && (
               <div className={styles.fontOptions}>
-                {FONTS.map((fontName) => {
-                  const mapped = fontMap[fontName] || fontName;
-                  const isActive = selectedFont === mapped;
+                {fonts.map((fontName) => {
+                  const isActive = selectedFont === fontName;
+
                   return (
-                    <>
+                    <React.Fragment key={fontName}>
                       <button
-                        key={fontName}
                         onClick={() => onFontSelect(fontName)}
                         className={`${styles.fontOption} ${
                           isActive ? styles.active : ""
                         }`}
-                        style={{ fontFamily: `'${mapped}', cursive` }}
+                        style={{ fontFamily: fontName }} // <-- Fix: no quotes needed
                       >
                         {fontName}
                       </button>
+
                       <div style={{ border: "1px solid #b3a99b" }}></div>
-                    </>
+                    </React.Fragment>
                   );
                 })}
               </div>

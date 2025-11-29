@@ -28,7 +28,7 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
-  // 🔹 Check if user is logged in
+
   useEffect(() => {
     const token = Cookies.get("idToken");
     setIsLoggedIn(!!token);
@@ -42,7 +42,7 @@ const Navbar = () => {
   ];
 
   const handleIconClick = (label, link) => {
-    setMenuOpen(false); // 🔥 close menu on every item click
+    setMenuOpen(false); 
 
     if (label === "Profile") {
       setIsLoginModalVisible(true);
@@ -57,13 +57,11 @@ const Navbar = () => {
   };
 
   const handleContinue = () => {
-    // After successful login
     setIsLoginModalVisible(false);
     setIsLoggedIn(true);
   };
 
   const handleLogout = () => {
-    // 👇 Clear all storage and cookies
     Cookies.remove("idToken");
     localStorage.clear();
     sessionStorage.clear();
@@ -94,7 +92,7 @@ const Navbar = () => {
       },
     });
     setCount(res?.data?.data?.count);
-    console.log(res?.data?.data?.count, "ooiiyyetrer");
+    localStorage.setItem("count",res?.data?.data?.count)
   };
 
   useEffect(() => {
