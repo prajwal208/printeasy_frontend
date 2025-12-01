@@ -77,9 +77,8 @@ const ProductCard = ({ item, getwishList }) => {
         <Image
           src={item?.productImages[0]}
           alt={item?.name}
-          width={300}
-          height={300}
           className={styles.productImg}
+          fill
         />
         {pathname === "/wishlist" && (
           <span

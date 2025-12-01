@@ -90,8 +90,8 @@
     white-space: nowrap;
   }
   .cardGrid {
-    grid-template-columns: repeat(2, 1fr); // Always 2 items per row
-    column-gap: 0.8rem;
-    row-gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 0;
+    row-gap: 0;
   }
 }

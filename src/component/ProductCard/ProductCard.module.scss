@@ -27,7 +27,7 @@
 
   h3 {
     font-size: 1rem;
-
+  margin-top: -1rem;
   }
 
   p {
@@ -41,7 +41,6 @@
   position: relative;
   width: 100%;
   height: 350px;
-  // background: #f3efe5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -76,11 +75,9 @@
   
 }
 
-
-
 @media screen and (max-width:760px){
   .card {
-  width: 176px;
+  width: 166px;
   padding-bottom: 0;
 
   .imageContainer{

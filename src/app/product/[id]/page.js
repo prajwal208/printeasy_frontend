@@ -14,6 +14,7 @@ import api from "@/axiosInstance/axiosInstance";
 import AddToBagLoader from "@/component/AddToBagLoader/AddToBagLoader";
 import DynamicModal from "@/component/Modal/Modal";
 import ProductDetailsShimmer from "@/component/ProductDetailsShimmer/ProductDetailsShimmer";
+import Suggested from "@/component/Suggested/Suggested";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -31,7 +32,9 @@ const ProductDetails = () => {
     printText: "",
     fontSize: "",
   });
+  const [relatedId, setRelatedId] = useState("");
   const [loader, setLoader] = useState(false);
+  const [relatedData, setRelatedData] = useState([]);
 
   console.log(sizeInfo?.options.length, "uuuttt");
 
@@ -47,6 +50,7 @@ const ProductDetails = () => {
           },
         });
         setProduct(res?.data?.data);
+        setRelatedId(res?.data?.data?.id);
       } catch (error) {
         console.error("Error fetching product:", error);
         toast.error("Failed to fetch product.");
@@ -57,6 +61,12 @@ const ProductDetails = () => {
 
     if (id) fetchProduct();
   }, [id]);
+
+    useEffect(() => {
+    if (relatedId) {
+      getRelatedProduct(relatedId);
+    }
+  }, [relatedId]);
 
   if (loading && !product) {
     return <ProductDetailsShimmer />;
@@ -160,16 +170,30 @@ const ProductDetails = () => {
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
-
-    // Find measurement data from response
     const match = product?.configuration[0]?.options.find(
       (item) => item.value === size
     );
-
-    console.log(match, "ieyyerersxxx");
-
     setSizeInfo(match || null);
-  };  
+  };
+
+  const getRelatedProduct = async (relatedId) => {
+    try {
+      const res = await api.get(`/v2/product/${relatedId}/related`,{
+         headers: {
+            "x-api-key":
+              "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+          },
+      });
+      setRelatedData(res?.data?.data);
+      console.log(res,"pposueueuuexxxncbcbc")
+      return res; // <-- as requested
+    } catch (error) {
+      console.log(error, "error while fetching related data");
+      return null; // safe return for failure
+    }
+  };
+
+
 
   return (
     <div className={styles.container}>
@@ -281,6 +305,10 @@ const ProductDetails = () => {
             </div>
           ))}
         </div>
+
+        <section>
+          <Suggested relatedData={relatedData}/>
+        </section>
       </div>
 
       <DynamicModal open={loader} onClose={() => setLoader(false)}>

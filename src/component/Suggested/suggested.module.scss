@@ -1,0 +1,26 @@
+.suggested_main_wrap {
+  margin-top: 2rem;
+  width: 58%;
+
+  .related_list {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.5rem;
+
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+}
+
+
+@media screen and (max-width:760px){
+    .suggested_main_wrap{
+        width: 40%;
+    }
+}

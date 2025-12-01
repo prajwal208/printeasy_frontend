@@ -13,28 +13,6 @@ const ProductSection = () => {
   const [filter,setFilter]= useState([])
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-
-  console.log(categoryList,"sjsjuueterwwwxxx")
-
-  // const getSubCategoriesList = async () => {
-  //   try {
-  //     const res = await api.get(
-  //       `/v1/categories/H8SZ4VfsFXa4C9cUeonB/subcategories`,
-  //       {
-  //         headers: {
-  //           "x-api-key":
-  //             "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-  //         },
-  //       }
-  //     );
-
-  //     const fetchedCategories = res?.data?.data || [];
-  //     setCategoryList([{ id: "All", name: "All" }, ...fetchedCategories]);
-  //   } catch (error) {
-  //     console.error("Error fetching subcategories:", error);
-  //   }
-  // };
-
   const getData = async () => {
     try {
       const res = await axios.get(`${apiUrl}/v1/categories/all`, {
@@ -65,27 +43,9 @@ const ProductSection = () => {
     setCategoryList(res?.data?.data);
     console.log(res, "sjsjshyyy");
   };
-
-  // const getProductList = async () => {
-  //   try {
-  //     const res = await api.get(
-  //       `/v2/product/category/H8SZ4VfsFXa4C9cUeonB`,
-  //       {
-  //         headers: {
-  //           "x-api-key":
-  //             "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-  //         },
-  //       }
-  //     );
-  //     setProduct(res?.data?.data || []);
-  //   } catch (error) {
-  //     console.error("Error fetching products:", error);
-  //   }
-  // };
+  
 
   useEffect(() => {
-    // getSubCategoriesList();
-    // getProductList();
     getData();
     getCategoryListData();
   }, []);
