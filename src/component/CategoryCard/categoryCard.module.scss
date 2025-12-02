@@ -12,10 +12,13 @@
   }
 }
 
-.image {
+.placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  background-color: #e0e0e0; // neutral gray placeholder
 }
 
 .overlay {
@@ -36,12 +39,6 @@
 
 @media screen and (max-width: 760px) {
   .card {
-    position: relative;
-    width: 100%;
     height: 178px;
-    border-radius: 8px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.3s ease;
   }
 }

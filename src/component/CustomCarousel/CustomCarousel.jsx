@@ -14,6 +14,8 @@ import DynamicModal from "@/component/Modal/Modal";
 import LoginForm from "@/features/signup/LogIn/LoginForm";
 import Logout from "@/features/signup/Logout/Logout";
 
+const CACHE_KEY = "carouselBanners";
+
 const CustomCarousel = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [banners, setBanners] = useState([]);
@@ -44,9 +46,16 @@ const CustomCarousel = () => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [menuOpen]);
 
-  // Fetch banners
+  // Fetch banners with caching
   useEffect(() => {
     setMounted(true);
+
+    const cachedBanners = localStorage.getItem(CACHE_KEY);
+    if (cachedBanners) {
+      setBanners(JSON.parse(cachedBanners));
+      setLoading(false);
+    }
+
     const getImage = async () => {
       try {
         const res = await axios.get(`${apiUrl}/v1/categories/banners`, {
@@ -57,19 +66,22 @@ const CustomCarousel = () => {
         });
         const all = res?.data?.data?.flatMap((b) => b?.banners || []);
         setBanners(all);
+        localStorage.setItem(CACHE_KEY, JSON.stringify(all));
       } catch (err) {
         console.error("Error fetching banner images:", err);
       } finally {
         setLoading(false);
       }
     };
-    getImage();
+
+    // Only fetch if no cache
+    if (!cachedBanners) getImage();
 
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [apiUrl]);
 
   // Check login
   useEffect(() => {
@@ -98,12 +110,12 @@ const CustomCarousel = () => {
   };
 
   const handleCartClick = () => {
-  if (!isLoggedIn) {
-    setIsLoginModalVisible(true); 
-  } else {
-    router.push('/cart');
-  }
-};
+    if (!isLoggedIn) {
+      setIsLoginModalVisible(true); 
+    } else {
+      router.push('/cart');
+    }
+  };
 
   const handleLogout = () => {
     Cookies.remove("idToken");
@@ -149,9 +161,7 @@ const CustomCarousel = () => {
                 alt={`banner-${i}`}
                 width={800}
                 height={600}
-                className={`${styles.banner_image} ${
-                  isMobile ? styles.mobileBanner : ""
-                }`}
+                className={`${styles.banner_image} ${isMobile ? styles.mobileBanner : ""}`}
                 priority
               />
 
@@ -166,7 +176,6 @@ const CustomCarousel = () => {
                       {menuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
 
-                    {/* Search */}
                     <div className={styles.searchWrapper}>
                       <svg className={styles.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
@@ -175,7 +184,6 @@ const CustomCarousel = () => {
                       <input type="text" placeholder="Search" className={styles.searchInput} onClick={() => router.push('/search')}/>
                     </div>
 
-                    {/* Cart Icon */}
                     <button className={styles.iconButton} aria-label="Shopping bag" onClick={handleCartClick}>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -185,7 +193,6 @@ const CustomCarousel = () => {
                     </button>
                   </div>
 
-                  {/* Mobile Menu */}
                   {menuOpen && (
                     <ul className={styles.mobileMenu}>
                       <li onClick={() => handleIconClick("Profile")}>
@@ -205,7 +212,6 @@ const CustomCarousel = () => {
         ))}
       </Slider>
 
-      {/* Modal */}
       <DynamicModal
         open={isLoginModalVisible}
         onClose={() => setIsLoginModalVisible(false)}

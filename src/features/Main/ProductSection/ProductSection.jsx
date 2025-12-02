@@ -24,8 +24,6 @@ const ProductSection = () => {
       setFilter(res?.data?.data?.[0].collections || []);
     } catch (err) {
       console.error("Error fetching categories:", err);
-    } finally {
-      setLoading(false); // 🔹 stop loader
     }
   };
 

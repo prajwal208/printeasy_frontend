@@ -1,64 +1,44 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
+// app/category/page.jsx
+import Link from "next/link";
 import styles from "./categotyGrid.module.scss";
 import CategoryCard from "@/component/CategoryCard/CategoryCard";
-import axios from "axios";
-import { useRouter } from "next/navigation";
 
-const CategoryGrid = () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const skeletonCount = 12;
-  const router = useRouter();
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  console.log(categories,"shshuueyrtrerxxx")
+const CategoryGridPage = async () => {
+  let categories = [];
 
-  const getData = async () => {
-    try {
-      const res = await axios.get(`${apiUrl}/v1/categories/all`, {
-        headers: {
-          "x-api-key":
-            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        },
-      });
-      setCategories(res?.data?.data?.[0].collections || []);
-    } catch (err) {
-      console.error("Error fetching categories:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    const res = await fetch(`${apiUrl}/v1/categories/all`, {
+      headers: {
+        "x-api-key":
+          "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+      },
+      cache: "force-cache",
+    });
 
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const handleCardClick = (id,name) => {
-    router.push(`/selectedcategory/${id}`);
-    localStorage.setItem("name",name)
-  };
-
-
-  
+    const data = await res.json();
+    categories = data?.data?.[0]?.collections || [];
+  } catch (err) {
+    console.error("Error fetching categories:", err);
+  }
 
   return (
     <main className={styles.featured_categories}>
       <h3 className={styles.featured_cat}>FEATURED CATEGORIES</h3>
       <section className={styles.gridWrapper}>
-        {loading
-          ? Array.from({ length: skeletonCount }).map((_, i) => (
-              <div key={i} className={styles.skeletonCard}></div>
-            ))
-          : categories.map((item) => (
-              <div key={item?.id} onClick={() => handleCardClick(item?.id,item?.name)}>
-                <CategoryCard image={item.image} title={item.name} />
-              </div>
-            ))}
+        {categories.map((item) => (
+          <Link
+            key={item?.id}
+            href={`/selectedcategory/${item?.id}`}
+            passHref
+          >
+            <CategoryCard image={item.image} title={item.name} />
+          </Link>
+        ))}
       </section>
     </main>
   );
 };
 
-export default CategoryGrid;
+export default CategoryGridPage;

@@ -15,12 +15,46 @@
       display: none;
     }
   }
-
 }
 
+@media screen and (max-width: 1100px) {
+  .suggested_main_wrap {
+    width: 100%;
+  }
 
-@media screen and (max-width:760px){
-    .suggested_main_wrap{
-        width: 40%;
-    }
+  .related_list {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    overflow: visible;
+    padding-bottom: 0rem;
+    gap: 1rem !important;
+  }
+}
+
+@media screen and (max-width: 760px) {
+  .suggested_main_wrap {
+    width: 100%;
+  }
+
+  .related_list {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    overflow: visible;
+    padding-bottom: 0rem;
+    gap: 0.8rem !important;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .suggested_main_wrap {
+    width: 100%;
+  }
+
+  .related_list {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    overflow: visible;
+    padding-bottom: 0rem;
+    gap: 0.8rem  !important;
+  }
 }

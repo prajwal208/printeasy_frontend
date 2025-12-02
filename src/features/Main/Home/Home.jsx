@@ -1,7 +1,6 @@
-"use client";
 
-import React, { useEffect, useState } from "react";
-import Cookies from "js-cookie";
+
+import React from "react";
 import CustomCarousel from "@/component/CustomCarousel/CustomCarousel";
 import CategoryGrid from "../CategoryGrid/CategoryGrid";
 import HeroWords from "../HeroWords/HeroWords";
@@ -11,19 +10,19 @@ import OfferMarquee from "@/component/OfferMarquee/OfferMarquee";
 import styles from "./home.module.scss";
 
 const Home = () => {
-  const [showOffer, setShowOffer] = useState(false);
+  // const [showOffer, setShowOffer] = useState(false);
 
-  useEffect(() => {
-    const idToken = Cookies.get("idToken");
-    if (idToken) {
-      setShowOffer(true);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const idToken = Cookies.get("idToken");
+  //   if (idToken) {
+  //     setShowOffer(true);
+  //   }
+  // }, []);
 
   return (
     <main className={styles.homeContainer}>
       <div className={styles.offerCarouselWrapper}>
-        {showOffer && <OfferMarquee />}
+        { <OfferMarquee />}
         <CustomCarousel />
       </div>
 
