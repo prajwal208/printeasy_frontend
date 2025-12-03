@@ -4,8 +4,8 @@ import { ChevronLeft, ShoppingBag, Heart, Share2 } from "lucide-react";
 import styles from "./canvas.module.scss";
 import { COLORS, fontMap, FONTS, SIZES } from "@/constants";
 import { useRouter } from "next/navigation";
-import bag from "../../assessts/bag.svg"
-import share from "../../assessts/share.svg"
+import bag from "../../assessts/bag.svg";
+import share from "../../assessts/share.svg";
 import Image from "next/image";
 
 export default function CanvasEditor({
@@ -26,7 +26,7 @@ export default function CanvasEditor({
   const [isWishlisted, setIsWishlisted] = useState(product?.isInWishlist);
   const [fonts, setFonts] = useState([]);
   const router = useRouter();
-  const count = localStorage.getItem("count")
+  const count = localStorage.getItem("count");
 
   const loadFont = async (fontName) => {
     if (!fontName) return;
@@ -156,7 +156,6 @@ export default function CanvasEditor({
 
   const loadProductImages = (canvas) => {
     const shirtUrl = getRealImageUrl(product?.canvasImage);
-    const illustrationUrl = getRealImageUrl(product?.illustrationImage);
 
     if (!shirtUrl) return;
 
@@ -164,35 +163,19 @@ export default function CanvasEditor({
       shirtUrl,
       (shirtImg) => {
         if (!shirtImg.width) return;
+
         const scale = (canvas.width / shirtImg.width) * 0.68;
-        shirtImg.set({ scaleX: scale, scaleY: scale, top: 100, left: 100 });
+
+        shirtImg.set({
+          scaleX: scale,
+          scaleY: scale,
+          top: 100,
+          left: 100,
+        });
+
         canvas.setBackgroundImage(shirtImg, () => {
           canvas.renderAll();
-          if (illustrationUrl) {
-            window.fabric.Image.fromURL(
-              illustrationUrl,
-              (illuImg) => {
-                if (!illuImg.width) return;
-                const scaleX = (SAFE.width / illuImg.width) * 0.95;
-                const scaleY = (SAFE.height / illuImg.height) * 0.95;
-                const scale = Math.min(scaleX, scaleY);
-                illuImg.set({
-                  left:
-                    SAFE.left + (SAFE.width - illuImg.width * scale) / 2 + 30,
-                  top: SAFE.top + (SAFE.height - illuImg.height * scale) / 2,
-                  scaleX: scale,
-                  scaleY: scale,
-                  selectable: false,
-                  evented: false,
-                });
-                canvas.add(illuImg);
-                addTextBelowIllustration(canvas, illuImg);
-              },
-              { crossOrigin: "anonymous" }
-            );
-          } else {
-            addTextBelowIllustration(canvas, null);
-          }
+          addTextBelowIllustration(canvas, null);
         });
       },
       { crossOrigin: "anonymous" }
@@ -228,8 +211,8 @@ export default function CanvasEditor({
 
   const addTextBelowIllustration = async (canvas, illustration) => {
     const topPos = illustration
-      ? illustration.top + illustration.getScaledHeight() + 5
-      : SAFE.top + SAFE.height / 2 - selectedSize / 2;
+      ? illustration.top + illustration.getScaledHeight() + 10
+      : (SAFE.top + SAFE.height / 2 - selectedSize / 2) + 65;
 
     const fontName =
       fontMap[product?.fontFamily] || product?.fontFamily || selectedFont;
@@ -240,8 +223,8 @@ export default function CanvasEditor({
     const text = new window.fabric.Textbox(
       product?.presetText || "YOUR TEXT HERE",
       {
-        left: SAFE.left + 33,
-        top: topPos - 10,
+        left: SAFE.left + 30,
+        top: topPos,
         width: SAFE.width - 10,
         fontSize: defaultFontSize,
         fontFamily: defaultFontFamily,
@@ -368,7 +351,7 @@ export default function CanvasEditor({
   const handleWishlistClick = async () => {
     try {
       const res = await addToWishlist();
-      if(res?.status === 200){
+      if (res?.status === 200) {
         setIsWishlisted(true);
       }
     } catch (err) {
@@ -384,8 +367,8 @@ export default function CanvasEditor({
       <div className={styles.mobileIconsContainer}>
         <div className={styles.mobileIconsRight}>
           <button className={styles.mobileIcon} onClick={() => {}}>
-             {count > "0" && <span className={styles.badge}>{count}</span>}
-            <Image src={bag}/>
+            {count > "0" && <span className={styles.badge}>{count}</span>}
+            <Image src={bag} />
           </button>
           <button className={styles.mobileIcon} onClick={handleWishlistClick}>
             <Heart
@@ -395,7 +378,7 @@ export default function CanvasEditor({
             />
           </button>
           <button className={styles.mobileIcon} onClick={handleShare}>
-            <Image src={share}/>
+            <Image src={share} />
           </button>
         </div>
       </div>

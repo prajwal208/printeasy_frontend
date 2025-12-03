@@ -73,10 +73,10 @@ const ProductDetails = () => {
   }
 
   const addToCart = async () => {
-    if (!accessToken) {
-      toast.warning("Please login to Add to Cart");
-      return;
-    }
+    // if (!accessToken) {
+    //   toast.warning("Please login to Add to Cart");
+    //   return;
+    // }
 
     if (product?.configuration?.length > 0 && !selectedSize) {
       toast.warning("Please select a size.");
@@ -121,7 +121,7 @@ const ProductDetails = () => {
     try {
       setLoader(true);
       setLoading(true);
-      const res = await api.post(`${apiUrl}/v1/cart`, payload, {
+      const res = await api.post(`/v1/cart`, payload, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "x-api-key":
@@ -131,7 +131,7 @@ const ProductDetails = () => {
 
       if (res.status === 200) toast.success("Added to bag!");
     } catch (err) {
-      console.error("❌ Error adding to cart:", err);
+      console.error("Error adding to cart", err);
       toast.error(err?.response?.data?.message || "Failed to add to bag");
     } finally {
       setLoading(false);
