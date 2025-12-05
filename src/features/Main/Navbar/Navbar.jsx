@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import axios from "axios";
 import api from "@/axiosInstance/axiosInstance";
+import { db } from "@/lib/db";
 
 const Navbar = () => {
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
@@ -27,7 +28,6 @@ const Navbar = () => {
   const [count, setCount] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
-
 
   useEffect(() => {
     const token = Cookies.get("idToken");
@@ -42,7 +42,11 @@ const Navbar = () => {
   ];
 
   const handleIconClick = (label, link) => {
-    setMenuOpen(false); 
+    setMenuOpen(false);
+    if (label === "Cart") {
+      router.push("/cart");
+      return;
+    }
 
     if (label === "Profile") {
       setIsLoginModalVisible(true);
@@ -51,9 +55,10 @@ const Navbar = () => {
 
     if (!isLoggedIn) {
       setIsLoginModalVisible(true);
-    } else {
-      router.push(link);
+      return;
     }
+
+    router.push(link);
   };
 
   const handleContinue = () => {
@@ -84,16 +89,27 @@ const Navbar = () => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [menuOpen]);
 
+  // const getCartCount = async () => {
+  //   const res = await api.get("/v1/cart/count", {
+  //     headers: {
+  //       "x-api-key":
+  //         "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+  //     },
+  //   });
+  //   setCount(res?.data?.data?.count);
+  //   localStorage.setItem("count", res?.data?.data?.count);
+  // };
+
   const getCartCount = async () => {
-    const res = await api.get("/v1/cart/count", {
-      headers: {
-        "x-api-key":
-          "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-      },
-    });
-    setCount(res?.data?.data?.count);
-    localStorage.setItem("count",res?.data?.data?.count)
-  };
+  try {
+    const count = await db.cart.count();
+
+    setCount(count);
+    localStorage.setItem("count", count);
+  } catch (error) {
+    console.error("Error getting cart count:", error);
+  }
+};
 
   useEffect(() => {
     getCartCount();
@@ -126,8 +142,6 @@ const Navbar = () => {
             <span>Profile</span>
           </li>
 
-          {/* Other nav items */}
-          {/* Other nav items */}
           {navItems.map(({ icon: Icon, label, link }, index) => (
             <li
               key={index}

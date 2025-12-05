@@ -6,6 +6,7 @@ import ProductCard from "@/component/ProductCard/ProductCard";
 import api from "@/axiosInstance/axiosInstance";
 import NoResult from "@/component/NoResult/NoResult";
 import { useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 
 const WishList = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -33,7 +34,9 @@ const WishList = () => {
   return (
     <>
       <main className={styles.wishlist_main}>
-
+        <button className={styles.iconBtn} onClick={() => router.push("/")}>
+            <ChevronLeft size={22} />
+          </button>
         {wishlistData?.length > 0 ? (
           <div className={styles.cardGrid}>
             {wishlistData.map((item) => (

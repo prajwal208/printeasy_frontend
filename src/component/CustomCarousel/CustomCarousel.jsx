@@ -7,7 +7,15 @@ import axios from "axios";
 import styles from "./carousel.module.scss";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { User, Briefcase, MapPin, Heart, ShoppingCart, X, Menu } from "lucide-react";
+import {
+  User,
+  Briefcase,
+  MapPin,
+  Heart,
+  ShoppingCart,
+  X,
+  Menu,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import DynamicModal from "@/component/Modal/Modal";
@@ -36,8 +44,10 @@ const CustomCarousel = () => {
   // Handle clicks outside menu
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!event.target.closest(`.${styles.mobileMenu}`) &&
-          !event.target.closest(`.${styles.iconButton}`)) {
+      if (
+        !event.target.closest(`.${styles.mobileMenu}`) &&
+        !event.target.closest(`.${styles.iconButton}`)
+      ) {
         setMenuOpen(false);
       }
     };
@@ -46,7 +56,6 @@ const CustomCarousel = () => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [menuOpen]);
 
-  // Fetch banners with caching
   useEffect(() => {
     setMounted(true);
 
@@ -74,7 +83,6 @@ const CustomCarousel = () => {
       }
     };
 
-    // Only fetch if no cache
     if (!cachedBanners) getImage();
 
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -83,7 +91,6 @@ const CustomCarousel = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [apiUrl]);
 
-  // Check login
   useEffect(() => {
     const token = Cookies.get("idToken");
     setIsLoggedIn(!!token);
@@ -109,18 +116,16 @@ const CustomCarousel = () => {
     setIsLoggedIn(true);
   };
 
-  const handleCartClick = () => {
-    if (!isLoggedIn) {
-      setIsLoginModalVisible(true); 
-    } else {
-      router.push('/cart');
-    }
-  };
-
   const handleLogout = () => {
-    Cookies.remove("idToken");
+    document.cookie.split(";").forEach((cookie) => {
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+    });
+
     localStorage.clear();
     sessionStorage.clear();
+
     setIsLoggedIn(false);
     setIsLoginModalVisible(false);
   };
@@ -161,7 +166,9 @@ const CustomCarousel = () => {
                 alt={`banner-${i}`}
                 width={800}
                 height={600}
-                className={`${styles.banner_image} ${isMobile ? styles.mobileBanner : ""}`}
+                className={`${styles.banner_image} ${
+                  isMobile ? styles.mobileBanner : ""
+                }`}
                 priority
               />
 
@@ -177,18 +184,68 @@ const CustomCarousel = () => {
                     </button>
 
                     <div className={styles.searchWrapper}>
-                      <svg className={styles.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
-                        <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      <svg
+                        className={styles.searchIcon}
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <circle
+                          cx="11"
+                          cy="11"
+                          r="8"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M21 21l-4.35-4.35"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
                       </svg>
-                      <input type="text" placeholder="Search" className={styles.searchInput} onClick={() => router.push('/search')}/>
+                      <input
+                        type="text"
+                        placeholder="Search"
+                        className={styles.searchInput}
+                        onClick={() => router.push("/search")}
+                      />
                     </div>
 
-                    <button className={styles.iconButton} aria-label="Shopping bag" onClick={handleCartClick}>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="2"/>
-                        <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <button
+                      className={styles.iconButton}
+                      aria-label="Shopping bag"
+                      onClick={() => router.push("/cart")}
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <line
+                          x1="3"
+                          y1="6"
+                          x2="21"
+                          y2="6"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M16 10a4 4 0 01-8 0"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -199,7 +256,10 @@ const CustomCarousel = () => {
                         <User size={20} /> Profile
                       </li>
                       {navItems.map(({ icon: Icon, label, link }, idx) => (
-                        <li key={idx} onClick={() => handleIconClick(label, link)}>
+                        <li
+                          key={idx}
+                          onClick={() => handleIconClick(label, link)}
+                        >
                           <Icon size={20} /> {label}
                         </li>
                       ))}

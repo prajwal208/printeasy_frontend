@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { startTransition, useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import styles from "./cart.module.scss";
 import NoResult from "@/component/NoResult/NoResult";
@@ -10,14 +10,22 @@ import PriceList from "./PriceList/PriceList";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import api from "@/axiosInstance/axiosInstance";
+import { ChevronLeft } from "lucide-react";
+import { db } from "@/lib/db";
+import Cookies from "js-cookie";
 
 const Cart = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [cartItems, setCartItems] = useState([]);
   const [addressList, setAddressList] = useState([]);
   const router = useRouter();
+  const accessToken = Cookies.get("idToken");
 
-  console.log(cartItems[0]?.id,"sjsjueyeynnbbcvcv")
+  useEffect(() => {
+    db.cart.toArray().then(setCartItems);
+  }, []);
+
+  console.log(cartItems, "oopopopopoeerrxx");
 
   const handleQuantityChange = (id, newQuantity) => {
     if (newQuantity < 1) return;
@@ -44,34 +52,57 @@ const Cart = () => {
   const couponDiscount = 0;
   const grandTotal = bagTotal - couponDiscount;
 
-  const getCartData = async () => {
-    try {
-      const res = await api.get(`/v1/cart`, {
-        headers: {
-          "x-api-key":
-            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        },
-      });
-      setCartItems(res?.data?.data || []);
-    } catch (error) {
-      console.error("❌ Error fetching cart:", error);
-      toast.error("Failed to fetch cart.");
-    }
-  };
+  // const getCartData = async () => {
+  //   try {
+  //     const res = await api.get(`/v1/cart`, {
+  //       headers: {
+  //         "x-api-key":
+  //           "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+  //       },
+  //     });
+  //     setCartItems(res?.data?.data || []);
+  //   } catch (error) {
+  //     console.error("❌ Error fetching cart:", error);
+  //     toast.error("Failed to fetch cart.");
+  //   }
+  // };
 
-  const handleDelete = async (id) => {
+  // const handleDelete = async (id) => {
+  //   try {
+  //     await api.delete(`/v1/cart?itemId=${id}`, {
+  //       headers: {
+  //         "x-api-key":
+  //           "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+  //       },
+  //     });
+  //     setCartItems((prev) => prev.filter((item) => item.id !== id));
+  //     toast.success("Item removed from cart.");
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Failed to remove item.");
+  //   }
+  // };
+
+  const removeFromCart = async (productId) => {
     try {
-      await api.delete(`/v1/cart?itemId=${id}`, {
-        headers: {
-          "x-api-key":
-            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        },
-      });
-      setCartItems((prev) => prev.filter((item) => item.id !== id));
-      toast.success("Item removed from cart.");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to remove item.");
+      console.log(productId, "sknsieieieieie");
+      const item = await db.cart.where("productId").equals(productId).first();
+
+      if (!item) {
+        toast.warning("Item not found in cart");
+        return;
+      }
+
+      await db.cart.delete(item.id);
+      setCartItems((prev) =>
+        prev.filter((cartItem) => cartItem.productId !== productId)
+      );
+
+      toast.success("Item removed from cart");
+      toast.success("Item removed from cart");
+    } catch (err) {
+      console.error("Error deleting cart item:", err);
+      toast.error("Failed to remove item");
     }
   };
 
@@ -89,10 +120,10 @@ const Cart = () => {
     }
   };
 
-  console.log(addressList?.[0]?.id,"sjsjueyeterrxxx")
+  console.log(addressList?.[0]?.id, "sjsjueyeterrxxx");
 
   useEffect(() => {
-    getCartData();
+    // getCartData();
     getAddressList();
   }, []);
 
@@ -104,15 +135,16 @@ const Cart = () => {
     }
 
     try {
-      const res = await api.post(`/v1/orders/create`,
+      const res = await api.post(
+        `/v1/orders/create`,
         {
           shippingAddressId: addressList?.[0].id,
           billingAddressId: addressList?.[0].id,
-          cartIds: cartItems.map(item => item.id),
+          cartIds: cartItems.map((item) => item.id),
           // couponCode: "",
-          items:[],
+          items: [],
           paymentMethod: "ONLINE",
-          totalAmount:grandTotal,
+          totalAmount: grandTotal,
         },
         {
           headers: {
@@ -135,7 +167,8 @@ const Cart = () => {
         handler: async function (response) {
           // Step 3: Capture payment on backend
           try {
-            await api.post(`/v1/payment/verify`,
+            await api.post(
+              `/v1/payment/verify`,
               { ...response, cartItems },
               {
                 headers: {
@@ -169,11 +202,41 @@ const Cart = () => {
     }
   };
 
+  const addToWishlist = async (productId) => {
+    if (!accessToken) {
+      toast.warning("Please login to Add to Wishlist");
+      return;
+    }
+
+    try {
+      const res = await api.post(
+        `${apiUrl}/v2/wishlist`,
+        { productId: productId },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "x-api-key":
+              "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+          },
+        }
+      );
+
+      if (res.status === 200) toast.success("Added to wishlist!");
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Failed to add to wishlist"
+      );
+    }
+  };
+
   return (
     <div className={styles.cartPage}>
       <ToastContainer position="top-right" autoClose={2000} />
       {cartItems?.length > 0 ? (
         <>
+          <button className={styles.iconBtn} onClick={() => router.push("/")}>
+            <ChevronLeft size={22} />
+          </button>
           <CartRewards totalAmount={bagTotal} />
 
           <div className={styles.cartContainer}>
@@ -189,7 +252,7 @@ const Cart = () => {
                       <div className={styles.itemHeader}>
                         <h3 className={styles.itemName}>{item.name}</h3>
                         <button
-                          onClick={() => handleDelete(item.id)}
+                          onClick={() => removeFromCart(item?.productId)}
                           className={styles.removeBtn}
                         >
                           <Trash2 size={20} />
@@ -197,9 +260,7 @@ const Cart = () => {
                       </div>
 
                       <div className={styles.itemMeta}>
-                        <span>
-                          {item.options?.size} | {item.options?.color}
-                        </span>
+                        <span>{item.options[0]?.value} |</span>
                         <span className={styles.quantitySelector}>
                           QTY |
                           <select
@@ -222,15 +283,15 @@ const Cart = () => {
                     </div>
 
                     <div className={styles.itemFooter}>
-                      <button className={styles.wishlistBtn}>
+                      <button
+                        className={styles.wishlistBtn}
+                        onClick={() => addToWishlist(item?.productId)}
+                      >
                         MOVE TO WISHLIST
                       </button>
                       <span className={styles.itemPrice}>
                         ₹
-                        {item.price ||
-                          item.totalPrice ||
-                          item.product?.price ||
-                          0}
+                        {item.discountPrice}
                       </span>
                     </div>
                   </div>

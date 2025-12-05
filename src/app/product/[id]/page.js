@@ -7,7 +7,7 @@ import Image from "next/image";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
-
+import { db } from "@/lib/db";
 import styles from "./ProductDetails.module.scss";
 import CanvasEditor from "@/component/CanvasEditor/CanvasEditor";
 import api from "@/axiosInstance/axiosInstance";
@@ -62,7 +62,7 @@ const ProductDetails = () => {
     if (id) fetchProduct();
   }, [id]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (relatedId) {
       getRelatedProduct(relatedId);
     }
@@ -73,11 +73,6 @@ const ProductDetails = () => {
   }
 
   const addToCart = async () => {
-    // if (!accessToken) {
-    //   toast.warning("Please login to Add to Cart");
-    //   return;
-    // }
-
     if (product?.configuration?.length > 0 && !selectedSize) {
       toast.warning("Please select a size.");
       return;
@@ -103,41 +98,42 @@ const ProductDetails = () => {
       options: [
         {
           label: "Size",
-          value: "size",
-          options:
-            product.configuration?.[0]?.options
-              ?.filter((opt) => opt.value === selectedSize)
-              .map((opt) => ({
-                label: opt.label,
-                value: opt.value,
-                options: opt.options || [],
-              })) || [],
+          value: selectedSize,
         },
       ],
-      illustrationImage: product?.illustrationImage,
-      printingImgText: printingImg,
+      addedAt: new Date().toISOString(),
     };
 
     try {
       setLoader(true);
       setLoading(true);
-      const res = await api.post(`/v1/cart`, payload, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "x-api-key":
-            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        },
-      });
 
-      if (res.status === 200) toast.success("Added to bag!");
+      const existingItem = await db.cart
+        .where("productId")
+        .equals(product.id)
+        .first();
+
+      if (existingItem) {
+        await db.cart.update(existingItem.id, {
+          quantity: existingItem.quantity + quantity,
+          totalPrice:
+            (existingItem.discountPrice || existingItem.basePrice) *
+            (existingItem.quantity + quantity),
+        });
+      } else {
+        await db.cart.add(payload);
+      }
+
+      toast.success("Added to cart!");
     } catch (err) {
-      console.error("Error adding to cart", err);
-      toast.error(err?.response?.data?.message || "Failed to add to bag");
+      console.error("Dexie error:", err);
+      toast.error("Failed to add to cart");
     } finally {
-      setLoading(false);
       setLoader(false);
+      setLoading(false);
     }
   };
+
 
   const addToWishlist = async () => {
     if (!accessToken) {
@@ -178,22 +174,20 @@ const ProductDetails = () => {
 
   const getRelatedProduct = async (relatedId) => {
     try {
-      const res = await api.get(`/v2/product/${relatedId}/related`,{
-         headers: {
-            "x-api-key":
-              "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-          },
+      const res = await api.get(`/v2/product/${relatedId}/related`, {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
       });
       setRelatedData(res?.data?.data);
-      console.log(res,"pposueueuuexxxncbcbc")
+      console.log(res, "pposueueuuexxxncbcbc");
       return res; // <-- as requested
     } catch (error) {
       console.log(error, "error while fetching related data");
       return null; // safe return for failure
     }
   };
-
-
 
   return (
     <div className={styles.container}>
@@ -307,7 +301,7 @@ const ProductDetails = () => {
         </div>
 
         <section>
-          <Suggested relatedData={relatedData}/>
+          <Suggested relatedData={relatedData} />
         </section>
       </div>
 
