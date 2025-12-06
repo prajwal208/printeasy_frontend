@@ -15,13 +15,15 @@ import AddToBagLoader from "@/component/AddToBagLoader/AddToBagLoader";
 import DynamicModal from "@/component/Modal/Modal";
 import ProductDetailsShimmer from "@/component/ProductDetailsShimmer/ProductDetailsShimmer";
 import Suggested from "@/component/Suggested/Suggested";
+import BottomSheet from "@/component/BottomSheet/BottomSheet";
+import AddToCartSuccessSheet from "@/component/AddToCartSuccessSheet/AddToCartSuccessSheet";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [loading, setLoading] = useState(true); // initially true
+  const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState(null);
   const [designPng, setDesignPng] = useState("");
   const [sizeInfo, setSizeInfo] = useState(null);
@@ -32,9 +34,11 @@ const ProductDetails = () => {
     printText: "",
     fontSize: "",
   });
+  const [showSizeSheet, setShowSizeSheet] = useState(false);
   const [relatedId, setRelatedId] = useState("");
   const [loader, setLoader] = useState(false);
   const [relatedData, setRelatedData] = useState([]);
+  const [showSuccessCart, setShowSuccessCart] = useState(false);
 
   console.log(sizeInfo?.options.length, "uuuttt");
 
@@ -74,7 +78,7 @@ const ProductDetails = () => {
 
   const addToCart = async () => {
     if (product?.configuration?.length > 0 && !selectedSize) {
-      toast.warning("Please select a size.");
+      setShowSizeSheet(true);
       return;
     }
 
@@ -124,7 +128,7 @@ const ProductDetails = () => {
         await db.cart.add(payload);
       }
 
-      toast.success("Added to cart!");
+      setShowSuccessCart(true);
     } catch (err) {
       console.error("Dexie error:", err);
       toast.error("Failed to add to cart");
@@ -133,7 +137,6 @@ const ProductDetails = () => {
       setLoading(false);
     }
   };
-
 
   const addToWishlist = async () => {
     if (!accessToken) {
@@ -182,10 +185,10 @@ const ProductDetails = () => {
       });
       setRelatedData(res?.data?.data);
       console.log(res, "pposueueuuexxxncbcbc");
-      return res; // <-- as requested
+      return res;
     } catch (error) {
       console.log(error, "error while fetching related data");
-      return null; // safe return for failure
+      return null;
     }
   };
 
@@ -300,9 +303,43 @@ const ProductDetails = () => {
           ))}
         </div>
 
-        <section>
+        <section style={{width:"100%",overflowX:"auto"}}>
           <Suggested relatedData={relatedData} />
         </section>
+
+        <BottomSheet
+          open={showSizeSheet}
+          onClose={() => setShowSizeSheet(false)}
+        >
+          <h3 style={{ textAlign: "center", marginBottom: "15px" }}>
+            SELECT A SIZE
+          </h3>
+
+          <div className={styles.sizeOptionsSheet}>
+            {product?.configuration[0].options.map((s) => (
+              <button
+                key={s.value}
+                onClick={() => {
+                  handleSizeSelect(s.value);
+                  setShowSizeSheet(false);
+                }}
+                className={`${styles.sizeBtn} ${
+                  selectedSize === s.value ? styles.activeSize : ""
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </BottomSheet>
+
+        <BottomSheet
+          open={showSuccessCart}
+          onClose={() => setShowSuccessCart(false)}
+        >
+
+          <AddToCartSuccessSheet relatedData={relatedData}/>
+        </BottomSheet>
       </div>
 
       <DynamicModal open={loader} onClose={() => setLoader(false)}>

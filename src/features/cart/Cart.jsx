@@ -18,8 +18,11 @@ const Cart = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [cartItems, setCartItems] = useState([]);
   const [addressList, setAddressList] = useState([]);
+  const [offerData, setOfferData] = useState([]);
   const router = useRouter();
   const accessToken = Cookies.get("idToken");
+
+  console.log(offerData, "sbbsiieiexxxx");
 
   useEffect(() => {
     db.cart.toArray().then(setCartItems);
@@ -35,6 +38,25 @@ const Cart = () => {
       )
     );
   };
+
+  const getOfferData = async () => {
+    try {
+      const res = await api.get(`/v2/giftreward`, {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      });
+      setOfferData(res?.data?.data || []);
+    } catch (error) {
+      console.error(" Error fetching reward:", error);
+      toast.error("Failed to fetch cart.");
+    }
+  };
+
+  useEffect(() => {
+    getOfferData();
+  }, []);
 
   const calculateTotal = () => {
     return cartItems.reduce((sum, item) => {
@@ -98,7 +120,6 @@ const Cart = () => {
         prev.filter((cartItem) => cartItem.productId !== productId)
       );
 
-      toast.success("Item removed from cart");
       toast.success("Item removed from cart");
     } catch (err) {
       console.error("Error deleting cart item:", err);
@@ -290,8 +311,11 @@ const Cart = () => {
                         MOVE TO WISHLIST
                       </button>
                       <span className={styles.itemPrice}>
-                        ₹
-                        {item.discountPrice}
+                        <span className={styles.strikeValue}>
+                          {" "}
+                          ₹{item?.basePrice}
+                        </span>{" "}
+                        <span>₹{item?.discountPrice}</span>
                       </span>
                     </div>
                   </div>
@@ -302,12 +326,13 @@ const Cart = () => {
             <div className={styles.rightSection}>
               <DefaultAddress
                 addressList={addressList}
-                onChange={() => console.log("Change Address Clicked")}
+                onChange={() => router.push("/address")}
               />
               <PriceList
                 bagTotal={bagTotal}
                 grandTotal={grandTotal}
                 handlePayNow={handlePayNow}
+                offerData={offerData}
               />
             </div>
           </div>

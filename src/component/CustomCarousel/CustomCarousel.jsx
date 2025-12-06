@@ -21,6 +21,7 @@ import Cookies from "js-cookie";
 import DynamicModal from "@/component/Modal/Modal";
 import LoginForm from "@/features/signup/LogIn/LoginForm";
 import Logout from "@/features/signup/Logout/Logout";
+import bag from "../../assessts/cartwhite.svg";
 
 const CACHE_KEY = "carouselBanners";
 
@@ -34,6 +35,8 @@ const CustomCarousel = () => {
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
+
+  const count = localStorage.getItem("count");
 
   const navItems = [
     { icon: Briefcase, label: "Orders", link: "/orders" },
@@ -214,39 +217,13 @@ const CustomCarousel = () => {
                     </div>
 
                     <button
-                      className={styles.iconButton}
-                      aria-label="Shopping bag"
+                      className={styles.mobileIcon}
                       onClick={() => router.push("/cart")}
                     >
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <path
-                          d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <line
-                          x1="3"
-                          y1="6"
-                          x2="21"
-                          y2="6"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        />
-                        <path
-                          d="M16 10a4 4 0 01-8 0"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
+                      {count > "0" && (
+                        <span className={styles.badge}>{count}</span>
+                      )}
+                      <Image src={bag} alt="cart_image"/>
                     </button>
                   </div>
 

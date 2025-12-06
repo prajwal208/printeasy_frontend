@@ -2,7 +2,7 @@
   display: flex;
 
   gap: 3rem;
-  padding: 2rem 4rem;
+  padding: 2rem;
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
@@ -39,7 +39,6 @@
   }
 }
 
-/* IMAGE OR CANVAS SECTION */
 .imageSection {
   flex: 1;
   min-width: 320px;
@@ -117,7 +116,7 @@
     gap: 0.8rem;
   }
 
-  .dis_price{
+  .dis_price {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -165,8 +164,6 @@
         justify-content: center;
       }
     }
-
-    
 
     .sizeBtn {
       border: 1px solid #000;
@@ -261,33 +258,58 @@
   }
 
   .offerTag {
-  font-size: 1rem;
-  font-weight: 700;
-  color: green;
-  margin-left: 6px;
-}
-
-/* size measurement box */
-.sizeDetailsBox {
-  background: #e6e6e6;
-  padding: 5px 14px;
-  width: fit-content;
-  font-size: 12px;
-  font-weight: 500;
-  display: flex;
-  gap: 6px;
-  color: #333;
-  margin-bottom: 14px;
-
-  span {
-    white-space: nowrap;
+    font-size: 1rem;
+    font-weight: 700;
+    color: green;
+    margin-left: 6px;
   }
 
- 
+  /* size measurement box */
+  .sizeDetailsBox {
+    background: #e6e6e6;
+    padding: 5px 14px;
+    width: fit-content;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    gap: 6px;
+    color: #333;
+    margin-bottom: 14px;
+
+    span {
+      white-space: nowrap;
+    }
+  }
+
+  .sizeOptionsSheet {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+
+    .sizeBtn {
+  width: 100%;
+  padding: 12px 0;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  font-size: 16px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: center;
+
+  &:hover {
+    border-color: #000;
+  }
 }
 
-
-
+.activeSize {
+  border-color: #000;
+  background: #000;
+  color: #fff;
+  font-weight: 600;
+}
+  }
 
   /* Shimmer loader */
   .shimmerWrapper {
@@ -317,55 +339,54 @@
   }
 }
 
+.accordion {
+  width: 100%;
+  border-top: 1px solid #dcdcdc;
+}
 
-  .accordion {
-    width: 100%;
-    border-top: 1px solid #dcdcdc;
+.accordionItem {
+  border-bottom: 1px solid #dcdcdc;
+  padding: 1.2rem 0;
+  cursor: pointer;
+}
+
+.accordionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  transition: color 0.2s ease;
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
   }
 
-  .accordionItem {
-    border-bottom: 1px solid #dcdcdc;
-    padding: 1.2rem 0;
-    cursor: pointer;
+  svg {
+    stroke-width: 2;
+    transition: transform 0.3s ease;
   }
+}
 
-  .accordionHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    transition: color 0.2s ease;
+.accordionContent {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.35s ease;
 
-    h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #000;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    }
-
-    svg {
-      stroke-width: 2;
-      transition: transform 0.3s ease;
-    }
-  }
-
-  .accordionContent {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: all 0.35s ease;
-
-    p {
-      margin-top: 10px;
-      font-size: 1rem;
-      line-height: 1.5;
-      color: #444;
-    }
-  }
-
-  .accordionContent.active {
-    max-height: 300px;
-    opacity: 1;
+  p {
     margin-top: 10px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #444;
   }
+}
+
+.accordionContent.active {
+  max-height: 300px;
+  opacity: 1;
+  margin-top: 10px;
+}

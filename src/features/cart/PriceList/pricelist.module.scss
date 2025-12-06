@@ -1,7 +1,7 @@
 .priceDetails {
   background-color: white;
   border-radius: 8px;
-  padding: 30px;
+  padding: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   height: fit-content;
   position: sticky;
@@ -10,6 +10,18 @@
   @media (max-width: 767px) {
     position: static;
   }
+}
+
+.finalAmount {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rewardsApplied {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .priceHeader {
@@ -69,12 +81,30 @@
   }
 }
 
+.freePriceWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.discountText {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.strikeValue {
+  color: #999;
+  font-size: 14px;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
 .priceValue {
   font-weight: 500;
 }
 
 .discountValue {
-  color: #4CAF50;
+  color: #4caf50;
   font-weight: 500;
 }
 
@@ -101,6 +131,7 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: background-color 0.3s;
+  margin-top: 14px;
 
   &:hover {
     background-color: #c1732e;

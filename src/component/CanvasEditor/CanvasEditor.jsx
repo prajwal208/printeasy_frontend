@@ -36,7 +36,7 @@ export default function CanvasEditor({
 
     const font = new FontFace(
       fileName,
-      `url(/fonts/${fileName}.ttf)` // <-- Local font loading
+      `url(/fonts/${fileName}.ttf)`
     );
 
     try {
@@ -366,9 +366,9 @@ export default function CanvasEditor({
       </div>
       <div className={styles.mobileIconsContainer}>
         <div className={styles.mobileIconsRight}>
-          <button className={styles.mobileIcon} onClick={() => {}}>
+          <button className={styles.mobileIcon} onClick={() => router.push('/cart')}>
             {count > "0" && <span className={styles.badge}>{count}</span>}
-            <Image src={bag} />
+            <Image src={bag} alt="bag"/>
           </button>
           <button className={styles.mobileIcon} onClick={handleWishlistClick}>
             <Heart
@@ -378,7 +378,7 @@ export default function CanvasEditor({
             />
           </button>
           <button className={styles.mobileIcon} onClick={handleShare}>
-            <Image src={share} />
+            <Image src={share} alt="share"/>
           </button>
         </div>
       </div>

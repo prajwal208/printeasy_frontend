@@ -1,0 +1,47 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s ease;
+  z-index: 9999999;
+}
+
+.overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sheet {
+  position: absolute;
+  bottom: -100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 12px 12px 0 0;
+  padding: 10px 0;
+  transition: 0.35s ease;
+}
+
+.overlay.show .sheet {
+  bottom: 0;
+}
+
+.handle {
+  width: 60px;
+  height: 5px;
+  background: #000;
+  opacity: 0.3;
+  border-radius: 10px;
+  margin: 10px auto;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  cursor: pointer;
+}
