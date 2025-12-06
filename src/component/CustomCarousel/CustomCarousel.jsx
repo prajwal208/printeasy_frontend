@@ -31,12 +31,18 @@ const CustomCarousel = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [count, setCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
-  const count = localStorage.getItem("count");
+  useEffect(() => {
+  if (typeof window !== "undefined") {
+    const storedCount = localStorage.getItem("count") || 0;
+    setCount(storedCount);
+  }
+}, []);
 
   const navItems = [
     { icon: Briefcase, label: "Orders", link: "/orders" },
