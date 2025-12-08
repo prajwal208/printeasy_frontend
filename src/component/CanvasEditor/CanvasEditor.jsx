@@ -372,6 +372,35 @@ export default function CanvasEditor({
     }
   };
 
+  useEffect(() => {
+  const toolbar = document.querySelector(`.${styles.floatingToolbar}`);
+  const editor = document.querySelector(`.${styles.editorWrapper}`);
+
+  if (!toolbar || !editor) return;
+
+  let initialHeight = window.innerHeight;
+
+  const handleResize = () => {
+    const currentHeight = window.innerHeight;
+
+    // Keyboard is OPEN (height reduces by > 150px)
+    if (initialHeight - currentHeight > 150) {
+      const keyboardHeight = initialHeight - currentHeight;
+
+      toolbar.style.bottom = `${keyboardHeight + 20}px`;
+      editor.style.paddingBottom = `${keyboardHeight + 80}px`;
+    } else {
+      // Keyboard CLOSED
+      toolbar.style.bottom = `20px`;
+      editor.style.paddingBottom = `0px`;
+    }
+  };
+
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
+
   return (
     <div className={styles.editorWrapper}>
       <div className={styles.back} onClick={() => router.back()}>
