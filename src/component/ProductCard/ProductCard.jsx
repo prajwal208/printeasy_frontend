@@ -96,7 +96,7 @@ const ProductCard = ({ item, getwishList }) => {
           </span>
         )}
       </div>
-
+      
       <h3>{item?.name}</h3>
       <p>
         ₹ {item?.discountedPrice}{" "}

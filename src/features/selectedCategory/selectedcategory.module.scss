@@ -14,10 +14,17 @@
 
 /* Mobile Layout */
 @media (max-width: 768px) {
-  .cardGrid {
-    grid-template-columns: repeat(2, 1fr); 
-    gap: 0;
-    padding: 0;
+ .cardGrid {
+    width: 100vw;
+    padding: 0 !important;
+    margin: 0 !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px !important;
+    justify-items: stretch;
+  }
+
+  .cardGrid > * {
+    width: 100% !important;
   }
 
   .mobileHeader {

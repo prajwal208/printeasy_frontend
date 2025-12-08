@@ -272,7 +272,7 @@ const ProductDetails = () => {
 
         <div className={styles.buttonsWrapper}>
 
-          {/* <div style={{position:"fixed",bottom:"0", right:"0px",width:"100%",height:"5rem",backgroundColor:"#efeded",zIndex:"999999"}}> */}
+          
           <div className={styles.button_wrapper}>
           <button
             className={styles.addToCart}
@@ -282,7 +282,6 @@ const ProductDetails = () => {
             {loading ? "ADDING..." : "ADD TO BAG"}
           </button>
           </div>
-          {/* </div> */}
 
           {/* <button className={styles.addToWishlist} onClick={addToWishlist}>
             <Heart size={18} style={{ marginRight: "6px" }} />
