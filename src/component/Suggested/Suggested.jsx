@@ -3,7 +3,6 @@ import styles from "./suggested.module.scss";
 import ProductCard from "../ProductCard/ProductCard";
 
 const Suggested = ({ relatedData }) => {
-  console.log(relatedData, "shidhwihihennn");
   return (
     <>
       <main className={styles.suggested_main_wrap}>
@@ -12,9 +11,7 @@ const Suggested = ({ relatedData }) => {
         <section className={styles.related_list}>
           {relatedData?.map((item) => {
             return (
-              <div key={item?.id} className={styles.card_wrapper}>
-                <ProductCard item={item} />
-              </div>
+                <ProductCard item={item} key={item.id}/>
             );
           })}
         </section>

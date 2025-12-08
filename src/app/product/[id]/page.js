@@ -200,6 +200,7 @@ const ProductDetails = () => {
   };
 
   return (
+    <>
     <div className={styles.container}>
       <ToastContainer position="top-right" autoClose={2000} />
 
@@ -314,9 +315,9 @@ const ProductDetails = () => {
           ))}
         </div>
 
-        <section style={{width:"100%",overflowX:"auto"}}>
+        {/* <section style={{width:"100%",overflowX:"auto"}}>
           <Suggested relatedData={relatedData} />
-        </section>
+        </section> */}
 
         <BottomSheet
           open={showSizeSheet}
@@ -357,6 +358,12 @@ const ProductDetails = () => {
         <AddToBagLoader />
       </DynamicModal>
     </div>
+
+    <section style={{width:"100%",overflowX:"auto"}}>
+          <Suggested relatedData={relatedData} />
+        </section>
+
+        </>
   );
 };
 

@@ -26,6 +26,7 @@ export default function CanvasEditor({
   const [activeTab, setActiveTab] = useState("font");
   const [isWishlisted, setIsWishlisted] = useState(product?.isInWishlist);
   const [fonts, setFonts] = useState([]);
+  const [canvasbackground,setCanvasBackground] = useState("")
   const router = useRouter();
   const { cartCount } = useCart();
   const count = localStorage.getItem("count");
@@ -113,11 +114,11 @@ export default function CanvasEditor({
     const canvas = new window.fabric.Canvas(canvasRef.current, {
       width: 600,
       height: 700,
-      backgroundColor: "#f0f0f0",
+      backgroundColor: "#fff",
       preserveObjectStacking: true,
       selection: true,
     });
-
+    canvas.setBackgroundColor(canvasbackground, canvas.renderAll.bind(canvas));
     fabricCanvasRef.current = canvas;
 
     const handleSelection = (e) => {
@@ -154,32 +155,47 @@ export default function CanvasEditor({
   };
 
   const loadProductImages = (canvas) => {
-    const shirtUrl = getRealImageUrl(product?.canvasImage);
+  const shirtUrl = getRealImageUrl(product?.canvasImage);
 
-    if (!shirtUrl) return;
+  if (!shirtUrl) return;
 
-    window.fabric.Image.fromURL(
-      shirtUrl,
-      (shirtImg) => {
-        if (!shirtImg.width) return;
+  window.fabric.Image.fromURL(
+    shirtUrl,
+    (shirtImg) => {
+      if (!shirtImg.width) return;
 
-        const scale = (canvas.width / shirtImg.width) * 0.68;
+      const scale = (canvas.width / shirtImg.width) * 0.68;
 
-        shirtImg.set({
-          scaleX: scale,
-          scaleY: scale,
-          top: 100,
-          left: 100,
-        });
+      shirtImg.set({
+        scaleX: scale,
+        scaleY: scale,
+        top: 125,
+        left: 100,
+      });
 
-        canvas.setBackgroundImage(shirtImg, () => {
-          canvas.renderAll();
-          addTextBelowIllustration(canvas, null);
-        });
-      },
-      { crossOrigin: "anonymous" }
-    );
-  };
+      // Set as Fabric background
+      canvas.setBackgroundImage(shirtImg, () => {
+        canvas.renderAll();
+        addTextBelowIllustration(canvas, null);
+
+        // Extract background color
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = shirtImg.width;
+        tempCanvas.height = shirtImg.height;
+        const ctx = tempCanvas.getContext("2d");
+        ctx.drawImage(shirtImg._element, 0, 0);
+
+        // Get pixel data of top-left corner (0,0)
+        const pixelData = ctx.getImageData(0, 0, 1, 1).data;
+        const bgColor = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
+        setCanvasBackground(bgColor)
+        console.log("Background color:", typeof bgColor);
+      });
+    },
+    { crossOrigin: "anonymous" }
+  );
+};
+
 
   useEffect(() => {
     Object.values(fontMap).forEach((font) => {
@@ -211,7 +227,7 @@ export default function CanvasEditor({
   const addTextBelowIllustration = async (canvas, illustration) => {
     const topPos = illustration
       ? illustration.top + illustration.getScaledHeight() + 10
-      : SAFE.top + SAFE.height / 2 - selectedSize / 2 + 65;
+      : SAFE.top + SAFE.height / 2 - selectedSize / 2 + 110;
 
     const fontName =
       fontMap[product?.fontFamily] || product?.fontFamily || selectedFont;
