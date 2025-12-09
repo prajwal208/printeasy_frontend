@@ -67,7 +67,7 @@
   animation: slideUp 0.4s ease;
   @media (max-width: 480px) {
     .floatingToolbar {
-      gap: 28px;
+      gap: 16px;
       padding: 0 16px;
       justify-content: center;
       position: fixed;
@@ -83,10 +83,10 @@
     }
   }
   @media (max-width: 440px) {
-    gap: 28px;
+    gap: 16px;
     padding: 0 16px;
     justify-content: center;
-    bottom: 180;
+    bottom: 220;
   }
 }
 
@@ -100,13 +100,6 @@
   padding: 2px;
   border-radius: 24px;
   transition: all 0.25s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.6);
-  }
-  &.active {
-    background: none;
-  }
 }
 
 .iconAa {
@@ -170,18 +163,36 @@
   }
 }
 
+@media screen and (max-width: 600px) {
+  .iconAa,
+  .iconColorA,
+  .iconF,
+  .iconKeyboard {
+    font-size: 18px;
+  }
+
+  .toolLabel {
+    font-size: 8px;
+  }
+
+  .closeToolbarBtn {
+    width: 30px;
+    height: 30px;
+  }
+}
+
 // ──────────────────────────────
 // Dropdown Panel (Appears above toolbar)
 // ──────────────────────────────
 .optionsPanel {
   position: absolute;
-  bottom: 75px;
-  left: 50%;
+  bottom: 52px;
+  left: 51%;
   background-color: #f3d4a7;
   transform: translateX(-50%);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
   z-index: 1001;
-  width: 100%;
+  width: 122%;
   animation: popUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.5);
 
   // Hide scrollbars everywhere inside
@@ -230,6 +241,12 @@
   }
 }
 
+@media screen and (max-width: 600px) {
+  .fontOption {
+    font-size: 16px;
+  }
+}
+
 // Color swatches
 .colorSwatch {
   width: 52px;
@@ -249,6 +266,17 @@
   }
 }
 
+
+@media screen and (max-width:600px){
+  .colorSwatch{
+      width: 20px;
+  height: 20px;
+  padding: 18px;
+  border-radius: 8px;
+  }
+  
+}
+
 // Size buttons
 .sizeBtn {
   width: 58px;
@@ -262,6 +290,22 @@
   cursor: pointer;
   transition: all 0.2s;
   padding: 15px;
+}
+
+@media screen and (max-width: 600px) {
+  .sizeBtn {
+    color: #333;
+    cursor: pointer;
+    background: #ffd392;
+    border: none;
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
 }
 
 // ──────────────────────────────
