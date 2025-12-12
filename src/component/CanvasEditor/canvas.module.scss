@@ -9,20 +9,7 @@
     align-items: center;
   }
 }
-// .editorWrapper {
-//   position: relative;
-//   width: 100%;
-//   max-width: 600px;   // match canvas width
-//   margin: 0 auto;
-//   padding: 0 !important;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
 
-//   @media (max-width: 768px) {
-//     max-width: 100%;
-//   }
-// }
 .canvas {
   border: 1px solid #ddd;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);

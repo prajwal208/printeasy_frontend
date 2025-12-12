@@ -247,29 +247,54 @@ export default function CanvasEditor({
 
     const fontName =
       fontMap[product?.fontFamily] || product?.fontFamily || selectedFont;
-
-    // Load matching font object from API response
     const fontData = fonts.find((f) => f.family === fontName);
 
     if (fontData) {
       await loadFont(fontData);
-
-      // Ensure browser fully registers font BEFORE rendering
       await document.fonts.ready;
     }
+
+    const MAX_LINES = 2;
+    const MAX_CHARS_PER_LINE = 24;
+
+    const truncateText = (text) => {
+      const lines = text.split("\n");
+      const processedLines = lines.slice(0, MAX_LINES).map((line) => {
+        if (line.length > MAX_CHARS_PER_LINE) {
+          return line.substring(0, MAX_CHARS_PER_LINE - 1);
+        }
+        return line;
+      });
+
+      // If more than 2 lines, keep only first 2 and add … on last line if needed
+      let result = processedLines.slice(0, MAX_LINES);
+      if (lines.length > MAX_LINES && result.length === MAX_LINES) {
+        const lastLine = result[MAX_LINES - 1];
+        if (lastLine.length >= MAX_CHARS_PER_LINE) {
+          result[MAX_LINES - 1] =
+            lastLine.substring(0, MAX_CHARS_PER_LINE - 2) + "…";
+        } else if (lastLine.length < MAX_CHARS_PER_LINE) {
+          result[MAX_LINES - 1] =
+            lastLine.padEnd(MAX_CHARS_PER_LINE - 1, " ") + "…";
+        }
+      }
+
+      return result.join("\n");
+    };
 
     const text = new window.fabric.Textbox(
       product?.presetText || "YOUR TEXT HERE",
       {
-        left: SAFE.left + 30,
+        left: SAFE.left + 50,
         top: topPos,
-        width: SAFE.width - 10,
+        width: SAFE.width - 40,
         fontSize: defaultFontSize,
         fontFamily: defaultFontFamily,
         fill: defaultFontColor,
         textAlign: "center",
         fontWeight: "normal",
-        splitByGrapheme: false,
+        lineHeight: 1.2,
+        splitByGrapheme: true,
         editable: true,
         lockMovementX: true,
         lockMovementY: true,
@@ -279,45 +304,36 @@ export default function CanvasEditor({
       }
     );
 
-    setPrintingImg({
-      textColor: text.fill,
-      fontFamily: text.fontFamily,
-      printText: text.text,
-      fontSize: text.fontSize,
-    });
+    // Main enforcement on text change
+    const enforceLimits = () => {
+      if (!text.text || text.text === text._text) return;
 
-    text.on("selected", () => {
-      activeTextRef.current = text;
-      setSelectedFont(text.fontFamily || "Arial");
-      setSelectedColor(text.fill || "#000");
-      setSelectedSize(text.fontSize || 28);
-      setIsEditing(!!text.isEditing);
-    });
+      const newText = truncateText(text.text);
+      if (newText !== text.text) {
+        // Store selection to restore cursor position
+        const selection = text.selectionStart;
+        text.set("text", newText);
+        canvas.renderAll();
 
+        // Try to restore cursor position (best effort)
+        requestAnimationFrame(() => {
+          text.selectionStart = text.selectionEnd = Math.min(
+            selection,
+            newText.length
+          );
+          text.enterEditing();
+          text.setSelectionStartEnd(text.selectionStart, text.selectionEnd);
+        });
+      }
+    };
+
+    text.on("changed", enforceLimits);
     text.on("editing:entered", () => {
-      try {
-        const ta = text.hiddenTextarea;
-        if (ta) {
-          ta.style.fontFamily = text.fontFamily || "Arial";
-          ta.style.color = text.fill || "#000";
-          ta.style.fontSize = (text.fontSize || 28) + "px";
-
-          setTimeout(() => {
-            const scrollAmount = window.innerHeight * 0.1;
-            window.scrollTo({
-              top: window.scrollY + scrollAmount,
-              behavior: "smooth",
-            });
-          }, 300);
-        }
-      } catch (e) {}
-
-      activeTextRef.current = text;
-      setIsEditing(true);
+      // Initial enforcement when user starts typing
+      enforceLimits();
     });
 
-    text.on("editing:exited", () => setIsEditing(false));
-
+    // Sync printing data
     const syncPrinting = () =>
       setPrintingImg({
         textColor: text.fill,
@@ -330,6 +346,8 @@ export default function CanvasEditor({
     text.on("changed", syncPrinting);
 
     canvas.add(text);
+    canvas.setActiveObject(text);
+    text.enterEditing();
     canvas.requestRenderAll();
   };
 
