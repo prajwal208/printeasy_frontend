@@ -1,61 +1,93 @@
-@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
 
-.heroword_main_wrap {
-  margin-top: 1rem;
-
-  h1 {
-    text-align: center;
-    margin-bottom: 1rem;
-    font-weight: 500;
-  }
-}
-
-.container {
-  position: relative;
+.wrapper {
   width: 100%;
   height: 320px;
   background-color: #fff0e4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
-
-  perspective: 1000px;
-  perspective-origin: 50% 50%;
 }
 
-.word {
-  position: absolute;
+.tickerContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  transform: rotate(-3deg);
+}
+
+.tickerWrapper {
+  width: 100%;
+  overflow: hidden;
   white-space: nowrap;
-  font-family: "Fredoka", sans-serif;
-  will-change: transform, opacity, filter;
-
-  animation-name: float3D;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
 }
 
-@keyframes float3D {
-  0% {
-    transform: translate3d(var(--x), 110vh, var(--z));
-    opacity: 0;
+.tickerTrack {
+  display: inline-flex;
+  gap: 20px;
+  will-change: transform;
+}
+
+.tickerItem {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 120px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #000;
+  padding: 10px 40px;
+  border-radius: 15px;
+  line-height: 0.9;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Animations */
+.left {
+  animation: scrollLeft 400s linear infinite;
+}
+
+.right {
+  animation: scrollRight 400s linear infinite;
+}
+
+@keyframes scrollLeft {
+  from {
+    transform: translateX(0);
   }
-
-  10% {
-    opacity: var(--opacity);
-  }
-
-  
-
-  90% {
-    opacity: var(--opacity);
-  }
-
-  100% {
-    transform: translate3d(var(--x), -20vh, var(--z));
-    opacity: 0;
+  to {
+    transform: translateX(-50%);
   }
 }
 
-@media screen and (max-width: 760px) {
-  .heroword_main_wrap h1 {
-    font-size: 1.3rem;
+@keyframes scrollRight {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
   }
 }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .wrapper {
+    height: 220px; /* ⬅ reduce overall height */
+  }
+
+  .tickerContainer {
+    gap: 14px;          /* tighter vertical spacing */
+    transform: rotate(-4deg);
+  }
+
+  .tickerItem {
+    font-size: 20px;    /* ⬅ smaller text */
+    padding: 6px 20px;  /* ⬅ smaller pill */
+    border-radius: 8px;
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+}
+
