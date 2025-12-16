@@ -99,6 +99,18 @@ export default function CanvasEditor({
     return img;
   };
 
+  // Add this inside your component
+useEffect(() => {
+  const shirtUrl = getRealImageUrl(product?.canvasImage);
+  if (shirtUrl) {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = shirtUrl;
+    document.head.appendChild(link);
+  }
+}, [product?.canvasImage]);
+
   useEffect(() => {
     if (window.fabric) {
       initCanvas();
@@ -116,7 +128,7 @@ export default function CanvasEditor({
       disposeCanvas();
       if (scriptRef.current) document.body.removeChild(scriptRef.current);
     };
-  }, [product]);
+  }, []);
 
   const disposeCanvas = () => {
     try {
@@ -241,6 +253,7 @@ export default function CanvasEditor({
   const loadProductImages = (canvas) => {
     const shirtUrl = getRealImageUrl(product?.canvasImage);
     if (!shirtUrl) return;
+    
     window.fabric.Image.fromURL(
       shirtUrl,
       (shirtImg) => {
@@ -250,14 +263,6 @@ export default function CanvasEditor({
         canvas.setBackgroundImage(shirtImg, () => {
           canvas.renderAll();
           addTextBelowIllustration(canvas, null);
-          const tempCanvas = document.createElement("canvas");
-          tempCanvas.width = shirtImg.width;
-          tempCanvas.height = shirtImg.height;
-          const ctx = tempCanvas.getContext("2d");
-          ctx.drawImage(shirtImg._element, 0, 0);
-          const pixelData = ctx.getImageData(0, 0, 1, 1).data;
-          const bgColor = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
-          setCanvasBackground(bgColor);
         });
       },
       { crossOrigin: "anonymous" }
@@ -365,7 +370,7 @@ export default function CanvasEditor({
       product?.presetText || PLACEHOLDER_TEXT,
       {
         left: SAFE.left + 24 + (SAFE.width - CONTAINER_WIDTH) / 2,
-        top: topPos + 148,
+        top: topPos + 150,
         width: CONTAINER_WIDTH,
         fontSize: defaultFontSize,
         fontFamily: defaultFontFamily,

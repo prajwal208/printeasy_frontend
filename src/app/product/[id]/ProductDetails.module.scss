@@ -9,7 +9,149 @@
   overflow: hidden;
   @media (max-width: 600px) {
     gap: 0;
-    padding: 1rem;
+    padding: 0;
+  }
+}
+
+.back {
+  position: absolute;
+  top: 10px;
+  left: 0px;
+  display: none;
+  z-index: 9999;
+
+  @media screen and (max-width: 768px) {
+    display: flex;
+  }
+}
+
+.mobileIconsContainer {
+  display: none; // Hidden by default (desktop)
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  width: calc(100% - 20px);
+  justify-content: flex-end;
+  align-items: flex-start;
+  z-index: 100;
+  pointer-events: none; // Allow clicks to pass through container
+
+  @media screen and (max-width: 768px) {
+    display: flex;
+  }
+
+  @media screen and (max-width: 480px) {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    width: calc(100% - 16px);
+  }
+
+  @media screen and (max-width: 440px) {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    width: calc(100% - 10px);
+  }
+}
+
+.mobileIconLeft {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #333;
+
+  &:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @media screen and (max-width: 480px) {
+    width: 36px;
+    height: 36px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.mobileIconsRight {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+  pointer-events: auto;
+
+  @media screen and (max-width: 480px) {
+    gap: 10px;
+    margin-right:0px;
+  }
+  // @media screen and (max-width: 432px) {
+  //   gap: 10px;
+  // margin-right: 1px;
+  // }
+  // @media screen and (max-width: 391px) {
+  //   gap: 10px;
+  // margin-right: 120px;
+  // }
+  // @media screen and (max-width: 376px) {
+  //   gap: 10px;
+  // margin-right: 120px;
+  // }
+}
+
+.mobileIcon {
+  background-color: transparent;
+  outline: none;
+  border: none;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+
+  .badge {
+    position: absolute;
+    top: 0px;
+    right: -4px;
+    font-size: 10px;
+    font-weight: 500;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media screen and (max-width: 480px) {
+    width: 36px;
+    height: 36px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
   }
 }
 
@@ -351,6 +493,12 @@
     100% {
       background-position: 200% 0;
     }
+  }
+}
+
+.infoSection_img{
+    @media screen and (max-width: 435px) {
+    margin-top: 0px;
   }
 }
 
