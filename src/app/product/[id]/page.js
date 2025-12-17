@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Plus, Minus, Heart,ChevronLeft } from "lucide-react";
+import { Plus, Minus, Heart, ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -44,11 +44,11 @@ const ProductDetails = () => {
   const [isCustomizable, setIsCustomizable] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(product?.isInWishlist);
   const { updateCart } = useCart();
-    const { cartCount } = useCart();
+  const { cartCount } = useCart();
   const accessToken = Cookies.get("idToken");
-  const router = useRouter()
+  const router = useRouter();
 
-    const handleWishlistClick = async () => {
+  const handleWishlistClick = async () => {
     try {
       const res = await addToWishlist();
       if (res?.status === 200) setIsWishlisted(true);
@@ -58,25 +58,27 @@ const ProductDetails = () => {
   };
 
   const handleShare = async () => {
-      const shareUrl = window.location.href;
-  
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: product?.title || "Check this out!",
-            text: "Look at this product:",
-            url: shareUrl,
-          });
-        } catch (error) {
-          console.log("Share cancelled", error);
-        }
-      } else {
-        window.open(
-          `https://wa.me/?text=${encodeURIComponent(shareUrl)}`,
-          "_blank"
-        );
+    const shareUrl = window.location.href;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product?.title || "Check this out!",
+          text: "Look at this product:",
+          url: shareUrl,
+        });
+      } catch (error) {
+        console.log("Share cancelled", error);
       }
-    };
+    } else {
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(shareUrl)}`,
+        "_blank"
+      );
+    }
+  };
+
+  console.log(product, "jsksjsiiiiii");
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -114,12 +116,41 @@ const ProductDetails = () => {
     return <ProductDetailsShimmer />;
   }
 
+  console.log(printingImg.textColor, "ooooiixxccc");
+
   const addToCart = async () => {
     if (product?.configuration?.length > 0 && !selectedSize) {
       setShowSizeSheet(true);
       return;
     }
+    setLoader(true)
+    let renderedImageUrl = "";
+    try {
+      const res = await api.post(
+        "/v1/cart/upload-image",
+        {
+          printingImgText: {
+            textColor: printingImg.textColor? printingImg.textColor :  product?.fontColor,
+            fontFamily: printingImg.fontFamily ? printingImg?.fontFamily :  product?.fontFamily,
+            printText: printingImg.printText ? printingImg.printText :  product?.presetText,
+            fontSize: printingImg.fontSize ? printingImg.fontSize : product?.fontSize,
+          },
+          canvasImage: product?.canvasImage,
+        },
+        {
+          headers: {
+            "x-api-key":
+              "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+          },
+        }
+      );
 
+      renderedImageUrl = res?.data?.data?.renderedImageUrl || "";
+    } catch (error) {
+      console.log("Upload image error:", error);
+    }
+
+ 
     const payload = {
       productId: product.id,
       categoryId: product.categoryId,
@@ -130,27 +161,34 @@ const ProductDetails = () => {
       discountPrice: product.discountedPrice || product.basePrice,
       totalPrice: (product.discountedPrice || product.basePrice) * quantity,
       isCustomizable: product.isCustomizable,
-      productImageUrl: product.productImages?.[0] || product.canvasImage || "",
+
+      productImageUrl:
+        renderedImageUrl ||
+        product.productImages?.[0] ||
+        product.canvasImage ||
+        "",
+
+      renderedImageUrl,
+
       dimensions: {
         length: product.dimension?.length || 0,
         width: product.dimension?.width || 0,
         height: product.dimension?.height || 0,
         weight: product.dimension?.weight || 0,
       },
+
       options: [
         {
           label: "Size",
           value: selectedSize,
         },
       ],
+
       addedAt: new Date().toISOString(),
     };
 
     try {
-      setLoader(true);
-      setLoading(true);
 
-      // Check if product already exists in cart
       const existingItem = await db.cart
         .where("productId")
         .equals(product.id)
@@ -162,12 +200,14 @@ const ProductDetails = () => {
           totalPrice:
             (existingItem.discountPrice || existingItem.basePrice) *
             (existingItem.quantity + quantity),
+
+          renderedImageUrl,
+          productImageUrl: renderedImageUrl || existingItem.productImageUrl,
         });
       } else {
         await db.cart.add(payload);
       }
 
-      /** 🚀 Sync Updated Cart Count */
       const updatedCartItems = await db.cart.toArray();
       updateCart(updatedCartItems.length);
 
@@ -177,7 +217,6 @@ const ProductDetails = () => {
       toast.error("Failed to add to cart");
     } finally {
       setLoader(false);
-      setLoading(false);
     }
   };
 

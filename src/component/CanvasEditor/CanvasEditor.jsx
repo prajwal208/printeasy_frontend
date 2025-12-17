@@ -77,7 +77,7 @@ export default function CanvasEditor({
     fetchFonts();
   }, []);
 
-  const defaultFontSize = product?.fontSize || selectedSize;
+  const defaultFontSize = 22 || selectedSize;
   const defaultFontFamily =
     fontMap[product?.fontFamily] || product?.fontFamily || selectedFont;
   const defaultFontColor = product?.fontColor || selectedColor;
@@ -99,7 +99,7 @@ export default function CanvasEditor({
     return img;
   };
 
-  // Add this inside your component
+
 useEffect(() => {
   const shirtUrl = getRealImageUrl(product?.canvasImage);
   if (shirtUrl) {
@@ -370,7 +370,7 @@ useEffect(() => {
       product?.presetText || PLACEHOLDER_TEXT,
       {
         left: SAFE.left + 24 + (SAFE.width - CONTAINER_WIDTH) / 2,
-        top: topPos + 150,
+        top: topPos + 140,
         width: CONTAINER_WIDTH,
         fontSize: defaultFontSize,
         fontFamily: defaultFontFamily,

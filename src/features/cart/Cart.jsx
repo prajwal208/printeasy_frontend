@@ -22,6 +22,7 @@ const Cart = () => {
   const router = useRouter();
   const accessToken = Cookies.get("idToken");
 
+  console.log(cartItems,"sjsjduuuiiuuiuiiu")
 
   useEffect(() => {
     db.cart.toArray().then(setCartItems);
