@@ -19,20 +19,19 @@
   left: 50%;
   transform: translate(-50%, -50%);
   
-  width: 220px;
-  /* (28px font * 1.2 line-height * 2 lines) + some buffer = ~71px-80px */
-  height: 71px; 
+  width: 210px;
+  height: 70px; 
   
   box-sizing: border-box; 
   text-align: center;
   line-height: 1.2;
-  padding: 5px 10px; // Reduced vertical padding to favor the 2-line view
+  
   
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap;
   
-  overflow-y: auto;
+  overflow-y: hidden;
   cursor: pointer;
   z-index: 10;
   margin: 0;
@@ -44,7 +43,6 @@
   }
 }
 
-/* Vertically centers the text when not in editing mode */
 div.presetText {
   display: flex;
   align-items: center;
@@ -52,7 +50,6 @@ div.presetText {
 //   margin-top: -14px;
 }
 
-/* Textarea specific styles */
 .editInput {
   background: transparent;
   outline: none;

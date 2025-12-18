@@ -12,7 +12,6 @@ const ShirtEditor = ({ product }) => {
   const inputRef = useRef(null);
   const viewRef = useRef(null);
 
-  // 1. Fetch Fonts
   useEffect(() => {
     const fetchFonts = async () => {
       try {
@@ -29,7 +28,7 @@ const ShirtEditor = ({ product }) => {
     fetchFonts();
   }, []);
 
-  // 2. Inject @font-face
+
   useEffect(() => {
     if (fonts.length > 0) {
       const styleId = "dynamic-fonts";
@@ -46,7 +45,7 @@ const ShirtEditor = ({ product }) => {
     }
   }, [fonts]);
 
-  // 3. Sync Scroll Position when leaving edit mode
+
   const handleBlur = () => {
     if (inputRef.current) {
       setScrollPos(inputRef.current.scrollTop);
@@ -54,14 +53,14 @@ const ShirtEditor = ({ product }) => {
     setIsEditing(false);
   };
 
-  // 4. Apply scroll position to DIV after it renders
+  
   useEffect(() => {
     if (!isEditing && viewRef.current) {
       viewRef.current.scrollTop = scrollPos;
     }
   }, [isEditing, scrollPos]);
 
-  // 5. Auto-scroll textarea while typing
+ 
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.scrollTop = inputRef.current.scrollHeight;
