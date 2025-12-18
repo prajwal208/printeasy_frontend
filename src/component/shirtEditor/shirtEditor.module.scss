@@ -10,7 +10,6 @@
   width: 500px;
   height: 600px;
 }
-
 .mainImage {
   object-fit: contain;
   width: 100%;
@@ -19,31 +18,29 @@
 
 .presetText {
   position: absolute;
-  top: 59%; // Position on the shirt
+  top: 59%;
   left: 50%;
   transform: translate(-50%, -50%);
   
   width: 220px;
-  
-  /* MATH: (FontSize 28 * LineHeight 1.2 * 2 Lines) + (Padding 10 * 2) = 87.2px */
-  height: 72px; 
+  /* (28px font * 1.2 line-height * 2 lines) + some buffer = ~71px-80px */
+  height: 71px; 
   
   box-sizing: border-box; 
   text-align: center;
   line-height: 1.2;
-  
+  padding: 5px 10px; // Reduced vertical padding to favor the 2-line view
   
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap;
   
-  /* Scroll logic */
   overflow-y: auto;
   cursor: pointer;
   z-index: 10;
   margin: 0;
 
-  /* Hide scrollbars for a cleaner look while still allowing scrolling */
+  /* Hide scrollbars */
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
@@ -55,7 +52,7 @@ div.presetText {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -16px;
+//   margin-top: -14px;
 }
 
 /* Textarea specific styles */

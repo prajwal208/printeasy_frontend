@@ -1,26 +1,67 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./shirtEditor.module.scss";
 import Image from "next/image";
+import api from "@/axiosInstance/axiosInstance";
 
 const ShirtEditor = ({ product }) => {
   const [text, setText] = useState(product?.presetText || "");
   const [isEditing, setIsEditing] = useState(false);
+  const [fonts, setFonts] = useState([]);
+  const [scrollPos, setScrollPos] = useState(0); // Track scroll position
+  
   const inputRef = useRef(null);
+  const viewRef = useRef(null);
 
-  // Sync text with product prop updates
+  // 1. Fetch Fonts
   useEffect(() => {
-    if (product?.presetText) setText(product.presetText);
-  }, [product]);
+    const fetchFonts = async () => {
+      try {
+        const res = await api.get("/v2/font?activeOnly=true", {
+          headers: {
+            "x-api-key": "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+          },
+        });
+        setFonts(res?.data?.data || []);
+      } catch (err) {
+        console.error("Font fetch error:", err);
+      }
+    };
+    fetchFonts();
+  }, []);
 
-  // Handle focus and cursor position
+  // 2. Inject @font-face
   useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.setSelectionRange(text.length, text.length);
+    if (fonts.length > 0) {
+      const styleId = "dynamic-fonts";
+      let styleElement = document.getElementById(styleId);
+      if (!styleElement) {
+        styleElement = document.createElement("style");
+        styleElement.id = styleId;
+        document.head.appendChild(styleElement);
+      }
+      const fontFaceRules = fonts
+        .map((font) => `@font-face { font-family: '${font.family}'; src: url('${font.downloadUrl}') format('truetype'); font-display: swap; }`)
+        .join("\n");
+      styleElement.innerHTML = fontFaceRules;
     }
-  }, [isEditing]);
+  }, [fonts]);
 
-  // Auto-scroll to bottom of textarea as user types
+  // 3. Sync Scroll Position when leaving edit mode
+  const handleBlur = () => {
+    if (inputRef.current) {
+      setScrollPos(inputRef.current.scrollTop);
+    }
+    setIsEditing(false);
+  };
+
+  // 4. Apply scroll position to DIV after it renders
+  useEffect(() => {
+    if (!isEditing && viewRef.current) {
+      viewRef.current.scrollTop = scrollPos;
+    }
+  }, [isEditing, scrollPos]);
+
+  // 5. Auto-scroll textarea while typing
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.scrollTop = inputRef.current.scrollHeight;
@@ -30,13 +71,13 @@ const ShirtEditor = ({ product }) => {
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      setIsEditing(false);
+      handleBlur();
     }
   };
 
   const dynamicStyles = {
     color: product?.fontColor || "white",
-    fontFamily: product?.fontFamily || "Summer Sunshine, sans-serif",
+    fontFamily: `'${product?.fontFamily || "Summer Sunshine"}', sans-serif`,
     fontSize: `${product?.fontSize || 28}px`,
   };
 
@@ -58,13 +99,14 @@ const ShirtEditor = ({ product }) => {
             className={`${styles.presetText} ${styles.editInput}`}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            onBlur={() => setIsEditing(false)}
+            onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             placeholder="Your Text Here"
             style={dynamicStyles}
           />
         ) : (
           <div
+            ref={viewRef}
             className={styles.presetText}
             onClick={() => setIsEditing(true)}
             style={dynamicStyles}

@@ -281,7 +281,44 @@ const ProductDetails = () => {
         <ToastContainer position="top-right" autoClose={2000} />
 
         {product?.isCustomizable ? (
-          <ShirtEditor product={product}/>
+          <>
+            <div className={styles.back} onClick={() => router.back()}>
+              <ChevronLeft size={30} />
+            </div>
+            <div className={styles.mobileIconsContainer}>
+              <div className={styles.mobileIconsRight}>
+                <button
+                  className={styles.mobileIcon}
+                  onClick={() => router.push("/cart")}
+                >
+                  {cartCount > "0" && (
+                    <span className={styles.badge}>{cartCount}</span>
+                  )}
+                  <Image src={bag} alt="bag" />
+                </button>
+                <button
+                  className={styles.mobileIcon}
+                  onClick={handleWishlistClick}
+                >
+                  <Heart
+                    size={40}
+                    stroke={isWishlisted ? "red" : "black"}
+                    fill={isWishlisted ? "red" : "transparent"}
+                  />
+                </button>
+                <button className={styles.mobileIcon} onClick={handleShare}>
+                  <Image src={share} alt="share" />
+                </button>
+              </div>
+            </div>
+            <ShirtEditor product={product}/>
+          </>
+          //  <CanvasEditor
+          //   product={product}
+          //   onDesignChange={handleDesignChange}
+          //   setPrintingImg={setPrintingImg}
+          //   addToWishlist={addToWishlist}
+          // />
         ) : (
           <>
             <div className={styles.back} onClick={() => router.back()}>
