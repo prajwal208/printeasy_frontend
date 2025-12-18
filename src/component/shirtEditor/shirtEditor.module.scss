@@ -19,53 +19,51 @@
 
 .presetText {
   position: absolute;
-  top: 57%;
+  top: 59%; // Position on the shirt
   left: 50%;
   transform: translate(-50%, -50%);
   
   width: 220px;
-  height: 73px;
   
-  /* Use border-box so padding doesn't increase height/width */
+  /* MATH: (FontSize 28 * LineHeight 1.2 * 2 Lines) + (Padding 10 * 2) = 87.2px */
+  height: 72px; 
+  
   box-sizing: border-box; 
-  
-  /* Text alignment */
   text-align: center;
   line-height: 1.2;
-  padding: 10px; /* Consistent padding */
+  
   
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap;
-  overflow-y: auto;
   
+  /* Scroll logic */
+  overflow-y: auto;
   cursor: pointer;
   z-index: 10;
   margin: 0;
 
-  /* Hide scrollbars */
+  /* Hide scrollbars for a cleaner look while still allowing scrolling */
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
   }
 }
 
-/* Logic to center text vertically in DIV mode */
+/* Vertically centers the text when not in editing mode */
 div.presetText {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: -16px;
 }
 
-/* Logic to align text in TEXTAREA mode */
+/* Textarea specific styles */
 .editInput {
   background: transparent;
   outline: none;
   border: none;
   resize: none;
   display: block; 
-  vertical-align: middle;
-  
-  /* Critical: Textarea needs this to match the flex-centered div */
-  padding-top: 20px; // Adjust this value to match your font's vertical center
+
 }

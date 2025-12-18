@@ -7,17 +7,25 @@ const ShirtEditor = ({ product }) => {
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef(null);
 
+  // Sync text with product prop updates
   useEffect(() => {
     if (product?.presetText) setText(product.presetText);
   }, [product]);
 
+  // Handle focus and cursor position
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
-      // Move cursor to end
       inputRef.current.setSelectionRange(text.length, text.length);
     }
   }, [isEditing]);
+
+  // Auto-scroll to bottom of textarea as user types
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.scrollTop = inputRef.current.scrollHeight;
+    }
+  }, [text, isEditing]);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
