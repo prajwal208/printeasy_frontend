@@ -147,7 +147,7 @@ const Cart = () => {
               sku: "SKU123",
               totalPrice: grandTotal,
               quantity: 2,
-              categoryId: "categoryId1",
+              categoryId: "H8SZ4VfsFXa4C9cUeonB",
               isCustomizable: false,
               discount: 0,
               tax: 12,
