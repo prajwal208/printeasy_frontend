@@ -22,7 +22,13 @@ export default function OrderSuccess() {
       const orderId = localStorage.getItem("pendingOrderId");
       const cashfreeOrderId = localStorage.getItem("pendingCashfreeOrderId");
       const orderAmount = localStorage.getItem("pendingOrderAmount");
-      console.log(cashfreeOrderId,"dnskdnsdiii",orderAmount,"dnsdknskdnsiiii")
+
+      console.log("Order data from localStorage:", {
+        orderId,
+        cashfreeOrderId,
+        orderAmount,
+      });
+
       if (!orderId || !cashfreeOrderId) {
         console.error("Missing order data in localStorage");
         toast.error("Order data not found. Please check your orders.");
@@ -69,8 +75,10 @@ export default function OrderSuccess() {
 
   const checkPaymentStatus = async (orderId, cashfreeOrderId) => {
     try {
+      console.log("Checking payment status:", { orderId, cashfreeOrderId });
+
       const res = await api.post(
-        "/v1/payment/status", // Note: plural "payments"
+        "/v1/payment/status", // Note: singular "payment" not "payments"
         {
           cashfreeOrderId: cashfreeOrderId,
           orderId: orderId,
@@ -83,9 +91,14 @@ export default function OrderSuccess() {
         }
       );
 
+      console.log("Payment status response:", res.data);
+
       if (res.data.success) {
         // Check if order was already confirmed (backend processed it)
-        if (res.data.message?.includes("already confirmed") || res.data.message?.includes("Order placed successfully")) {
+        if (
+          res.data.message?.includes("already confirmed") ||
+          res.data.message?.includes("Order placed successfully")
+        ) {
           // Payment successful and order processed
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
@@ -109,7 +122,7 @@ export default function OrderSuccess() {
           return;
         }
 
-        const { isSuccess, paymentStatus } = res.data.data;
+        const { isSuccess, paymentStatus } = res.data.data || {};
 
         if (isSuccess) {
           // Payment successful - backend will process automatically
@@ -151,6 +164,7 @@ export default function OrderSuccess() {
       }
     } catch (error) {
       console.error("Payment status check error:", error);
+      console.error("Error response:", error.response?.data);
 
       // Don't stop polling on temporary errors
       // Only stop if it's a clear failure
@@ -165,6 +179,13 @@ export default function OrderSuccess() {
         setError(true);
         setLoading(false);
         toast.error("Order not found. Please contact support.");
+      } else if (error.response?.status === 400) {
+        // 400 error - might be missing parameters
+        console.error("400 Error - Missing parameters:", error.response?.data);
+        toast.error(
+          error.response?.data?.message || "Invalid request. Please try again."
+        );
+        // Continue polling - might be a temporary issue
       }
       // For other errors, continue polling (might be temporary network issue)
     }
