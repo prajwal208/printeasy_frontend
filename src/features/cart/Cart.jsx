@@ -1,6 +1,6 @@
 "use client";
-import React, { startTransition, useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Trash2, ChevronLeft } from "lucide-react";
 import styles from "./cart.module.scss";
 import NoResult from "@/component/NoResult/NoResult";
 import { useRouter } from "next/navigation";
@@ -10,60 +10,45 @@ import PriceList from "./PriceList/PriceList";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import api from "@/axiosInstance/axiosInstance";
-import { ChevronLeft } from "lucide-react";
 import { db } from "@/lib/db";
 import Cookies from "js-cookie";
+import { load } from "@cashfreepayments/cashfree-js";
 
 const Cart = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [cartItems, setCartItems] = useState([]);
   const [addressList, setAddressList] = useState([]);
   const [offerData, setOfferData] = useState([]);
+  const [cashfree, setCashfree] = useState(null);
   const router = useRouter();
   const accessToken = Cookies.get("idToken");
 
-  console.log(cartItems,"sjsjduuuiiuuiuiiu")
+  useEffect(() => {
+    const initCashfree = async () => {
+      const cf = await load({
+        mode: "production",
+      });
+      setCashfree(cf);
+    };
+    initCashfree();
+  }, []);
 
   useEffect(() => {
     db.cart.toArray().then(setCartItems);
-  }, []);
-
-
-  const handleQuantityChange = (id, newQuantity) => {
-    if (newQuantity < 1) return;
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
-
-  const getOfferData = async () => {
-    try {
-      const res = await api.get(`/v2/giftreward`, {
-        headers: {
-          "x-api-key":
-            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        },
-      });
-      setOfferData(res?.data?.data || []);
-    } catch (error) {
-      console.error(" Error fetching reward:", error);
-      toast.error("Failed to fetch cart.");
-    }
-  };
-
-  useEffect(() => {
+    getAddressList();
     getOfferData();
   }, []);
 
+  const handleQuantityChange = async (id, newQuantity) => {
+    if (newQuantity < 1) return;
+    await db.cart.update(id, { quantity: newQuantity });
+    const updatedCart = await db.cart.toArray();
+    setCartItems(updatedCart);
+  };
+
   const calculateTotal = () => {
     return cartItems.reduce((sum, item) => {
-      const price =
-        Number(item.price) ||
-        Number(item.totalPrice) ||
-        Number(item.product?.price) ||
-        0;
+      const price = Number(item.discountPrice) || 0;
       const qty = Number(item.quantity) || 1;
       return sum + price * qty;
     }, 0);
@@ -73,54 +58,14 @@ const Cart = () => {
   const couponDiscount = 0;
   const grandTotal = bagTotal - couponDiscount;
 
-  // const getCartData = async () => {
-  //   try {
-  //     const res = await api.get(`/v1/cart`, {
-  //       headers: {
-  //         "x-api-key":
-  //           "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-  //       },
-  //     });
-  //     setCartItems(res?.data?.data || []);
-  //   } catch (error) {
-  //     console.error("❌ Error fetching cart:", error);
-  //     toast.error("Failed to fetch cart.");
-  //   }
-  // };
-
-  // const handleDelete = async (id) => {
-  //   try {
-  //     await api.delete(`/v1/cart?itemId=${id}`, {
-  //       headers: {
-  //         "x-api-key":
-  //           "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-  //       },
-  //     });
-  //     setCartItems((prev) => prev.filter((item) => item.id !== id));
-  //     toast.success("Item removed from cart.");
-  //   } catch (error) {
-  //     console.error(error);
-  //     toast.error("Failed to remove item.");
-  //   }
-  // };
-
   const removeFromCart = async (productId) => {
     try {
       const item = await db.cart.where("productId").equals(productId).first();
-
-      if (!item) {
-        toast.warning("Item not found in cart");
-        return;
-      }
-
+      if (!item) return;
       await db.cart.delete(item.id);
-      setCartItems((prev) =>
-        prev.filter((cartItem) => cartItem.productId !== productId)
-      );
-
-      toast.success("Item removed from cart");
+      setCartItems((prev) => prev.filter((i) => i.productId !== productId));
+      toast.success("Item removed");
     } catch (err) {
-      console.error("Error deleting cart item:", err);
       toast.error("Failed to remove item");
     }
   };
@@ -139,112 +84,112 @@ const Cart = () => {
     }
   };
 
-  console.log(addressList?.[0]?.id, "sjsjueyeterrxxx");
+  const getOfferData = async () => {
+    try {
+      const res = await api.get(`/v2/giftreward`, {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      });
+      setOfferData(res?.data?.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  useEffect(() => {
-    // getCartData();
-    getAddressList();
-  }, []);
+  // ----------------- Cashfree Integration -----------------
+ const handlePayNow = async () => {
+  if (cartItems.length === 0) {
+    toast.warning("Your cart is empty!");
+    return;
+  }
 
-  // ----------------- Razorpay Integration -----------------
-  const handlePayNow = async () => {
-    if (cartItems.length === 0) {
-      toast.warning("Your cart is empty!");
+  if (!addressList?.[0]?.id) {
+    toast.warning("Please select a shipping address");
+    return;
+  }
+
+  try {
+    const res = await api.post(
+      "/v1/orders/create",
+      {
+        shippingAddressId: addressList[0].id,
+        billingAddressId: addressList[0].id,
+        paymentMethod: "ONLINE",
+        totalAmount: grandTotal,
+        items: [
+          {
+            name: "Product Name",
+            sku: "SKU123",
+            totalPrice: 500,
+            quantity: 2,
+            categoryId: "categoryId1",
+            isCustomizable: false,
+            discount: 0,
+            tax: 12,
+            hsn: 482090,
+          },
+        ],
+      },
+      {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      }
+    );
+
+    const orderData = res?.data?.data;
+
+    console.log("Order response:", orderData?.cashfree?.sessionId);
+
+    const paymentSessionId = orderData?.cashfree?.sessionId;
+
+    if (!paymentSessionId) {
+      toast.error("Payment session not generated");
       return;
     }
 
-    try {
-      const res = await api.post(
-        `/v1/orders/create`,
-        {
-          shippingAddressId: addressList?.[0].id,
-          billingAddressId: addressList?.[0].id,
-          cartIds: cartItems.map((item) => item.id),
-          // couponCode: "",
-          items: [],
-          paymentMethod: "ONLINE",
-          totalAmount: grandTotal,
-        },
-        {
-          headers: {
-            "x-api-key":
-              "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-          },
-        }
-      );
+    const checkoutOptions = {
+      paymentSessionId,
+      redirectTarget: "_self",
+    };
 
-      const { orderId, currency } = res.data.data;
+    cashfree.checkout(checkoutOptions).then((result) => {
+      if (result.error) {
+        toast.error(result.error.message);
+      }
+      if (result.redirect) {
+        console.log("Payment redirection in progress");
+      }
+    });
+  } catch (error) {
+    console.error("Cashfree error:", error);
+    toast.error("Failed to initiate payment.");
+  }
+};
 
-      // Step 2: Open Razorpay Checkout
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
-        amount: grandTotal * 100,
-        currency: currency || "INR",
-        name: "Your Store Name",
-        description: "Order Payment",
-        order_id: orderId,
-        handler: async function (response) {
-          // Step 3: Capture payment on backend
-          try {
-            await api.post(
-              `/v1/payment/verify`,
-              { ...response, cartItems },
-              {
-                headers: {
-                  "x-api-key":
-                    "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-                },
-              }
-            );
-            toast.success("Payment successful!");
-            router.push("/order/success");
-          } catch (err) {
-            console.error(err);
-            toast.error("Payment verification failed!");
-          }
-        },
-        prefill: {
-          name: "John Doe",
-          email: "john@example.com",
-          contact: "9999999999",
-        },
-        theme: {
-          color: "#ff6b00",
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to initiate payment.");
-    }
-  };
 
   const addToWishlist = async (productId) => {
     if (!accessToken) {
       toast.warning("Please login to Add to Wishlist");
       return;
     }
-
     try {
-      const res = await api.post(
+      await api.post(
         `${apiUrl}/v2/wishlist`,
-        { productId: productId },
+        { productId },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            "x-api-key":
-              "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+            "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
           },
         }
       );
-
-      if (res.status === 200) toast.success("Added to wishlist!");
+      toast.success("Added to wishlist!");
     } catch (error) {
-      toast.error(
-        error?.response?.data?.message || "Failed to add to wishlist"
-      );
+      toast.error("Failed to add to wishlist");
     }
   };
 
@@ -267,38 +212,36 @@ const Cart = () => {
                   </div>
 
                   <div className={styles.itemDetails}>
-                    <div>
-                      <div className={styles.itemHeader}>
-                        <h3 className={styles.itemName}>{item.name}</h3>
-                        <button
-                          onClick={() => removeFromCart(item?.productId)}
-                          className={styles.removeBtn}
-                        >
-                          <Trash2 size={20} />
-                        </button>
-                      </div>
+                    <div className={styles.itemHeader}>
+                      <h3 className={styles.itemName}>{item.name}</h3>
+                      <button
+                        onClick={() => removeFromCart(item?.productId)}
+                        className={styles.removeBtn}
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
 
-                      <div className={styles.itemMeta}>
-                        <span>{item.options[0]?.value} |</span>
-                        <span className={styles.quantitySelector}>
-                          QTY |
-                          <select
-                            value={item.quantity}
-                            onChange={(e) =>
-                              handleQuantityChange(
-                                item.id,
-                                parseInt(e.target.value)
-                              )
-                            }
-                          >
-                            {[...Array(10).keys()].map((num) => (
-                              <option key={num + 1} value={num + 1}>
-                                {num + 1}
-                              </option>
-                            ))}
-                          </select>
-                        </span>
-                      </div>
+                    <div className={styles.itemMeta}>
+                      <span>{item.options?.[0]?.value} |</span>
+                      <span className={styles.quantitySelector}>
+                        QTY |
+                        <select
+                          value={item.quantity}
+                          onChange={(e) =>
+                            handleQuantityChange(
+                              item.id,
+                              parseInt(e.target.value)
+                            )
+                          }
+                        >
+                          {[...Array(10).keys()].map((num) => (
+                            <option key={num + 1} value={num + 1}>
+                              {num + 1}
+                            </option>
+                          ))}
+                        </select>
+                      </span>
                     </div>
 
                     <div className={styles.itemFooter}>
@@ -310,7 +253,6 @@ const Cart = () => {
                       </button>
                       <span className={styles.itemPrice}>
                         <span className={styles.strikeValue}>
-                          {" "}
                           ₹{item?.basePrice}
                         </span>{" "}
                         <span>₹{item?.discountPrice}</span>
@@ -338,7 +280,7 @@ const Cart = () => {
       ) : (
         <NoResult
           title="Oops! Your Cart is Empty"
-          description="It seems like your shopping cart is currently empty. Start adding items to your cart to continue shopping and enjoy a seamless checkout experience. Explore our products and find the perfect items for you."
+          description="Explore our products and find the perfect items for you."
           buttonText="Explore"
           onButtonClick={() => router.push("/")}
         />

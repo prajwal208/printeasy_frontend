@@ -6,35 +6,76 @@
 
 .img_wrap {
   position: relative;
+  
 }
 .mainImage {
   object-fit: contain;
+  width: 500;
+  height: 600;
+}
+
+.shimmerWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  z-index: 5;
+  background: #f6f0ec; // Base color
+  overflow: hidden;
+  border-radius: 8px; // Matches image rounding if any
 }
+
+.shimmer {
+  width: 100%;
+  height: 100%;
+ background: linear-gradient(
+    90deg,
+    #ffe7cf 0%,
+    #ffd4a6 50%,
+    #ffe7cf 100%
+  );
+ background-size: 400% 400%;
+  animation: shimmerAnimation 1.5s infinite linear;
+  flex-shrink: 0;
+}
+
+@keyframes shimmerAnimation {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+
 
 .presetText {
   position: absolute;
   top: 59%;
   left: 50%;
   transform: translate(-50%, -50%);
-  
+
   width: 175px;
-  height: 70px; 
-  
-  box-sizing: border-box; 
+  /* Fixed height: 2 lines based on current font size */
+  height: calc(var(--current-font-size, 28px) * 1.2 * 2);
+  min-height: calc(var(--current-font-size, 28px) * 1.2 * 2);
+  max-height: calc(var(--current-font-size, 28px) * 1.2 * 2);
+
+  box-sizing: border-box;
   text-align: center;
   line-height: 1.2;
-  
-  
+
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap;
-  
-  overflow-y: hidden;
+
+  overflow: hidden;
   cursor: pointer;
   z-index: 10;
   margin: 0;
+  padding: 0;
 
   /* Hide scrollbars */
   scrollbar-width: none;
@@ -43,18 +84,384 @@
   }
 }
 
-div.presetText {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-//   margin-top: -14px;
-}
-
 .editInput {
   background: transparent;
   outline: none;
   border: none;
   resize: none;
-  display: block; 
+  display: block;
+}
 
+.floatingToolbar {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  background: #fdf1e4;
+  border-radius: 50px;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  border: 3px solid green;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 2px solid #ffe0c2;
+  z-index: 1000;
+  animation: slideUp 0.4s ease;
+
+ 
+  @media (max-width: 480px) {
+    .floatingToolbar {
+      gap: 16px;
+      padding: 5px 16px;
+      justify-content: center;
+      position: fixed;
+      bottom: 0;
+      top: 80;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: bottom 0.25s ease-in-out;
+      z-index: 9999;
+    }
+
+    .editorWrapper {
+      transition: padding-bottom 0.25s ease-in-out;
+    }
+  }
+  @media (max-width: 440px) {
+    gap: 16px;
+    padding: 5px 16px;
+    justify-content: center;
+    bottom: 5;
+  }
+}
+
+.toolButton {
+  background: none;
+  border: none;
+  display: flex;
+  gap: 0.2rem;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 24px;
+  transition: all 0.25s;
+  white-space: noWrap;
+  margin-top: 0.4rem;
+}
+
+.iconAa {
+  font-size: 32px;
+  font-weight: 900;
+  color: #333;
+}
+.iconColorA {
+  font-size: 32px;
+  font-weight: 900;
+  background: linear-gradient(
+    to right,
+    red,
+    orange,
+    yellow,
+    green,
+    blue,
+    indigo,
+    violet
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.iconF {
+  font-size: 32px;
+  font-style: italic;
+  font-weight: 900;
+  color: #333;
+}
+.iconKeyboard {
+  font-size: 26px;
+}
+
+.toolLabel {
+  font-size: 11px;
+  color: #666;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: noWrap;
+}
+
+.closeToolbarBtn {
+  margin-left: auto;
+  background: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  font-size: 30px;
+  color: #999;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+
+  &:hover {
+    background: #ff6b00;
+    color: white;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .iconAa,
+  .iconColorA,
+  .iconF,
+  .iconKeyboard {
+    font-size: 18px;
+    margin-top: 4px;
+  }
+
+  .toolLabel {
+    font-size: 11px;
+    margin-top: 6px;
+  }
+
+  .closeToolbarBtn {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+// ──────────────────────────────
+// Dropdown Panel (Appears above toolbar)
+// ──────────────────────────────
+.optionsPanel {
+  position: absolute;
+  bottom: 70.8px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 38vw; // ⬅ full width of parent
+  overflow-x: auto; // ⬅ horizontal scroll
+
+  background-color: #f3d4a7;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+  z-index: 1001;
+  animation: popUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.5);
+
+  // Hide scrollbars
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+@media screen and (max-width: 600px) {
+  .optionsPanel {
+    width: 100vw;
+  }
+}
+
+// ──────────────────────────────
+// Content Grids (Responsive & No Scrollbar)
+// ──────────────────────────────
+
+.colorOptions,
+.sizeOptions {
+  display: flex;
+  gap: 10px;
+  justify-content: left;
+  padding: 12px;
+  background-color: #fff2de;
+
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.fontOptions {
+  display: flex;
+  gap: 0;
+  justify-content: left;
+  padding: 8px;
+  background-color: #fff2de;
+
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// Font buttons
+.fontOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  font-size: 20px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: 0.2s;
+  padding: 0 4px;
+
+  &.active {
+    background: #ffd392;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .fontOption {
+    font-size: 16px;
+  }
+}
+
+// Color swatches
+.colorSwatch {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  border: 4px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s;
+  padding: 20px;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+  &.active {
+    border-color: #ff6b00;
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.3);
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .colorSwatch {
+    width: 20px;
+    height: 20px;
+    padding: 18px;
+    border-radius: 8px;
+  }
+}
+
+// Size buttons
+.sizeBtn {
+  width: 58px;
+  height: 58px;
+  border-radius: 8px;
+  background: #ffd392;
+  border: none;
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 15px;
+}
+
+@media screen and (max-width: 600px) {
+  .sizeBtn {
+    color: #333;
+    cursor: pointer;
+    background: #ffd392;
+    border: none;
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+}
+
+// ──────────────────────────────
+// Edit Button (when not editing)
+// ──────────────────────────────
+.editButton {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  background: #ff6b00;
+  color: white;
+  padding: 12px 36px;
+  border-radius: 50px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(255, 107, 0, 0.4);
+  cursor: pointer;
+  z-index: 900;
+  transition: all 0.3s;
+
+  &:hover {
+    background: #e55a00;
+    transform: translateX(-50%) translateY(-3px);
+  }
+}
+
+// ──────────────────────────────
+// Animations
+// ──────────────────────────────
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes popUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.92) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .toolButton {
+    padding: 5px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .toolButton {
+    padding: 5px;
+  }
+}
+
+@media screen and (max-width: 300px) {
+  .toolButton {
+    padding: 5px;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .mainImage {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@media screen and (max-width:700px){
+  .img_wrap {
+  position: relative;
+  width: max-content;
+  height: 600;
+}
 }
