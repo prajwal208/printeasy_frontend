@@ -41,25 +41,20 @@ const Address = () => {
     form.state &&
     form.pinCode;
 
- const postNewAddress = async () => {
+const postNewAddress = async () => {
   if (!isFormValid) return;
   setIsSubmitting(true);
 
   try {
     const method = selectedAddressId ? "patch" : "put";
     const url = selectedAddressId
-      ? `${apiUrl}/v1/address?addressId=${selectedAddressId}`
-      : `${apiUrl}/v1/address`;
+      ? `/v1/address?addressId=${selectedAddressId}`
+      : `/v1/address`;
 
     const payload = { ...form };
 
-    const res = await axios[method](url, payload, {
-      headers: {
-        "x-api-key":
-          "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN}`,
-      },
-    });
+    // Using the same api instance as getAddressList
+    const res = await api[method](url, payload);
 
     if (res.status === 200) {
       alert(selectedAddressId ? "Address updated successfully!" : "Address added successfully!");
@@ -74,6 +69,7 @@ const Address = () => {
     setIsSubmitting(false);
   }
 };
+
 
 
   const resetForm = () => {

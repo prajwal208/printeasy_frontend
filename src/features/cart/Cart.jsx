@@ -13,7 +13,6 @@ import api from "@/axiosInstance/axiosInstance";
 import { db } from "@/lib/db";
 import Cookies from "js-cookie";
 import { load } from "@cashfreepayments/cashfree-js";
-import { useSearchParams } from "next/navigation";
 
 const Cart = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -23,9 +22,6 @@ const Cart = () => {
   const [cashfree, setCashfree] = useState(null);
   const router = useRouter();
   const accessToken = Cookies.get("idToken");
-  const searchParams = useSearchParams();
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     const initCashfree = async () => {
@@ -198,56 +194,6 @@ const Cart = () => {
     }
   };
 
-  const verifyPayment = async () => {
-    try {
-      setVerifying(true);
-
-      const payload = {
-        orderId: searchParams.get("orderId"), // YOUR internal orderId
-        cashfreeOrderId: searchParams.get("orderId"), // CF orderId (if same)
-        orderAmount: searchParams.get("orderAmount"),
-        referenceId: searchParams.get("referenceId"),
-        txStatus: searchParams.get("txStatus"),
-        paymentMode: searchParams.get("paymentMode"),
-        txMsg: searchParams.get("txMsg"),
-        txTime: searchParams.get("txTime"),
-        cashfreeSignature: searchParams.get("signature"),
-      };
-
-      const res = await api.patch("/v1/payment/verify", payload, {
-        headers: {
-          "x-api-key":
-            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        },
-      });
-
-      toast.success("Order Confirmed 🎉");
-
-      // Clear cart after success
-      await db.cart.clear();
-      setCartItems([]);
-
-      setShowSuccessModal(true);
-
-      // Remove query params to avoid re-verification on refresh
-      window.history.replaceState({}, "", "/cart");
-    } catch (error) {
-      console.error("Verification failed", error);
-      toast.error("Payment verification failed");
-    } finally {
-      setVerifying(false);
-    }
-  };
-
-  useEffect(() => {
-    const txStatus = searchParams.get("txStatus");
-
-    // Only verify if redirected from Cashfree
-    if (txStatus) {
-      verifyPayment();
-    }
-  }, []);
-
   return (
     <div className={styles.cartPage}>
       <ToastContainer position="top-right" autoClose={2000} />
@@ -330,21 +276,6 @@ const Cart = () => {
                 offerData={offerData}
               />
             </div>
-
-            {showSuccessModal && (
-              <div className={styles.modalOverlay}>
-                <div className={styles.modal}>
-                  <h2>🎉 Order Confirmed</h2>
-                  <p>
-                    Your payment was successful and your order has been placed.
-                  </p>
-
-                  <button onClick={() => router.push("/orders")}>
-                    Go to Orders
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </>
       ) : (
