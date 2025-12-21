@@ -22,7 +22,7 @@ export default function OrderSuccess() {
       const orderId = localStorage.getItem("pendingOrderId");
       const cashfreeOrderId = localStorage.getItem("pendingCashfreeOrderId");
       const orderAmount = localStorage.getItem("pendingOrderAmount");
-
+      console.log(cashfreeOrderId,"dnskdnsdiii",orderAmount,"dnsdknskdnsiiii")
       if (!orderId || !cashfreeOrderId) {
         console.error("Missing order data in localStorage");
         toast.error("Order data not found. Please check your orders.");

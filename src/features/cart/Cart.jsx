@@ -143,7 +143,12 @@ const Cart = () => {
       );
 
       const orderData = res?.data?.data;
-
+      localStorage.setItem("pendingOrderId", orderData.orderId);
+      localStorage.setItem(
+        "pendingCashfreeOrderId",
+        orderData.cashfree.orderId
+      );
+      localStorage.setItem("pendingOrderAmount", String(grandTotal));
       console.log("Order response:", orderData?.cashfree?.sessionId);
 
       const paymentSessionId = orderData?.cashfree?.sessionId;
