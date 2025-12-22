@@ -8,6 +8,7 @@ import CartRewards from "./CartRewards/CartRewards";
 import DefaultAddress from "./DefaultAddress/DefaultAddress";
 import PriceList from "./PriceList/PriceList";
 import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import api from "@/axiosInstance/axiosInstance";
 import { db } from "@/lib/db";
 import Cookies from "js-cookie";
@@ -16,15 +17,34 @@ import DynamicModal from "@/component/Modal/Modal";
 import LoginForm from "../signup/LogIn/LoginForm";
 
 const Cart = () => {
-  const router = useRouter();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [cartItems, setCartItems] = useState([]);
   const [addressList, setAddressList] = useState([]);
   const [offerData, setOfferData] = useState([]);
   const [cashfree, setCashfree] = useState(null);
+  const router = useRouter();
+  const accessToken = Cookies.get("idToken");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
 
+  // useEffect(() => {
+  //   const token = Cookies.get("idToken");
+  //   setIsLoggedIn(!!token);
+  // }, []);
+
+  const handleContinue = () => {
+    setIsLoginModalVisible(false);
+    setIsLoggedIn(true);
+  };
+
   useEffect(() => {
-    load({ mode: "production" }).then(setCashfree);
+    const initCashfree = async () => {
+      const cf = await load({
+        mode: "production",
+      });
+      setCashfree(cf);
+    };
+    initCashfree();
   }, []);
 
   useEffect(() => {
@@ -33,68 +53,119 @@ const Cart = () => {
     getOfferData();
   }, []);
 
-  const calculateTotal = () =>
-    cartItems.reduce(
-      (sum, i) => sum + Number(i.discountPrice) * Number(i.quantity),
-      0
-    );
+  const handleQuantityChange = async (id, newQuantity) => {
+    if (newQuantity < 1) return;
+    await db.cart.update(id, { quantity: newQuantity });
+    const updatedCart = await db.cart.toArray();
+    setCartItems(updatedCart);
+  };
+
+  const calculateTotal = () => {
+    return cartItems.reduce((sum, item) => {
+      const price = Number(item.discountPrice) || 0;
+      const qty = Number(item.quantity) || 1;
+      return sum + price * qty;
+    }, 0);
+  };
 
   const bagTotal = calculateTotal();
-  const grandTotal = bagTotal;
+  const couponDiscount = 0;
+  const grandTotal = bagTotal - couponDiscount;
+
+  console.log(grandTotal);
+
+  const removeFromCart = async (productId) => {
+    try {
+      const item = await db.cart.where("productId").equals(productId).first();
+      if (!item) return;
+      await db.cart.delete(item.id);
+      setCartItems((prev) => prev.filter((i) => i.productId !== productId));
+      toast.success("Item removed");
+    } catch (err) {
+      toast.error("Failed to remove item");
+    }
+  };
 
   const getAddressList = async () => {
-    const res = await api.get("/v1/address/all");
-    setAddressList(res?.data?.data || []);
+    try {
+      const res = await api.get(`/v1/address/all`, {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      });
+      setAddressList(res?.data?.data || []);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const getOfferData = async () => {
-    const res = await api.get("/v2/giftreward");
-    setOfferData(res?.data?.data || []);
+    try {
+      const res = await api.get(`/v2/giftreward`, {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      });
+      setOfferData(res?.data?.data || []);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  // 🔐 ONE CLICK PAY
+  // ----------------- Cashfree Integration -----------------
   const handlePayNow = async () => {
-    if (!Cookies.get("idToken")) {
-      setIsLoginModalVisible(true);
-      return;
-    }
+  const token = Cookies.get("idToken");
 
-    if (!cartItems.length) {
-      toast.warning("Cart is empty");
-      return;
-    }
+  if (!token) {
+    setIsLoginModalVisible(true);
+    return;
+  }
 
-    if (!addressList?.[0]?.id) {
-      toast.warning("Select shipping address");
-      return;
-    }
+  if (cartItems.length === 0) {
+    toast.warning("Your cart is empty!");
+    return;
+  }
 
-    try {
-      const items = cartItems.map((item) => ({
-        productId: item.productId,
-        name: item.name,
-        sku: item.sku,
-        totalPrice: Number(item.discountPrice),
-        quantity: Number(item.quantity),
-        categoryId: item.categoryId,
-        isCustomizable: item.isCustomizable || false,
-        discount: 0,
-        tax: 0,
-      }));
+  if (!addressList?.[0]?.id) {
+    toast.warning("Please select a shipping address");
+    return;
+  }
 
-      const res = await api.post("/v1/orders/create", {
+  try {
+    // ✅ map actual cart items (DO NOT send totalAmount)
+    const items = cartItems.map((item) => ({
+      productId: item.productId,
+      name: item.name,
+      sku: item.sku,
+      totalPrice: Number(item.discountPrice),
+      quantity: Number(item.quantity),
+      categoryId: item.categoryId,
+      isCustomizable: item.isCustomizable || false,
+      discount: 0,
+      tax: 0,
+      hsn: item.hsn || null,
+    }));
+
+    const res = await api.post(
+      "/v1/orders/create",
+      {
         shippingAddressId: addressList[0].id,
         billingAddressId: addressList[0].id,
         paymentMethod: "ONLINE",
-        items,
-      });
+        items, // ✅ correct
+      },
+      {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      }
+    );
 
-      const { orderId, cashfreeOrderId, paymentSessionId } =
-        res.data.data;
-
-      // Store for polling page
-      localStorage.setItem("pendingOrderId", orderId);
-      localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
+    const { orderId, cashfreeOrderId, paymentSessionId } =
+      res?.data?.data || {};
 
     if (!paymentSessionId) {
       toast.error("Payment session not created");
@@ -144,32 +215,70 @@ const Cart = () => {
 
   return (
     <div className={styles.cartPage}>
-      <ToastContainer />
-      {cartItems.length ? (
+      <ToastContainer position="top-right" autoClose={2000} />
+      {cartItems?.length > 0 ? (
         <>
-          <button onClick={() => router.push("/")}>
-            <ChevronLeft />
+          <button className={styles.iconBtn} onClick={() => router.push("/")}>
+            <ChevronLeft size={22} />
           </button>
-
           <CartRewards totalAmount={bagTotal} />
 
           <div className={styles.cartContainer}>
             <div className={styles.cartItems}>
               {cartItems.map((item) => (
                 <div key={item.id} className={styles.cartItem}>
-                  <img src={item.productImageUrl} alt={item.name} />
-                  <h3>{item.name}</h3>
-                  <button
-                    onClick={() =>
-                      db.cart.delete(item.id).then(() =>
-                        setCartItems((p) =>
-                          p.filter((x) => x.id !== item.id)
-                        )
-                      )
-                    }
-                  >
-                    <Trash2 />
-                  </button>
+                  <div className={styles.itemImage}>
+                    <img src={item.productImageUrl} alt={item.name} />
+                  </div>
+
+                  <div className={styles.itemDetails}>
+                    <div className={styles.itemHeader}>
+                      <h3 className={styles.itemName}>{item.name}</h3>
+                      <button
+                        onClick={() => removeFromCart(item?.productId)}
+                        className={styles.removeBtn}
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+
+                    <div className={styles.itemMeta}>
+                      <span>{item.options?.[0]?.value} |</span>
+                      <span className={styles.quantitySelector}>
+                        QTY |
+                        <select
+                          value={item.quantity}
+                          onChange={(e) =>
+                            handleQuantityChange(
+                              item.id,
+                              parseInt(e.target.value)
+                            )
+                          }
+                        >
+                          {[...Array(10).keys()].map((num) => (
+                            <option key={num + 1} value={num + 1}>
+                              {num + 1}
+                            </option>
+                          ))}
+                        </select>
+                      </span>
+                    </div>
+
+                    <div className={styles.itemFooter}>
+                      <button
+                        className={styles.wishlistBtn}
+                        onClick={() => addToWishlist(item?.productId)}
+                      >
+                        MOVE TO WISHLIST
+                      </button>
+                      <span className={styles.itemPrice}>
+                        <span className={styles.strikeValue}>
+                          ₹{item?.basePrice}
+                        </span>{" "}
+                        <span>₹{item?.discountPrice}</span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -192,12 +301,17 @@ const Cart = () => {
             open={isLoginModalVisible}
             onClose={() => setIsLoginModalVisible(false)}
           >
-            <LoginForm onContinue={() => setIsLoginModalVisible(false)} />
+            <LoginForm
+              onContinue={handleContinue}
+              setIsLoginModalVisible={setIsLoginModalVisible}
+              setIsLoggedIn={setIsLoggedIn}
+            />
           </DynamicModal>
         </>
       ) : (
         <NoResult
-          title="Your cart is empty"
+          title="Oops! Your Cart is Empty"
+          description="Explore our products and find the perfect items for you."
           buttonText="Explore"
           onButtonClick={() => router.push("/")}
         />
