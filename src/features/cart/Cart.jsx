@@ -131,6 +131,11 @@ const handlePayNow = async () => {
       shippingAddressId: addressList?.[0]?.id || null, 
       paymentMethod: "ONLINE",
       items,
+    },{
+       headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
     });
 
     const { paymentSessionId, orderId, cashfreeOrderId } = res?.data?.data || {};
