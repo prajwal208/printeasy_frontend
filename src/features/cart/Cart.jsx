@@ -15,6 +15,7 @@ import Cookies from "js-cookie";
 import { load } from "@cashfreepayments/cashfree-js";
 import DynamicModal from "@/component/Modal/Modal";
 import LoginForm from "../signup/LogIn/LoginForm";
+import axios from "axios";
 
 const Cart = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -30,27 +31,215 @@ const Cart = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const initCashfree = async () => {
-      const cf = await load({
-        mode: "production",
-      });
-      setCashfree(cf);
-    };
-    initCashfree();
-  }, []);
+  // Check if user has saved address for one-click checkout
+
+  // useEffect(() => {
+  //   const initCashfree = async () => {
+  //     try {
+  //       // Check if window.Cashfree is available (from the script tag)
+  //       if (window.Cashfree) {
+  //         const cf = window.Cashfree;
+  //         setCashfree(cf);
+  //         console.log("Cashfree SDK loaded from window object");
+  //       } else {
+  //         // Fallback: try to load via npm package
+  //         const cf = await load({
+  //           mode: "production",
+  //         });
+  //         setCashfree(cf);
+  //         console.log("Cashfree SDK loaded via import");
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to initialize Cashfree:", error);
+  //       toast.error("Payment system not available. Please refresh the page.");
+  //     }
+  //   };
+
+  //   // Only run on client side - this effect will not run on server
+  //   if (window.Cashfree) {
+  //     initCashfree();
+  //   } else {
+  //     // Wait for the script to load
+  //     const checkCashfree = setInterval(() => {
+  //       if (window.Cashfree) {
+  //         initCashfree();
+  //         clearInterval(checkCashfree);
+  //       }
+  //     }, 100);
+
+  //     // Stop checking after 5 seconds
+  //     setTimeout(() => clearInterval(checkCashfree), 5000);
+  //     db.cart.toArray().then(setCartItems);
+  //     getAddressList();
+  //     getOfferData();
+  //   }
+  //   // Get user data if logged in
+  //   if (accessToken) {
+  //     // getUserData();
+  //   }
+  // }, [accessToken]);
+
+  // useEffect(() => {
+  //   const initCashfree = async () => {
+  //     try {
+  //       let cf;
+
+  //       // Check if window.Cashfree is available (from the script tag)
+  //       if (window.Cashfree) {
+  //         // Initialize Cashfree with configuration
+  //         cf = await window.Cashfree.init({
+  //           mode: "production", // or "sandbox" for testing
+  //         });
+  //         console.log("Cashfree SDK loaded from window object");
+  //       } else {
+  //         // Fallback: try to load via npm package
+  //         cf = await load({
+  //           mode: "production",
+  //         });
+  //         console.log("Cashfree SDK loaded via import");
+  //       }
+
+  //       setCashfree(cf);
+  //     } catch (error) {
+  //       console.error("Failed to initialize Cashfree:", error);
+  //       toast.error("Payment system not available. Please refresh the page.");
+  //     }
+  //   };
+
+  //   // Only initialize after component mounts (client-side only)
+  //   if (typeof window !== "undefined") {
+  //     // Wait for the script to load if not already available
+  //     if (window.Cashfree) {
+  //       initCashfree();
+  //     } else {
+  //       const checkCashfree = setInterval(() => {
+  //         if (window.Cashfree) {
+  //           initCashfree();
+  //           clearInterval(checkCashfree);
+  //         }
+  //       }, 100);
+
+  //       // Stop checking after 5 seconds
+  //       setTimeout(() => {
+  //         clearInterval(checkCashfree);
+  //         if (!window.Cashfree) {
+  //           toast.error("Failed to load payment system. Please refresh.");
+  //         }
+  //       }, 5000);
+  //     }
+
+  //     // Load cart items and other data
+  //     db.cart.toArray().then(setCartItems);
+  //     getAddressList();
+  //     getOfferData();
+  //   }
+
+  //   // Get user data if logged in
+  //   if (accessToken) {
+  //     // getUserData();
+  //   }
+  // }, [accessToken]);
 
   useEffect(() => {
-    db.cart.toArray().then(setCartItems);
-    getAddressList();
-    getOfferData();
-    // Get user data if logged in
-    if (accessToken) {
-      getUserData();
+    const initCashfree = async () => {
+      try {
+        let cf;
+
+        if (typeof window !== "undefined" && window.Cashfree) {
+          console.log("Window.Cashfree detected:", window.Cashfree);
+
+          // Try different initialization methods
+          try {
+            // Method 1: Check if Cashfree is already initialized
+            if (typeof window.Cashfree === "function") {
+              cf = window.Cashfree({ mode: "production" });
+            }
+            // Method 2: Check if it has an init method
+            else if (window.Cashfree.init) {
+              cf = await window.Cashfree.init({ mode: "production" });
+            }
+            // Method 3: Use it directly if it's already an instance
+            else {
+              cf = window.Cashfree;
+            }
+
+            console.log("Cashfree initialized successfully:", cf);
+            setCashfree(cf);
+          } catch (initError) {
+            console.error("Cashfree initialization error:", initError);
+
+            // Fallback: try npm package
+            console.log("Attempting fallback to npm package...");
+            cf = await load({ mode: "production" });
+            console.log("Cashfree loaded via npm package");
+            setCashfree(cf);
+          }
+        } else {
+          // No window.Cashfree, use npm package
+          console.log("Loading Cashfree via npm package...");
+          cf = await load({ mode: "production" });
+          console.log("Cashfree SDK loaded via import");
+          setCashfree(cf);
+        }
+      } catch (error) {
+        console.error("Failed to initialize Cashfree:", error);
+        toast.error("Payment system not available. Please refresh the page.");
+      }
+    };
+
+    // Only initialize after component mounts (client-side only)
+    if (typeof window !== "undefined") {
+      // Small delay to ensure DOM and scripts are fully loaded
+      const initTimer = setTimeout(() => {
+        if (window.Cashfree) {
+          console.log("Cashfree script found, initializing...");
+          initCashfree();
+        } else {
+          console.log("Waiting for Cashfree script to load...");
+
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds total
+
+          const checkCashfree = setInterval(() => {
+            attempts++;
+
+            if (window.Cashfree) {
+              
+              initCashfree();
+              clearInterval(checkCashfree);
+            } else if (attempts >= maxAttempts) {
+              clearInterval(checkCashfree);
+              console.error("Cashfree script failed to load after 5 seconds");
+
+              // Try loading via npm as final fallback
+              console.log("Final fallback: Loading via npm package...");
+              load({ mode: "production" })
+                .then((cf) => {
+                  console.log("Cashfree loaded via npm fallback");
+                  setCashfree(cf);
+                })
+                .catch((err) => {
+                  console.error("All Cashfree loading methods failed:", err);
+                  toast.error("Failed to load payment system. Please refresh.");
+                });
+            }
+          }, 100);
+        }
+      }, 100); // Small initial delay
+
+      // Load cart items and other data
+      db.cart.toArray().then(setCartItems).catch(console.error);
+
+      if (accessToken) {
+        getAddressList();
+      }
+
+      getOfferData();
+
+      return () => clearTimeout(initTimer);
     }
   }, [accessToken]);
 
-  // Check if user has saved address for one-click checkout
   useEffect(() => {
     if (addressList && addressList.length > 0) {
       setHasSavedAddress(true);
@@ -59,19 +248,19 @@ const Cart = () => {
     }
   }, [addressList]);
 
-  const getUserData = async () => {
-    try {
-      const res = await api.get(`/v1/user`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
-        },
-      });
-      setUser(res?.data?.data || null);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
+  // const getUserData = async () => {
+  //   try {
+  //     const res = await api.get("/v1/user", {
+  //       headers: {
+  //         Authorization: Bearer ${accessToken},
+  //         "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+  //       },
+  //     });
+  //     setUser(res?.data?.data || null);
+  //   } catch (error) {
+  //     console.error("Error fetching user data:", error);
+  //   }
+  // };
 
   const handleContinue = () => {
     setIsLoginModalVisible(false);
@@ -111,10 +300,9 @@ const Cart = () => {
 
   const getAddressList = async () => {
     try {
-      const res = await api.get(`/v1/address/all`, {
+      const res = await api.get("/v1/address/all", {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+          "x-api-key": "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10"
         },
       });
       setAddressList(res?.data?.data || []);
@@ -126,7 +314,7 @@ const Cart = () => {
 
   const getOfferData = async () => {
     try {
-      const res = await api.get(`/v2/giftreward`, {
+      const res = await api.get("/v2/giftreward", {
         headers: {
           "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
         },
@@ -164,30 +352,32 @@ const Cart = () => {
         discount: 0,
         tax: 0,
         hsn: item.hsn || "482090",
-        productImageUrl: item.productImageUrl,
-        imageUrl: item.productImageUrl,
-        renderedImageUrl: item.renderedImageUrl,
+        // productImageUrl: item.productImageUrl,
+        // imageUrl: item.productImageUrl,
+        // renderedImageUrl: item.renderedImageUrl,
       }));
 
-      // ✅ ONE-CLICK CHECKOUT: Don't send address - Cashfree will collect it
-      const res = await api.post(
-        "/v1/orders/create",
+      // Calculate total amount with convenience fee
+      let totalAmount = items.reduce(
+        (sum, item) => sum + item.totalPrice * item.quantity,
+        0
+      );
+
+      // Add convenience fee for orders below 500
+      if (totalAmount < 500) {
+        totalAmount = Number((totalAmount + 50).toFixed(2));
+      }
+
+      // ✅ ONE-CLICK CHECKOUT: Use dedicated endpoint and pass totalAmount
+      const res = await api.post("/v1/orders/one-click-checkout",
         {
-          shippingAddressId: null, // Cashfree collects address
-          billingAddressId: null, // Cashfree collects address
-          paymentMethod: "ONLINE",
           items,
-          // Optional: Send user data to help Cashfree pre-fill
-          user: user || {
-            name: "Customer",
-            email: "",
-            phone: "",
-          },
+          totalAmount,
+          // No address needed - Cashfree will collect it
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-            "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+           "x-api-key": "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10"
           },
         }
       );
@@ -197,8 +387,24 @@ const Cart = () => {
       const orderId = orderData.orderId;
       const cashfreeOrderId = orderData.cashfree?.orderId;
 
+      console.log("One-click order creation response:", {
+        orderData,
+        paymentSessionId,
+        orderId,
+        cashfreeOrderId,
+        cashfreeObject: !!cashfree,
+      });
+
       if (!paymentSessionId) {
-        toast.error("Failed to create payment session");
+        console.error("Missing payment session:", orderData);
+        toast.error("Failed to create payment session. Please try again.");
+        setIsProcessing(false);
+        return;
+      }
+
+      if (!cashfree) {
+        console.error("Cashfree SDK not loaded");
+        toast.error("Payment system not ready. Please refresh the page.");
         setIsProcessing(false);
         return;
       }
@@ -206,18 +412,28 @@ const Cart = () => {
       // Store order info for verification
       localStorage.setItem("pendingOrderId", orderId);
       localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
-      localStorage.setItem("grandTotal", grandTotal.toString());
+      localStorage.setItem("grandTotal", totalAmount.toString());
+
+      console.log(
+        "Initializing Cashfree one-click checkout with session:",
+        paymentSessionId
+      );
 
       // Initialize Cashfree checkout - Cashfree will show address collection form
       const result = await cashfree.checkout({
-        paymentSessionId,
+        paymentSessionId: paymentSessionId,
         redirectTarget: "_self",
       });
 
-      if (result.error) {
+      console.log("Cashfree one-click checkout result:", result);
+
+      if (result?.error) {
         console.error("Cashfree checkout error:", result.error);
-        toast.error("Payment initialization failed");
+        toast.error("Payment initialization failed. Please try again.");
         setIsProcessing(false);
+      } else if (!result?.redirect) {
+        console.warn("Checkout may not have redirected properly", result);
+        // Still allow the redirect to happen naturally
       }
     } catch (error) {
       console.error("One-click checkout error:", error);
@@ -256,13 +472,25 @@ const Cart = () => {
         discount: 0,
         tax: 0,
         hsn: item.hsn || "482090",
-        productImageUrl: item.productImageUrl,
-        imageUrl: item.productImageUrl,
-        renderedImageUrl: item.renderedImageUrl,
+        // productImageUrl: item.productImageUrl,
+        // imageUrl: item.productImageUrl,
+        // renderedImageUrl: item.renderedImageUrl,
       }));
 
+      // Calculate total amount with convenience fee
+      let totalAmount = items.reduce(
+        (sum, item) => sum + item.totalPrice * item.quantity,
+        0
+      );
+
+      // Add convenience fee for orders below 500
+      if (totalAmount < 500) {
+        totalAmount = Number((totalAmount + 50).toFixed(2));
+      }
+
       // Normal checkout: Can send address if available, or let Cashfree collect
-      const defaultAddress = addressList.find((addr) => addr.isDefault) || addressList[0];
+      const defaultAddress =
+        addressList.find((addr) => addr.isDefault) || addressList[0];
 
       const res = await api.post(
         "/v1/orders/create",
@@ -271,6 +499,7 @@ const Cart = () => {
           billingAddressId: defaultAddress?.id || null,
           paymentMethod: "ONLINE",
           items,
+          totalAmount,
           // If no address, send user data
           ...(!defaultAddress && {
             user: user || {
@@ -282,8 +511,7 @@ const Cart = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-            "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+           "x-api-key": "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10"
           },
         }
       );
@@ -293,8 +521,24 @@ const Cart = () => {
       const orderId = orderData.orderId;
       const cashfreeOrderId = orderData.cashfree?.orderId;
 
+      console.log("Order creation response:", {
+        orderData,
+        paymentSessionId,
+        orderId,
+        cashfreeOrderId,
+        cashfreeObject: !!cashfree,
+      });
+
       if (!paymentSessionId) {
-        toast.error("Failed to create payment session");
+        console.error("Missing payment session:", orderData);
+        toast.error("Failed to create payment session. Please try again.");
+        setIsProcessing(false);
+        return;
+      }
+
+      if (!cashfree) {
+        console.error("Cashfree SDK not loaded");
+        toast.error("Payment system not ready. Please refresh the page.");
         setIsProcessing(false);
         return;
       }
@@ -302,24 +546,32 @@ const Cart = () => {
       // Store order info for verification
       localStorage.setItem("pendingOrderId", orderId);
       localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
-      localStorage.setItem("grandTotal", grandTotal.toString());
+      localStorage.setItem("grandTotal", totalAmount.toString());
+
+      console.log(
+        "Initializing Cashfree checkout with session:",
+        paymentSessionId
+      );
 
       // Initialize Cashfree checkout
       const result = await cashfree.checkout({
-        paymentSessionId,
+        paymentSessionId: paymentSessionId,
         redirectTarget: "_self",
       });
 
-      if (result.error) {
+      console.log("Cashfree checkout result:", result);
+
+      if (result?.error) {
         console.error("Cashfree checkout error:", result.error);
-        toast.error("Payment initialization failed");
+        toast.error("Payment initialization failed. Please try again.");
         setIsProcessing(false);
+      } else if (!result?.redirect) {
+        console.warn("Checkout may not have redirected properly", result);
+        // Still allow the redirect to happen naturally
       }
     } catch (error) {
       console.error("Payment error:", error);
-      toast.error(
-        error.response?.data?.message || "Payment failed to start"
-      );
+      toast.error(error.response?.data?.message || "Payment failed to start");
       setIsProcessing(false);
     }
   };
@@ -335,8 +587,7 @@ const Cart = () => {
         { productId },
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+           "x-api-key": "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10"
           },
         }
       );
@@ -423,7 +674,7 @@ const Cart = () => {
               />
 
               {/* One-Click Checkout Button */}
-              {hasSavedAddress && (
+              {(hasSavedAddress || accessToken) && (
                 <div style={{ marginBottom: "20px" }}>
                   <button
                     onClick={handleOneClickCheckout}
