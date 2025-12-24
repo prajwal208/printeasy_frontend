@@ -674,7 +674,7 @@ const Cart = () => {
               />
 
               {/* One-Click Checkout Button */}
-              {(hasSavedAddress || accessToken) && (
+              
                 <div style={{ marginBottom: "20px" }}>
                   <button
                     onClick={handleOneClickCheckout}
@@ -711,7 +711,7 @@ const Cart = () => {
                     Cashfree will collect your address during checkout
                   </p>
                 </div>
-              )}
+              
 
               {/* Divider */}
               {hasSavedAddress && (
