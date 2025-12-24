@@ -1,307 +1,350 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle, XCircle, Loader2, ArrowRight } from "lucide-react";
+
+import React, { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { db } from "@/lib/db";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import api from "@/axiosInstance/axiosInstance";
-import Cookies from "js-cookie";
-import { db } from "@/lib/db";
-import styles from './ordersuccess.module.scss'
 
-
-const OrderSuccess = () => {
+export default function OrderSuccess() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  const accessToken = Cookies.get("idToken");
-
-  const [status, setStatus] = useState("loading"); // loading, success, error
-  const [orderData, setOrderData] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isVerifying, setIsVerifying] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
+  const pollingIntervalRef = useRef(null);
+  const maxPollingTime = 5 * 60 * 1000; // 5 minutes
+  const pollingStartTime = useRef(Date.now());
 
   useEffect(() => {
+    const verifyPayment = async () => {
+      // Get stored order data from localStorage
+      const orderId = localStorage.getItem("pendingOrderId");
+      const cashfreeOrderId = localStorage.getItem("pendingCashfreeOrderId");
+      const orderAmount = localStorage.getItem("pendingOrderAmount");
+
+      console.log("Order data from localStorage:", {
+        orderId,
+        cashfreeOrderId,
+        orderAmount,
+      });
+
+      if (!orderId || !cashfreeOrderId) {
+        console.error("Missing order data in localStorage");
+        toast.error("Order data not found. Please check your orders.");
+        setError(true);
+        setLoading(false);
+        return;
+      }
+
+      // Start polling for payment status
+      startPaymentPolling(orderId, cashfreeOrderId, orderAmount);
+    };
+
     verifyPayment();
+
+    // Cleanup polling on unmount
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
   }, []);
 
-  const verifyPayment = async () => {
-    try {
-      // Get order info from localStorage (stored in Cart.jsx)
-      const pendingOrderId = localStorage.getItem("pendingOrderId");
-      const pendingCashfreeOrderId = localStorage.getItem("pendingCashfreeOrderId");
+  const startPaymentPolling = (orderId, cashfreeOrderId, orderAmount) => {
+    pollingStartTime.current = Date.now();
 
-      if (!pendingOrderId || !pendingCashfreeOrderId) {
-        // Try to get from URL params (if Cashfree redirects with data)
-        const orderId = searchParams.get("orderId");
-        const cashfreeOrderId = searchParams.get("order_id") || searchParams.get("cashfreeOrderId");
-        
-        if (!orderId || !cashfreeOrderId) {
-          setStatus("error");
-          setErrorMessage("Order information not found. Please check your order history.");
-          setIsVerifying(false);
-          return;
-        }
+    // Check payment status immediately
+    checkPaymentStatus(orderId, cashfreeOrderId);
 
-        // If we have params, try direct verification first
-        await verifyPaymentWithParams(orderId, cashfreeOrderId);
+    // Then poll every 3 seconds
+    pollingIntervalRef.current = setInterval(() => {
+      // Check if we've exceeded max polling time
+      if (Date.now() - pollingStartTime.current > maxPollingTime) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+        setLoading(false);
+        setError(true);
+        toast.error("Payment verification timeout. Please check your order status.");
         return;
       }
 
-      // Method 1: Poll payment status (recommended - more reliable)
-      await pollPaymentStatus(pendingOrderId, pendingCashfreeOrderId);
-    } catch (error) {
-      console.error("Payment verification error:", error);
-      setStatus("error");
-      setErrorMessage(
-        error.response?.data?.message || "Failed to verify payment. Please contact support."
-      );
-      setIsVerifying(false);
-    }
+      checkPaymentStatus(orderId, cashfreeOrderId);
+    }, 3000);
   };
 
-  // Verify payment using URL params (if Cashfree redirects with data)
-  const verifyPaymentWithParams = async (orderId, cashfreeOrderId) => {
+  const checkPaymentStatus = async (orderId, cashfreeOrderId) => {
     try {
-      const orderAmount = searchParams.get("order_amount");
-      const referenceId = searchParams.get("reference_id") || searchParams.get("cf_payment_id");
-      const txStatus = searchParams.get("tx_status") || searchParams.get("payment_status");
-      const paymentMode = searchParams.get("payment_mode");
-      const txMsg = searchParams.get("tx_msg") || searchParams.get("payment_message");
-      const txTime = searchParams.get("tx_time") || searchParams.get("payment_time");
-      const cashfreeSignature = searchParams.get("signature");
+      console.log("Checking payment status:", { orderId, cashfreeOrderId });
 
-      if (!orderId || !cashfreeOrderId || !referenceId || !txStatus) {
-        // If params incomplete, fall back to polling
-        await pollPaymentStatus(orderId, cashfreeOrderId);
-        return;
-      }
-
-      const res = await api.post(`/v1/payments/verify`,
+      const res = await api.post(
+        "/v1/payment/status", // Note: singular "payment" not "payments"
         {
-          orderId,
-          cashfreeOrderId,
-          orderAmount: orderAmount || localStorage.getItem("grandTotal") || "0",
-          referenceId,
-          txStatus,
-          paymentMode: paymentMode || "ONLINE",
-          txMsg: txMsg || "",
-          txTime: txTime || new Date().toISOString(),
-          cashfreeSignature: cashfreeSignature || "API_VERIFIED",
-        },
-        {
-           headers: {
-          "x-api-key":
-            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        },
-        }
-      );
-
-      if (res.data.success) {
-        handleSuccess(res.data.data);
-      } else {
-        setStatus("error");
-        setErrorMessage(res.data.message || "Payment verification failed");
-        setIsVerifying(false);
-      }
-    } catch (error) {
-      console.error("Direct verification failed, trying polling:", error);
-      // Fall back to polling
-      const orderId = searchParams.get("orderId") || localStorage.getItem("pendingOrderId");
-      const cashfreeOrderId = searchParams.get("order_id") || localStorage.getItem("pendingCashfreeOrderId");
-      if (orderId && cashfreeOrderId) {
-        await pollPaymentStatus(orderId, cashfreeOrderId);
-      } else {
-        setStatus("error");
-        setErrorMessage("Failed to verify payment");
-        setIsVerifying(false);
-      }
-    }
-  };
-
-  // Poll payment status (more reliable method)
-  const pollPaymentStatus = async (orderId, cashfreeOrderId, retries = 0) => {
-    const maxRetries = 10; // Poll for up to 10 times
-    const pollInterval = 2000; // 2 seconds between polls
-
-    try {
-      const res = await api.post(`/v1/payments/status`,
-        {
-          orderId,
-          cashfreeOrderId,
+          cashfreeOrderId: cashfreeOrderId,
+          orderId: orderId,
         },
         {
           headers: {
-          "x-api-key":
-            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        },
+            "x-api-key":
+              "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+          },
         }
       );
 
-      const data = res.data.data || res.data;
+      console.log("Payment status response:", res.data);
 
-      // Check if payment is successful
-      if (data.isSuccess || data.status === "CONFIRMED") {
-        handleSuccess(data);
-        return;
-      }
+      if (res.data.success) {
+        // Check if order was already confirmed (backend processed it)
+        if (
+          res.data.message?.includes("already confirmed") ||
+          res.data.message?.includes("Order placed successfully")
+        ) {
+          // Payment successful and order processed
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+          }
 
-      // Check if payment failed
-      if (data.paymentStatus === "FAILED" || data.orderStatus === "CANCELLED") {
-        setStatus("error");
-        setErrorMessage("Payment failed or was cancelled");
-        setIsVerifying(false);
-        return;
-      }
+          // Clear stored data
+          localStorage.removeItem("pendingOrderId");
+          localStorage.removeItem("pendingCashfreeOrderId");
+          localStorage.removeItem("pendingOrderAmount");
 
-      // If still pending and we have retries left, poll again
-      if (retries < maxRetries && (data.paymentStatus === "PENDING" || !data.isSuccess)) {
-        setTimeout(() => {
-          pollPaymentStatus(orderId, cashfreeOrderId, retries + 1);
-        }, pollInterval);
-      } else {
-        // Max retries reached or payment still pending
-        setStatus("error");
-        setErrorMessage(
-          "Payment verification is taking longer than expected. Please check your order status in your account."
-        );
-        setIsVerifying(false);
+          // Clear cart
+          await db.cart.clear();
+
+          toast.success("Order Confirmed 🎉");
+          setSuccess(true);
+          setLoading(false);
+
+          // Clean up URL
+          window.history.replaceState({}, "", "/order-success");
+          return;
+        }
+
+        const { isSuccess, paymentStatus } = res.data.data || {};
+
+        if (isSuccess) {
+          // Payment successful - backend will process automatically
+          // Wait a moment for backend to process, then check again
+          setTimeout(() => {
+            checkPaymentStatus(orderId, cashfreeOrderId);
+          }, 2000);
+        } else if (
+          paymentStatus === "FAILED" ||
+          paymentStatus === "CANCELLED" ||
+          paymentStatus === "USER_DROPPED"
+        ) {
+          // Payment failed or cancelled - stop polling
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+          }
+
+          const errorMessage =
+            paymentStatus === "CANCELLED"
+              ? "Payment was cancelled"
+              : paymentStatus === "USER_DROPPED"
+              ? "Payment was cancelled by user"
+              : "Payment failed";
+
+          toast.error(errorMessage);
+          setError(true);
+          setLoading(false);
+
+          // Clear stored data
+          localStorage.removeItem("pendingOrderId");
+          localStorage.removeItem("pendingCashfreeOrderId");
+          localStorage.removeItem("pendingOrderAmount");
+
+          // Clean up URL
+          window.history.replaceState({}, "", "/order-success");
+        }
+        // If payment is still pending, continue polling (no action needed)
       }
     } catch (error) {
-      console.error("Polling error:", error);
-      if (retries < maxRetries) {
-        // Retry on error
-        setTimeout(() => {
-          pollPaymentStatus(orderId, cashfreeOrderId, retries + 1);
-        }, pollInterval);
-      } else {
-        setStatus("error");
-        setErrorMessage(
-          error.response?.data?.message || "Failed to verify payment. Please contact support."
+      console.error("Payment status check error:", error);
+      console.error("Error response:", error.response?.data);
+
+      // Don't stop polling on temporary errors
+      // Only stop if it's a clear failure
+      if (
+        error.response?.status === 404 ||
+        error.response?.data?.message?.includes("not found")
+      ) {
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+        }
+        setError(true);
+        setLoading(false);
+        toast.error("Order not found. Please contact support.");
+      } else if (error.response?.status === 400) {
+        // 400 error - might be missing parameters
+        console.error("400 Error - Missing parameters:", error.response?.data);
+        toast.error(
+          error.response?.data?.message || "Invalid request. Please try again."
         );
-        setIsVerifying(false);
+        // Continue polling - might be a temporary issue
       }
+      // For other errors, continue polling (might be temporary network issue)
     }
   };
 
-  const handleSuccess = (data) => {
-    setStatus("success");
-    setOrderData(data);
-    setIsVerifying(false);
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          padding: "20px",
+        }}
+      >
+        <ToastContainer />
+        <div
+          style={{
+            border: "4px solid #f3f3f3",
+            borderTop: "4px solid #ff6b00",
+            borderRadius: "50%",
+            width: "50px",
+            height: "50px",
+            animation: "spin 1s linear infinite",
+            marginBottom: "20px",
+          }}
+        />
+        <h2>Verifying your payment...</h2>
+        <p style={{ color: "#666", marginTop: "10px" }}>
+          Please wait while we confirm your payment
+        </p>
+        <style jsx>{`
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
-    // Clear localStorage
-    localStorage.removeItem("pendingOrderId");
-    localStorage.removeItem("pendingCashfreeOrderId");
-    localStorage.removeItem("grandTotal");
-
-    // Clear cart from IndexedDB
-    db.cart.clear()
-      .then(() => {
-        console.log("Cart cleared successfully");
-      })
-      .catch((err) => {
-        console.error("Error clearing cart:", err);
-      });
-
-    toast.success("Order placed successfully! 🎉");
-  };
+  if (error) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          padding: "20px",
+          textAlign: "center",
+        }}
+      >
+        <ToastContainer />
+        <h2 style={{ color: "#e74c3c", marginBottom: "20px" }}>
+          Payment Verification Failed
+        </h2>
+        <p style={{ color: "#666", marginBottom: "30px" }}>
+          We couldn't verify your payment. Please check your order status or
+          contact support if the payment was successful.
+        </p>
+        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+          <button
+            onClick={() => router.push("/orders")}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#ff6b00",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            View Orders
+          </button>
+          <button
+            onClick={() => router.push("/")}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#95a5a6",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Go Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className={styles.orderSuccessPage}>
-      <ToastContainer position="top-right" autoClose={3000} />
-      
-      {status === "loading" && (
-        <div className={styles.loadingContainer}>
-          <Loader2 className={styles.spinner} size={48} />
-          <h2>Verifying your payment...</h2>
-          <p>Please wait while we confirm your order</p>
-        </div>
-      )}
-
-      {status === "success" && (
-        <div className={styles.successContainer}>
-          <div className={styles.successIcon}>
-            <CheckCircle size={80} color="#10B981" />
-          </div>
-          <h1 className={styles.successTitle}>Order Placed Successfully!</h1>
-          <p className={styles.successMessage}>
-            Thank you for your purchase. Your order has been confirmed.
-          </p>
-
-          {orderData && (
-            <div className={styles.orderDetails}>
-              <div className={styles.detailCard}>
-                <h3>Order Details</h3>
-                <div className={styles.detailRow}>
-                  <span>Order ID:</span>
-                  <strong>{orderData.orderId || "N/A"}</strong>
-                </div>
-                {orderData.cashfree?.referenceId && (
-                  <div className={styles.detailRow}>
-                    <span>Payment Reference:</span>
-                    <strong>{orderData.cashfree.referenceId}</strong>
-                  </div>
-                )}
-                {orderData.shiprocket?.shipmentId && (
-                  <div className={styles.detailRow}>
-                    <span>Shipment ID:</span>
-                    <strong>{orderData.shiprocket.shipmentId}</strong>
-                  </div>
-                )}
-                <div className={styles.detailRow}>
-                  <span>Status:</span>
-                  <strong className={styles.statusConfirmed}>
-                    {orderData.status || "CONFIRMED"}
-                  </strong>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className={styles.actionButtons}>
-            <button
-              className={styles.primaryButton}
-              onClick={() => router.push("/orders")}
-            >
-              View My Orders
-              <ArrowRight size={20} />
-            </button>
-            <button
-              className={styles.secondaryButton}
-              onClick={() => router.push("/")}
-            >
-              Continue Shopping
-            </button>
-          </div>
-        </div>
-      )}
-
-      {status === "error" && (
-        <div className={styles.errorContainer}>
-          <div className={styles.errorIcon}>
-            <XCircle size={80} color="#EF4444" />
-          </div>
-          <h1 className={styles.errorTitle}>Payment Verification Failed</h1>
-          <p className={styles.errorMessage}>{errorMessage}</p>
-
-          <div className={styles.actionButtons}>
-            <button
-              className={styles.primaryButton}
-              onClick={() => router.push("/orders")}
-            >
-              Check Order Status
-            </button>
-            <button
-              className={styles.secondaryButton}
-              onClick={() => router.push("/cart")}
-            >
-              Back to Cart
-            </button>
-          </div>
-        </div>
-      )}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        padding: "50px 20px",
+        textAlign: "center",
+      }}
+    >
+      <ToastContainer />
+      <div
+        style={{
+          fontSize: "80px",
+          marginBottom: "20px",
+        }}
+      >
+        🎉
+      </div>
+      <h1 style={{ marginBottom: "20px", color: "#27ae60" }}>
+        Order Confirmed!
+      </h1>
+      <p style={{ color: "#666", marginBottom: "30px", fontSize: "18px" }}>
+        Your order has been placed successfully. You will receive a confirmation
+        email shortly.
+      </p>
+      <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+        <button
+          onClick={() => router.push("/orders")}
+          style={{
+            padding: "12px 24px",
+            backgroundColor: "#ff6b00",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontSize: "16px",
+            fontWeight: "bold",
+          }}
+        >
+          View Orders
+        </button>
+        <button
+          onClick={() => router.push("/")}
+          style={{
+            padding: "12px 24px",
+            backgroundColor: "#95a5a6",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontSize: "16px",
+          }}
+        >
+          Continue Shopping
+        </button>
+      </div>
     </div>
   );
-};
-
-export default OrderSuccess;
+}

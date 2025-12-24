@@ -347,7 +347,7 @@ const Cart = () => {
         totalPrice: Number(item.discountPrice),
         price: Number(item.discountPrice),
         quantity: Number(item.quantity),
-        categoryId: item.categoryId,
+        categoryId: "H8SZ4VfsFXa4C9cUeonB",
         isCustomizable: item.isCustomizable || false,
         discount: 0,
         tax: 0,
@@ -467,7 +467,7 @@ const Cart = () => {
         totalPrice: Number(item.discountPrice),
         price: Number(item.discountPrice),
         quantity: Number(item.quantity),
-        categoryId: item.categoryId,
+        categoryId:"H8SZ4VfsFXa4C9cUeonB",
         isCustomizable: item.isCustomizable || false,
         discount: 0,
         tax: 0,
@@ -546,7 +546,7 @@ const Cart = () => {
       // Store order info for verification
       localStorage.setItem("pendingOrderId", orderId);
       localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
-      localStorage.setItem("grandTotal", totalAmount.toString());
+      localStorage.setItem("pendingOrderAmount", totalAmount.toString());
 
       console.log(
         "Initializing Cashfree checkout with session:",
@@ -675,7 +675,7 @@ const Cart = () => {
 
               {/* One-Click Checkout Button */}
               
-                <div style={{ marginBottom: "20px" }}>
+                {/* <div style={{ marginBottom: "20px" }}>
                   <button
                     onClick={handleOneClickCheckout}
                     disabled={isProcessing || !cashfree}
@@ -710,7 +710,7 @@ const Cart = () => {
                   >
                     Cashfree will collect your address during checkout
                   </p>
-                </div>
+                </div> */}
               
 
               {/* Divider */}
@@ -744,7 +744,7 @@ const Cart = () => {
               <PriceList
                 bagTotal={bagTotal}
                 grandTotal={grandTotal}
-                handlePayNow={handlePayNow}
+                handlePayNow={handleOneClickCheckout}
                 offerData={offerData}
                 isProcessing={isProcessing}
               />
