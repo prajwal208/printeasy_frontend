@@ -77,8 +77,7 @@ const OrderSuccess = () => {
         return;
       }
 
-      const res = await api.post(
-        `${apiUrl}/v1/payments/verify`,
+      const res = await api.post(`/v1/payments/verify`,
         {
           orderId,
           cashfreeOrderId,
@@ -91,10 +90,10 @@ const OrderSuccess = () => {
           cashfreeSignature: cashfreeSignature || "API_VERIFIED",
         },
         {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
-          },
+           headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
         }
       );
 
@@ -126,17 +125,16 @@ const OrderSuccess = () => {
     const pollInterval = 2000; // 2 seconds between polls
 
     try {
-      const res = await api.post(
-        `${apiUrl}/v1/payments/status`,
+      const res = await api.post(`/v1/payments/status`,
         {
           orderId,
           cashfreeOrderId,
         },
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
-          },
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
         }
       );
 
