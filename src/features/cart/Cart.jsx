@@ -116,7 +116,6 @@ const Cart = () => {
 
   // ----------------- Cashfree Integration -----------------
   const handlePayNow = async () => {
-
     if (cartItems.length === 0) {
       toast.warning("Your cart is empty!");
       return;
@@ -170,7 +169,7 @@ const Cart = () => {
 
       const checkoutOptions = {
         paymentSessionId,
-        redirectTarget: "_self",
+        container: "#cashfree-dropin",
       };
 
       cashfree.checkout(checkoutOptions).then((result) => {
@@ -211,6 +210,7 @@ const Cart = () => {
 
   return (
     <div className={styles.cartPage}>
+      <div id="cashfree-dropin"></div>
       <ToastContainer position="top-right" autoClose={2000} />
       {cartItems?.length > 0 ? (
         <>

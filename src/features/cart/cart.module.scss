@@ -4,6 +4,13 @@
   padding: 16px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
+  #cashfree-dropin {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999999;
+}
+
   .iconBtn {
     background: transparent;
     border: none;
