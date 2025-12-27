@@ -131,13 +131,14 @@ const Cart = () => {
   }));
 
   const customizableItem = cartItems.find((item) => item.isCustomizable);
-
+  console.log(customizableItem?.canvasImage,"jdksjdkjsduuuyyyy")
   const uploadImagePayload = customizableItem
     ? {
         printText: customizableItem.presetText || "Empty Text",
         textColor: customizableItem.textColor || "",
         fontFamily: customizableItem.fontFamily || "",
         fontSize: customizableItem.fontSize || "",
+        canvasImage:customizableItem?.canvasImage
       }
     : null;
 

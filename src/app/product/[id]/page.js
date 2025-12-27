@@ -49,7 +49,7 @@ const [text, setText] = useState("");
     useEffect(() => {
       if (product) {
         setText(product.presetText || "Empty Text");
-        setSelectedColor(product.fontColor || "#ffffff");
+        setSelectedColor(product.fontColor || "#000");
         setSelectedFont(product.fontFamily || "Arial");
         setSelectedSize(product.fontSize || 28);
       }
@@ -89,6 +89,8 @@ const [text, setText] = useState("");
       console.error("Capture image error:", error);
     }
 
+    console.log(product,"dnsdsjdiuuyyyyy")
+
     const payload = {
       productId: product.id,
       categoryId: product.categoryId,
@@ -112,7 +114,8 @@ const [text, setText] = useState("");
       presetText:text,
       textColor:selectedColor,
       fontFamily:selectedFont,
-      fontSize:selectedSize
+      fontSize:selectedSize,
+      canvasImage:product.canvasImage
     };
 
     console.log(payload,"dskdnskdoooooooo")
