@@ -256,7 +256,7 @@ export default function OrderSuccess() {
           <button
             onClick={() => router.push("/orders")}
             style={{
-              padding: "10px 20px",
+              padding: "8px 12px",
               backgroundColor: "#ff6b00",
               color: "white",
               border: "none",
