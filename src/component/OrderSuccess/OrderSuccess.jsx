@@ -13,7 +13,7 @@ export default function OrderSuccess() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const pollingIntervalRef = useRef(null);
-  const maxPollingTime = 5 * 60 * 1000; // 5 minutes
+  const maxPollingTime = 1 * 60 * 1000;
   const pollingStartTime = useRef(Date.now());
 
   useEffect(() => {
