@@ -92,7 +92,7 @@ export default function OrderSuccess() {
       console.log("Payment status response:", res.data);
 
       if (res.data.success) {
-        localStorage.setItem("orderId",res?.data?.orderId)
+        localStorage.setItem("orderId",res?.data?.data?.orderId)
         // Check if order was already confirmed (backend processed it)
         if (
           res.data.message?.includes("already confirmed") ||
