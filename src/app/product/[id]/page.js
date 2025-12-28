@@ -36,24 +36,24 @@ const ProductDetails = () => {
   const [showSuccessCart, setShowSuccessCart] = useState(false);
   const [isCustomizable, setIsCustomizable] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
-const [isEditing, setIsEditing] = useState(false);
-const [text, setText] = useState("");
- const [selectedSize, setSelectedSize] = useState(28);
+  const [isEditing, setIsEditing] = useState(false);
+  const [text, setText] = useState("");
+  const [selectedSize, setSelectedSize] = useState(28);
   const [selectedFont, setSelectedFont] = useState("Arial");
   const [selectedColor, setSelectedColor] = useState("#ffffff");
   const accessToken = Cookies.get("idToken");
   const editorRef = useRef(null);
 
-  console.log(text,"dskdnskdiiioiiioio",selectedColor)
+  console.log(text, "dskdnskdiiioiiioio", selectedColor);
 
-    useEffect(() => {
-      if (product) {
-        setText(product.presetText || "Empty Text");
-        setSelectedColor(product.fontColor || "#000");
-        setSelectedFont(product.fontFamily || "");
-        setSelectedSize(product.fontSize || 28);
-      }
-    }, [product]);
+  useEffect(() => {
+    if (product) {
+      setText(product.presetText || "Empty Text");
+      setSelectedColor(product.fontColor || "#000");
+      setSelectedFont(product.fontFamily || "");
+      setSelectedSize(product.fontSize || 28);
+    }
+  }, [product]);
 
   const handleSizeSelect = (size, autoAdd = false) => {
     setSelectedSize(size);
@@ -62,7 +62,6 @@ const [text, setText] = useState("");
     );
     setSizeInfo(match || null);
 
-    
     if (autoAdd) {
       processAddToCart(size);
     }
@@ -89,8 +88,10 @@ const [text, setText] = useState("");
       console.error("Capture image error:", error);
     }
 
-    console.log(product,"dnsdsjdiuuyyyyy")
+    console.log(product, "dnsdsjdiuuyyyyy");
 
+
+    console.log(product,"djkjkjdfijfidfidfidnvnvnvn")
     const payload = {
       productId: product.id,
       categoryId: product.categoryId,
@@ -111,14 +112,16 @@ const [text, setText] = useState("");
       },
       options: [{ label: "Size", value: sizeToUse }],
       addedAt: new Date().toISOString(),
-      presetText:text,
-      textColor:selectedColor,
-      fontFamily:selectedFont,
-      fontSize:selectedSize,
-      canvasImage:product.canvasImage
+      presetText: text,
+      textColor: selectedColor,
+      fontFamily: selectedFont,
+      fontSize: selectedSize,
+      canvasImage: product.canvasImage,
+      illustrationImage:product.illustrationImage,
+      fullProductUrl:product.productImages[0]
     };
 
-    console.log(payload,"dskdnskdoooooooo")
+    console.log(payload, "dskdnskdoooooooo");
 
     try {
       const existingItem = await db.cart
@@ -277,19 +280,19 @@ const [text, setText] = useState("");
 
         {/* Product Visual Section */}
         {product?.isCustomizable ? (
-          <ShirtEditor 
-          product={product} 
-          ref={editorRef} 
-          isEditing={isEditing} 
-          setIsEditing={setIsEditing}
-          text={text}
-          setText={setText}
-          selectedSize={selectedSize}
-          selectedFont={selectedFont}
-          selectedColor={selectedColor}
-          setSelectedColor={setSelectedColor}
-          setSelectedFont={setSelectedFont}
-          setSelectedSize={setSelectedSize}
+          <ShirtEditor
+            product={product}
+            ref={editorRef}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+            text={text}
+            setText={setText}
+            selectedSize={selectedSize}
+            selectedFont={selectedFont}
+            selectedColor={selectedColor}
+            setSelectedColor={setSelectedColor}
+            setSelectedFont={setSelectedFont}
+            setSelectedSize={setSelectedSize}
           />
         ) : (
           <Image
@@ -358,7 +361,6 @@ const [text, setText] = useState("");
           )}
 
           <div className={styles.button_wrapper}>
-            
             <button className={styles.buyit_btn} onClick={addToCart}>
               {"BUY IT NOW"}
               <p>(click to select size)</p>

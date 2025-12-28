@@ -118,6 +118,8 @@ const Cart = () => {
     }
   };
 
+  console.log(cartItems[0]?.fullProductUrl,"dsdsssssssssssss")
+
   const orderPayloadItems = cartItems.map((item) => ({
     name: item.name,
     sku: item.sku || item.productId,
@@ -125,20 +127,21 @@ const Cart = () => {
     quantity: item.quantity,
     categoryId: item.categoryId,
     isCustomizable: !!item.isCustomizable,
+    productImageUrl:item?.fullProductUrl,
     discount: item.discount || 0,
     tax: item.tax || 0,
     hsn: item.hsn || null,
   }));
 
   const customizableItem = cartItems.find((item) => item.isCustomizable);
-  console.log(customizableItem?.canvasImage,"jdksjdkjsduuuyyyy")
+  console.log(customizableItem?.illustrationImage,"jdksjdkjsduuuyyyy")
   const uploadImagePayload = customizableItem
     ? {
         printText: customizableItem.presetText || "Empty Text",
         textColor: customizableItem.textColor || "",
         fontFamily: customizableItem.fontFamily || "",
         fontSize: customizableItem.fontSize || "",
-        canvasImage:customizableItem?.canvasImage
+        illustrationImage:customizableItem?.illustrationImage
       }
     : null;
 
