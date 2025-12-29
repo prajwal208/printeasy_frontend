@@ -84,7 +84,7 @@ const Cart = () => {
       if (!item) return;
       await db.cart.delete(item.id);
       setCartItems((prev) => prev.filter((i) => i.productId !== productId));
-      toast.success("Item removed");
+      // toast.success("Item removed");
     } catch (err) {
       toast.error("Failed to remove item");
     }

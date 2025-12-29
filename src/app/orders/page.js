@@ -29,15 +29,29 @@ const Page = () => {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
   useEffect(() => {
-   getUserOrder();
+    if (orderId) getUserOrder();
+    // else setLoading(false);
   }, []);
 
-  if (loading) return null;
+  /* 🔹 SHIMMER UI */
+  if (loading) {
+    return (
+      <div className={styles.orders_main_wrap}>
+        <h2>Your Orders</h2>
+
+        <div className={styles.order_card}>
+          <div className={styles.shimmerWrapper}>
+            <div className={styles.shimmer}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!order) {
     return (
@@ -57,6 +71,7 @@ const Page = () => {
   return (
     <div className={styles.orders_main_wrap}>
       <h2>Your Orders</h2>
+
       <div className={styles.order_card}>
         <div className={styles.order_header}>
           <div>
@@ -89,9 +104,7 @@ const Page = () => {
         {/* ADDRESS */}
         <div className={styles.address_section}>
           <h4>Delivery Address</h4>
-          <p>
-            <strong>{order.shipAddress.name}</strong>
-          </p>
+          <p><strong>{order.shipAddress.name}</strong></p>
           <p>{order.shipAddress.addressLine1}</p>
           <p>
             {order.shipAddress.city}, {order.shipAddress.state}{" "}

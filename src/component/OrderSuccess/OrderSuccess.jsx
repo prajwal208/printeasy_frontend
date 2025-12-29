@@ -311,7 +311,7 @@ export default function OrderSuccess() {
       </h1>
       <p style={{ color: "#666", marginBottom: "30px", fontSize: "18px" }}>
         Your order has been placed successfully. You will receive a confirmation
-        email shortly.
+        message shortly.
       </p>
       <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
         <button
