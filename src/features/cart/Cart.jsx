@@ -206,7 +206,7 @@ const Cart = () => {
       cashfree.checkout({
         paymentSessionId,
         redirectTarget: document.getElementById("cashfree-dropin"),
-        returnUrl: `${"https://onrise.in"}/order-success?order_id={order_id}`,
+        returnUrl: `https://onrise.in/order-success?order_id=${orderData?.cashfree?.orderId}`,
       });
     } catch (error) {
       console.error("Payment error:", error);
