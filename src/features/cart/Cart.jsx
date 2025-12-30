@@ -199,7 +199,7 @@ const Cart = () => {
       }
 
       // 🔥 SHOW CHECKOUT, HIDE CART
-      setShowCheckout(true);
+      // setShowCheckout(true);
 
       const cashfree = Cashfree({ mode: "production" });
 
@@ -240,7 +240,7 @@ const Cart = () => {
 
   return (
     <>
-      {showCheckout && (
+      {/* {showCheckout && ( */}
         <div
           id="cashfree-dropin"
           style={{
@@ -248,7 +248,7 @@ const Cart = () => {
             height: "100vh"
           }}
         />
-      )}
+      {/* )} */}
       <div className={styles.cartPage}>
         <ToastContainer position="top-right" autoClose={2000} />
         {cartItems?.length > 0 ? (
