@@ -27,7 +27,7 @@ const Cart = () => {
   const accessToken = Cookies.get("idToken");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
-  const [cartLoader,setCartLodaer] = useState(false)
+  const [cartLoader, setCartLodaer] = useState(false);
 
   console.log(cartItems, "sksksiisoueuyyexxxx");
 
@@ -112,13 +112,13 @@ const Cart = () => {
             "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
         },
       });
-      setOfferData(res?.data?.data || []);  
+      setOfferData(res?.data?.data || []);
     } catch (error) {
       console.error(error);
     }
   };
 
-  console.log(cartItems[0]?.fullProductUrl,"dsdsssssssssssss")
+  console.log(cartItems[0]?.fullProductUrl, "dsdsssssssssssss");
 
   const orderPayloadItems = cartItems.map((item) => ({
     name: item.name,
@@ -127,67 +127,40 @@ const Cart = () => {
     quantity: item.quantity,
     categoryId: item.categoryId,
     isCustomizable: !!item.isCustomizable,
-    productImageUrl:item?.fullProductUrl,
+    productImageUrl: item?.fullProductUrl,
     discount: item.discount || 0,
     tax: item.tax || 0,
     hsn: item.hsn || null,
   }));
 
   const customizableItem = cartItems.find((item) => item.isCustomizable);
-  console.log(customizableItem?.illustrationImage,"jdksjdkjsduuuyyyy")
+  console.log(customizableItem?.illustrationImage, "jdksjdkjsduuuyyyy");
   const uploadImagePayload = customizableItem
     ? {
         printText: customizableItem.presetText || "Empty Text",
         textColor: customizableItem.textColor || "",
         fontFamily: customizableItem.fontFamily || "",
         fontSize: customizableItem.fontSize || "",
-        illustrationImage:customizableItem?.illustrationImage
+        illustrationImage: customizableItem?.illustrationImage,
       }
     : null;
 
   // ----------------- Cashfree Integration -----------------
   const handlePayNow = async () => {
-    if (cartItems.length === 0) {
-      toast.warning("Your cart is empty!");
-      return;
-    }
+  if (cartItems.length === 0) {
+    toast.warning("Your cart is empty!");
+    return;
+  }
 
-    try {
-      setCartLodaer(true)
-      let renderedImageUrl = null;
+  try {
+    setCartLodaer(true);
+    let renderedImageUrl = null;
 
-      if (uploadImagePayload) {
-        const uploadRes = await api.post(
-          "/v1/cart/upload-image",
-          { printingImgText: uploadImagePayload },
-          {
-            headers: {
-              "x-api-key":
-                "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-            },
-          }
-        );
-        console.log(uploadRes,"dsdnsjnduuyyttttt")
-        renderedImageUrl = uploadRes?.data?.data?.renderedImageUrl || null;
-        console.log(renderedImageUrl,"llkkxxbccbnnn")
-        if(renderedImageUrl){
-          setCartLodaer(false)
-        }
-      }
-
-      /* ---------------- Attach image to items ---------------- */
-      const finalItems = orderPayloadItems.map((item) =>
-        item.isCustomizable ? { ...item, imageUrl: renderedImageUrl } : item
-      );
-
-      /* ---------------- Create Order ---------------- */
-      const orderRes = await api.post(
-        "/v1/orders/create",
-        {
-          paymentMethod: "ONLINE",
-          totalAmount: grandTotal,
-          items: finalItems, // ✅ ARRAY
-        },
+    /* ---------- Upload Image (if any) ---------- */
+    if (uploadImagePayload) {
+      const uploadRes = await api.post(
+        "/v1/cart/upload-image",
+        { printingImgText: uploadImagePayload },
         {
           headers: {
             "x-api-key":
@@ -196,42 +169,78 @@ const Cart = () => {
         }
       );
 
-      const orderData = orderRes?.data?.data;
+      renderedImageUrl =
+        uploadRes?.data?.data?.renderedImageUrl || null;
+    }
 
-      localStorage.setItem("pendingOrderId", orderData.orderId);
-      localStorage.setItem(
-        "pendingCashfreeOrderId",
-        orderData.cashfree.orderId
-      );
-      localStorage.setItem("pendingOrderAmount", String(grandTotal));
+    /* ---------- Attach image to customizable items ---------- */
+    const finalItems = orderPayloadItems.map((item) =>
+      item.isCustomizable ? { ...item, imageUrl: renderedImageUrl } : item
+    );
 
-      const paymentSessionId = orderData?.cashfree?.sessionId;
-
-      if (!paymentSessionId) {
-        toast.error("Payment session not generated");
-        return;
+    /* ---------- Create Order ---------- */
+    const orderRes = await api.post(
+      "/v1/orders/create",
+      {
+        paymentMethod: "ONLINE",
+        totalAmount: grandTotal,
+        items: finalItems,
+      },
+      {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
       }
+    );
 
-      /* ---------------- Cashfree Checkout ---------------- */
-      const checkoutOptions = {
+    const orderData = orderRes?.data?.data;
+
+    localStorage.setItem("pendingOrderId", orderData.orderId);
+    localStorage.setItem(
+      "pendingCashfreeOrderId",
+      orderData.cashfree.orderId
+    );
+    localStorage.setItem(
+      "pendingOrderAmount",
+      String(grandTotal)
+    );
+
+    const paymentSessionId = orderData?.cashfree?.sessionId;
+
+    if (!paymentSessionId) {
+      toast.error("Payment session not generated");
+      return;
+    }
+
+    /* ---------- Cashfree INLINE Checkout ---------- */
+    const cashfree = Cashfree({
+      mode: process.env.NODE_ENV === "production" ? "production" : "sandbox",
+    });
+
+    cashfree
+      .checkout({
         paymentSessionId,
-        container: "#cashfree-dropin",
-        redirectTarget: "_self"
-      };
-
-      cashfree.checkout(checkoutOptions).then((result) => {
+        redirectTarget: document.getElementById("cashfree-dropin"),
+        returnUrl: `${window.location.origin}/order-status?order_id={order_id}`,
+      })
+      .then((result) => {
         if (result.error) {
           toast.error(result.error.message);
         }
+
         if (result.redirect) {
-          console.log("Payment redirection in progress");
+          console.log("Cashfree handling redirect internally");
         }
       });
-    } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Failed to initiate payment");
-    }
-  };
+  } catch (error) {
+    console.error("Payment error:", error);
+    toast.error("Failed to initiate payment");
+  } finally {
+    setCartLodaer(false);
+  }
+};
+
 
   const addToWishlist = async (productId) => {
     if (!accessToken) {
@@ -257,117 +266,120 @@ const Cart = () => {
 
   return (
     <>
-      <div id="cashfree-dropin"></div>
-    <div className={styles.cartPage}>
-      <ToastContainer position="top-right" autoClose={2000} />
-      {cartItems?.length > 0 ? (
-        <>
-          <button className={styles.iconBtn} onClick={() => router.push("/")}>
-            <ChevronLeft size={22} />
-          </button>
-          <CartRewards totalAmount={bagTotal} />
+      <div
+        id="cashfree-dropin"
+        style={{ width: "100%", height: "100vh" }}
+      ></div>
+      <div className={styles.cartPage}>
+        <ToastContainer position="top-right" autoClose={2000} />
+        {cartItems?.length > 0 ? (
+          <>
+            <button className={styles.iconBtn} onClick={() => router.push("/")}>
+              <ChevronLeft size={22} />
+            </button>
+            <CartRewards totalAmount={bagTotal} />
 
-          <div className={styles.cartContainer}>
-            <div className={styles.cartItems}>
-              {cartItems.map((item) => (
-                <div key={item.id} className={styles.cartItem}>
-                  <div className={styles.itemImage}>
-                    <img src={item.productImageUrl} alt={item.name} />
-                  </div>
-
-                  <div className={styles.itemDetails}>
-                    <div className={styles.itemHeader}>
-                      <h3 className={styles.itemName}>{item.name}</h3>
-                      <button
-                        onClick={() => removeFromCart(item?.productId)}
-                        className={styles.removeBtn}
-                      >
-                        <Trash2 size={20} />
-                      </button>
+            <div className={styles.cartContainer}>
+              <div className={styles.cartItems}>
+                {cartItems.map((item) => (
+                  <div key={item.id} className={styles.cartItem}>
+                    <div className={styles.itemImage}>
+                      <img src={item.productImageUrl} alt={item.name} />
                     </div>
 
-                    <div className={styles.itemMeta}>
-                      <span>{item.options?.[0]?.value} |</span>
-                      <span className={styles.quantitySelector}>
-                        QTY |
-                        <select
-                          value={item.quantity}
-                          onChange={(e) =>
-                            handleQuantityChange(
-                              item.id,
-                              parseInt(e.target.value)
-                            )
-                          }
+                    <div className={styles.itemDetails}>
+                      <div className={styles.itemHeader}>
+                        <h3 className={styles.itemName}>{item.name}</h3>
+                        <button
+                          onClick={() => removeFromCart(item?.productId)}
+                          className={styles.removeBtn}
                         >
-                          {[...Array(10).keys()].map((num) => (
-                            <option key={num + 1} value={num + 1}>
-                              {num + 1}
-                            </option>
-                          ))}
-                        </select>
-                      </span>
-                    </div>
+                          <Trash2 size={20} />
+                        </button>
+                      </div>
 
-                    <div className={styles.itemFooter}>
-                      <button
-                        className={styles.wishlistBtn}
-                        onClick={() => addToWishlist(item?.productId)}
-                      >
-                        MOVE TO WISHLIST
-                      </button>
-                      <span className={styles.itemPrice}>
-                        <span className={styles.strikeValue}>
-                          ₹{item?.basePrice}
-                        </span>{" "}
-                        <span>₹{item?.discountPrice}</span>
-                      </span>
+                      <div className={styles.itemMeta}>
+                        <span>{item.options?.[0]?.value} |</span>
+                        <span className={styles.quantitySelector}>
+                          QTY |
+                          <select
+                            value={item.quantity}
+                            onChange={(e) =>
+                              handleQuantityChange(
+                                item.id,
+                                parseInt(e.target.value)
+                              )
+                            }
+                          >
+                            {[...Array(10).keys()].map((num) => (
+                              <option key={num + 1} value={num + 1}>
+                                {num + 1}
+                              </option>
+                            ))}
+                          </select>
+                        </span>
+                      </div>
+
+                      <div className={styles.itemFooter}>
+                        <button
+                          className={styles.wishlistBtn}
+                          onClick={() => addToWishlist(item?.productId)}
+                        >
+                          MOVE TO WISHLIST
+                        </button>
+                        <span className={styles.itemPrice}>
+                          <span className={styles.strikeValue}>
+                            ₹{item?.basePrice}
+                          </span>{" "}
+                          <span>₹{item?.discountPrice}</span>
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              <div className={styles.rightSection}>
+                <DefaultAddress
+                  addressList={addressList}
+                  onChange={() => router.push("/address")}
+                />
+                <PriceList
+                  bagTotal={bagTotal}
+                  grandTotal={grandTotal}
+                  handlePayNow={handlePayNow}
+                  offerData={offerData}
+                />
+              </div>
             </div>
 
-            <div className={styles.rightSection}>
-              <DefaultAddress
-                addressList={addressList}
-                onChange={() => router.push("/address")}
+            <DynamicModal
+              open={isLoginModalVisible}
+              onClose={() => setIsLoginModalVisible(false)}
+            >
+              <LoginForm
+                onContinue={handleContinue}
+                setIsLoginModalVisible={setIsLoginModalVisible}
+                setIsLoggedIn={setIsLoggedIn}
               />
-              <PriceList
-                bagTotal={bagTotal}
-                grandTotal={grandTotal}
-                handlePayNow={handlePayNow}
-                offerData={offerData}
-              />
-            </div>
-          </div>
+            </DynamicModal>
 
-          <DynamicModal
-            open={isLoginModalVisible}
-            onClose={() => setIsLoginModalVisible(false)}
-          >
-            <LoginForm
-              onContinue={handleContinue}
-              setIsLoginModalVisible={setIsLoginModalVisible}
-              setIsLoggedIn={setIsLoggedIn}
-            />
-          </DynamicModal>
-
-          <DynamicModal
-          open={cartLoader}
-            onClose={() => setCartLodaer(false)}
-          >
-            <AddToBagLoader/>
-          </DynamicModal>
-        </>
-      ) : (
-        <NoResult
-          title="Oops! Your Cart is Empty"
-          description="Explore our products and find the perfect items for you."
-          buttonText="Explore"
-          onButtonClick={() => router.push("/")}
-        />
-      )}
-    </div>
+            <DynamicModal
+              open={cartLoader}
+              onClose={() => setCartLodaer(false)}
+            >
+              <AddToBagLoader />
+            </DynamicModal>
+          </>
+        ) : (
+          <NoResult
+            title="Oops! Your Cart is Empty"
+            description="Explore our products and find the perfect items for you."
+            buttonText="Explore"
+            onButtonClick={() => router.push("/")}
+          />
+        )}
+      </div>
     </>
   );
 };

@@ -10,6 +10,7 @@ html, body {
   height: -webkit-fill-available;
 }
 
+
 @media (max-width: 768px) {
   .navbar-wrapper {
     display: none !important;
