@@ -198,14 +198,10 @@ const Cart = () => {
         return;
       }
 
-      // 🔥 SHOW CHECKOUT, HIDE CART
-      setShowCartUI(false);
-
-      const cashfree = Cashfree({ mode: "production" });
-
+      // ✅ USE LOADED SDK
       cashfree.checkout({
         paymentSessionId,
-        redirectTarget: document.getElementById("cashfree-dropin"),
+        redirectTarget: "_self",
         returnUrl: `https://onrise.in/order-success?order_id=${orderData?.cashfree?.orderId}`,
       });
     } catch (error) {
@@ -247,120 +243,121 @@ const Cart = () => {
           height: "auto",
         }}
       />
-      {
-        showCartUI && 
-         <div className={styles.cartPage}>
-        <ToastContainer position="top-right" autoClose={2000} />
-        {cartItems?.length > 0 ? (
-          <>
-            <button className={styles.iconBtn} onClick={() => router.push("/")}>
-              <ChevronLeft size={22} />
-            </button>
-            <CartRewards totalAmount={bagTotal} />
+      {showCartUI && (
+        <div className={styles.cartPage}>
+          <ToastContainer position="top-right" autoClose={2000} />
+          {cartItems?.length > 0 ? (
+            <>
+              <button
+                className={styles.iconBtn}
+                onClick={() => router.push("/")}
+              >
+                <ChevronLeft size={22} />
+              </button>
+              <CartRewards totalAmount={bagTotal} />
 
-            <div className={styles.cartContainer}>
-              <div className={styles.cartItems}>
-                {cartItems.map((item) => (
-                  <div key={item.id} className={styles.cartItem}>
-                    <div className={styles.itemImage}>
-                      <img src={item.productImageUrl} alt={item.name} />
-                    </div>
-
-                    <div className={styles.itemDetails}>
-                      <div className={styles.itemHeader}>
-                        <h3 className={styles.itemName}>{item.name}</h3>
-                        <button
-                          onClick={() => removeFromCart(item?.productId)}
-                          className={styles.removeBtn}
-                        >
-                          <Trash2 size={20} />
-                        </button>
+              <div className={styles.cartContainer}>
+                <div className={styles.cartItems}>
+                  {cartItems.map((item) => (
+                    <div key={item.id} className={styles.cartItem}>
+                      <div className={styles.itemImage}>
+                        <img src={item.productImageUrl} alt={item.name} />
                       </div>
 
-                      <div className={styles.itemMeta}>
-                        <span>{item.options?.[0]?.value} |</span>
-                        <span className={styles.quantitySelector}>
-                          QTY |
-                          <select
-                            value={item.quantity}
-                            onChange={(e) =>
-                              handleQuantityChange(
-                                item.id,
-                                parseInt(e.target.value)
-                              )
-                            }
+                      <div className={styles.itemDetails}>
+                        <div className={styles.itemHeader}>
+                          <h3 className={styles.itemName}>{item.name}</h3>
+                          <button
+                            onClick={() => removeFromCart(item?.productId)}
+                            className={styles.removeBtn}
                           >
-                            {[...Array(10).keys()].map((num) => (
-                              <option key={num + 1} value={num + 1}>
-                                {num + 1}
-                              </option>
-                            ))}
-                          </select>
-                        </span>
-                      </div>
+                            <Trash2 size={20} />
+                          </button>
+                        </div>
 
-                      <div className={styles.itemFooter}>
-                        <button
-                          className={styles.wishlistBtn}
-                          onClick={() => addToWishlist(item?.productId)}
-                        >
-                          MOVE TO WISHLIST
-                        </button>
-                        <span className={styles.itemPrice}>
-                          <span className={styles.strikeValue}>
-                            ₹{item?.basePrice}
-                          </span>{" "}
-                          <span>₹{item?.discountPrice}</span>
-                        </span>
+                        <div className={styles.itemMeta}>
+                          <span>{item.options?.[0]?.value} |</span>
+                          <span className={styles.quantitySelector}>
+                            QTY |
+                            <select
+                              value={item.quantity}
+                              onChange={(e) =>
+                                handleQuantityChange(
+                                  item.id,
+                                  parseInt(e.target.value)
+                                )
+                              }
+                            >
+                              {[...Array(10).keys()].map((num) => (
+                                <option key={num + 1} value={num + 1}>
+                                  {num + 1}
+                                </option>
+                              ))}
+                            </select>
+                          </span>
+                        </div>
+
+                        <div className={styles.itemFooter}>
+                          <button
+                            className={styles.wishlistBtn}
+                            onClick={() => addToWishlist(item?.productId)}
+                          >
+                            MOVE TO WISHLIST
+                          </button>
+                          <span className={styles.itemPrice}>
+                            <span className={styles.strikeValue}>
+                              ₹{item?.basePrice}
+                            </span>{" "}
+                            <span>₹{item?.discountPrice}</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                <div className={styles.rightSection}>
+                  <DefaultAddress
+                    addressList={addressList}
+                    onChange={() => router.push("/address")}
+                  />
+                  <PriceList
+                    bagTotal={bagTotal}
+                    grandTotal={grandTotal}
+                    handlePayNow={handlePayNow}
+                    offerData={offerData}
+                  />
+                </div>
               </div>
 
-              <div className={styles.rightSection}>
-                <DefaultAddress
-                  addressList={addressList}
-                  onChange={() => router.push("/address")}
+              <DynamicModal
+                open={isLoginModalVisible}
+                onClose={() => setIsLoginModalVisible(false)}
+              >
+                <LoginForm
+                  onContinue={handleContinue}
+                  setIsLoginModalVisible={setIsLoginModalVisible}
+                  setIsLoggedIn={setIsLoggedIn}
                 />
-                <PriceList
-                  bagTotal={bagTotal}
-                  grandTotal={grandTotal}
-                  handlePayNow={handlePayNow}
-                  offerData={offerData}
-                />
-              </div>
-            </div>
+              </DynamicModal>
 
-            <DynamicModal
-              open={isLoginModalVisible}
-              onClose={() => setIsLoginModalVisible(false)}
-            >
-              <LoginForm
-                onContinue={handleContinue}
-                setIsLoginModalVisible={setIsLoginModalVisible}
-                setIsLoggedIn={setIsLoggedIn}
-              />
-            </DynamicModal>
-
-            <DynamicModal
-              open={cartLoader}
-              onClose={() => setCartLodaer(false)}
-            >
-              <AddToBagLoader />
-            </DynamicModal>
-          </>
-        ) : (
-          <NoResult
-            title="Oops! Your Cart is Empty"
-            description="Explore our products and find the perfect items for you."
-            buttonText="Explore"
-            onButtonClick={() => router.push("/")}
-          />
-        )}
-      </div>
-      }
-     
+              <DynamicModal
+                open={cartLoader}
+                onClose={() => setCartLodaer(false)}
+              >
+                <AddToBagLoader />
+              </DynamicModal>
+            </>
+          ) : (
+            <NoResult
+              title="Oops! Your Cart is Empty"
+              description="Explore our products and find the perfect items for you."
+              buttonText="Explore"
+              onButtonClick={() => router.push("/")}
+            />
+          )}
+        </div>
+      )}
     </>
   );
 };
