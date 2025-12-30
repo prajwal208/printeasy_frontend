@@ -244,8 +244,7 @@ const Cart = () => {
           id="cashfree-dropin"
           style={{
             width: "100%",
-            minHeight: "100vh",
-            background: "#fff",
+            height: "100vh"
           }}
         />
       )}
