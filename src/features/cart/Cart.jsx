@@ -195,31 +195,27 @@ const Cart = () => {
       const cashfree = await load({ mode: "production" });
 
       // Embedded checkout with proper callback structure
-      cashfree.checkout({
+      const checkoutOptions = {
         paymentSessionId: paymentSessionId,
-        redirectTarget: document.getElementById("cashfree-dropin"),
-        onSuccess: function(data) {
-          console.log("Payment successful", data);
-          // Redirect to order success page
-          window.location.href = "/order-success";
-        },
-        onFailure: function(data) {
-          console.log("Payment failed", data);
-          toast.error("Payment failed. Please try again.");
-          // Clear localStorage on failure
-          localStorage.removeItem("pendingOrderId");
-          localStorage.removeItem("pendingCashfreeOrderId");
-          localStorage.removeItem("pendingOrderAmount");
+        redirectTarget: document.getElementById("cashfree-dropin"), // Your embedded div
+      };
+
+      cashfree.checkout(checkoutOptions).then((result) => {
+        if (result.error) {
+          console.error("SDK Error:", result.error);
+          toast.error(result.error.message);
           setShowCartUI(true);
-        },
-        onError: function(error) {
-          console.error("Payment error", error);
-          toast.error("An error occurred during payment.");
-          // Clear localStorage on error
-          localStorage.removeItem("pendingOrderId");
-          localStorage.removeItem("pendingCashfreeOrderId");
-          localStorage.removeItem("pendingOrderAmount");
-          setShowCartUI(true);
+        }
+
+        // If the payment is completed (success or failure)
+        if (result.paymentDetails) {
+          console.log("Payment completed, checking status...");
+          // Force redirect to your success page
+          window.location.href = `/order-success?order_id=${cashfreeOrderId}`;
+        }
+
+        if (result.redirect) {
+          console.log("SDK handled redirection automatically");
         }
       });
     } catch (error) {
@@ -268,7 +264,10 @@ const Cart = () => {
           <ToastContainer position="top-right" autoClose={2000} />
           {cartItems?.length > 0 ? (
             <>
-              <button className={styles.iconBtn} onClick={() => router.push("/")}>
+              <button
+                className={styles.iconBtn}
+                onClick={() => router.push("/")}
+              >
                 <ChevronLeft size={22} />
               </button>
               <CartRewards totalAmount={bagTotal} />
