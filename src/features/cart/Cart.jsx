@@ -168,7 +168,8 @@ const Cart = () => {
 
       const orderData = orderRes?.data?.data;
       const paymentSessionId = orderData?.cashfree?.sessionId;
-      const orderId = orderData?.cashfree?.orderId;
+      const cashfreeOrderId = orderData?.cashfree?.orderId;
+      const backendOrderId = orderData?.orderId;
 
       if (!paymentSessionId) {
         toast.error("Payment session not generated");
@@ -176,39 +177,51 @@ const Cart = () => {
         return;
       }
 
+      // Store order data in localStorage for order-success page
+      localStorage.setItem("pendingOrderId", backendOrderId);
+      localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
+      localStorage.setItem("pendingOrderAmount", grandTotal.toString());
+
+      console.log("Stored order data:", {
+        pendingOrderId: backendOrderId,
+        pendingCashfreeOrderId: cashfreeOrderId,
+        pendingOrderAmount: grandTotal,
+      });
+
       // Hide cart UI and show checkout
       setShowCartUI(false);
       setCartLodaer(false);
 
       const cashfree = await load({ mode: "production" });
 
-      // Embedded checkout with callbacks
-      const checkoutOptions = {
-        paymentSessionId,
+      // Embedded checkout with proper callback structure
+      cashfree.checkout({
+        paymentSessionId: paymentSessionId,
         redirectTarget: document.getElementById("cashfree-dropin"),
-        appearance: {
-          width: "100%",
-          height: "700px",
+        onSuccess: function(data) {
+          console.log("Payment successful", data);
+          // Redirect to order success page
+          window.location.href = "/order-success";
         },
-        onSuccess: async function (data) {
-          console.log("Payment Success:", data);
-
-          // Clear cart after successful payment
-          await db.cart.clear();
-
-          // Redirect to success page with order ID
-          router.push(`/order-success?orderId=${orderId}`);
-        },
-        onFailure: function (data) {
-          console.log("Payment Failed:", data);
+        onFailure: function(data) {
+          console.log("Payment failed", data);
           toast.error("Payment failed. Please try again.");
-
-          // Show cart UI again
+          // Clear localStorage on failure
+          localStorage.removeItem("pendingOrderId");
+          localStorage.removeItem("pendingCashfreeOrderId");
+          localStorage.removeItem("pendingOrderAmount");
           setShowCartUI(true);
         },
-      };
-
-      cashfree.checkout(checkoutOptions);
+        onError: function(error) {
+          console.error("Payment error", error);
+          toast.error("An error occurred during payment.");
+          // Clear localStorage on error
+          localStorage.removeItem("pendingOrderId");
+          localStorage.removeItem("pendingCashfreeOrderId");
+          localStorage.removeItem("pendingOrderAmount");
+          setShowCartUI(true);
+        }
+      });
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment");
@@ -246,7 +259,7 @@ const Cart = () => {
         id="cashfree-dropin"
         style={{
           width: "100%",
-          minHeight: showCartUI ? "0" : "700px",
+          height: showCartUI ? "0" : "auto",
           display: showCartUI ? "none" : "block",
         }}
       />
@@ -255,10 +268,7 @@ const Cart = () => {
           <ToastContainer position="top-right" autoClose={2000} />
           {cartItems?.length > 0 ? (
             <>
-              <button
-                className={styles.iconBtn}
-                onClick={() => router.push("/")}
-              >
+              <button className={styles.iconBtn} onClick={() => router.push("/")}>
                 <ChevronLeft size={22} />
               </button>
               <CartRewards totalAmount={bagTotal} />
