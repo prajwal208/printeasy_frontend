@@ -1,3 +1,19 @@
+
+.paymentContainer {
+  width: 100%;
+  max-width: 600px; // Optional: prevents it from becoming too wide on desktop
+  margin: 0 auto;
+  min-height: 500px; // Important: gives the SDK space to render before loading
+  padding: 15px;
+  background: #fff;
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    padding: 10px;
+    min-height: 600px; // Mobile usually needs more vertical space
+  }
+}
+
 .cartPage {
   min-height: 100vh;
   background-color: #f8f8f8;

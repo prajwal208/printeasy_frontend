@@ -207,10 +207,8 @@ const Cart = () => {
           setShowCartUI(true);
         }
 
-        // If the payment is completed (success or failure)
         if (result.paymentDetails) {
           console.log("Payment completed, checking status...");
-          // Force redirect to your success page
           window.location.href = `/order-success?order_id=${cashfreeOrderId}`;
         }
 
@@ -251,14 +249,12 @@ const Cart = () => {
 
   return (
     <>
-      <div
-        id="cashfree-dropin"
-        style={{
-          width: "100%",
-          height: showCartUI ? "0" : "auto",
-          display: showCartUI ? "none" : "block",
-        }}
-      />
+      {!showCartUI && (
+    <div 
+      id="cashfree-dropin" 
+      className={styles.paymentContainer} 
+    />
+  )}
       {showCartUI && (
         <div className={styles.cartPage}>
           <ToastContainer position="top-right" autoClose={2000} />
