@@ -131,23 +131,46 @@ const ShirtEditor = forwardRef(
     }, [fonts]);
 
     /* ================= IOS & SCROLL LOGIC ================= */
-    const startTextEditing = () => {
-      setIsEditing(true);
+    // const startTextEditing = () => {
+    //   setIsEditing(true);
 
-      if (window.innerWidth <= 768) {
-        window.scrollTo({
-          top: window.innerHeight * 0.3,
-          behavior: "smooth",
-        });
+    //   if (window.innerWidth <= 768) {
+    //     window.scrollTo({
+    //       top: window.innerHeight * 0.3,
+    //       behavior: "smooth",
+    //     });
+    //   }
+
+    //   requestAnimationFrame(() => {
+    //     console.log("inputRef.current", inputRef.current);
+    //     if (inputRef.current) {
+    //       inputRef.current.focus();
+    //       const len = inputRef.current.value.length;
+    //       inputRef.current.setSelectionRange(len, len);
+    //     }
+    //   });
+    // };
+
+    const startTextEditing = () => {
+      // ✅ MUST be first (synchronous)
+      if (inputRef.current) {
+        inputRef.current.focus();
+        const len = inputRef.current.value.length;
+        inputRef.current.setSelectionRange(len, len);
       }
 
-      requestAnimationFrame(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-          const len = inputRef.current.value.length;
-          inputRef.current.setSelectionRange(len, len);
-        }
-      });
+      // Now safe to update state
+      setIsEditing(true);
+
+      // Optional scroll (after focus)
+      if (window.innerWidth <= 768) {
+        setTimeout(() => {
+          window.scrollTo({
+            top: window.innerHeight * 0.3,
+            behavior: "smooth",
+          });
+        }, 50);
+      }
     };
 
     const handleBlur = (e) => {
@@ -208,16 +231,26 @@ const ShirtEditor = forwardRef(
 
           {product &&
             (isEditing ? (
+              // <textarea
+              //   ref={inputRef}
+              //   className={`${styles.presetText} ${styles.editInput}`}
+              //   value={text}
+              //   onChange={(e) => setText(e.target.value)}
+              //   onBlur={handleBlur}
+              //   onKeyDown={(e) =>
+              //     e.key === "Enter" && !e.shiftKey && handleBlur({})
+              //   }
+              //   style={dynamicStyles}
+              // />
+
               <textarea
                 ref={inputRef}
                 className={`${styles.presetText} ${styles.editInput}`}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                onBlur={handleBlur}
-                onKeyDown={(e) =>
-                  e.key === "Enter" && !e.shiftKey && handleBlur({})
-                }
                 style={dynamicStyles}
+                onBlur={handleBlur}
+                inputMode="text"
               />
             ) : (
               <div
