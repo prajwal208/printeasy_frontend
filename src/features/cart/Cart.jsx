@@ -251,14 +251,12 @@ const Cart = () => {
 
   return (
     <>
+    {!showCartUI && (
       <div
         id="cashfree-dropin"
-        style={{
-          width: "100%",
-          height: showCartUI ? "0" : "auto",
-          display: showCartUI ? "none" : "block",
-        }}
+       className={styles.paymentContainer} 
       />
+    )}
       {showCartUI && (
         <div className={styles.cartPage}>
           <ToastContainer position="top-right" autoClose={2000} />
