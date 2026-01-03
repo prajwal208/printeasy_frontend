@@ -70,7 +70,6 @@ const ProductDetails = () => {
     }
   };
 
-  console.log(sizeInfo,"dsjdsjduyyyy")
 
   const addToCart = async () => {
     setIsEditing(false);
@@ -121,8 +120,6 @@ const ProductDetails = () => {
       illustrationImage: product.illustrationImage,
       fullProductUrl: product.productImages[0],
     };
-
-    console.log(payload, "dskdnskdoooooooo");
 
     try {
       const existingItem = await db.cart
@@ -180,8 +177,6 @@ const ProductDetails = () => {
       );
     }
   };
-
-  console.log(product,"dsnjdnjsduyyyyyy")
 
 const handleShare = async () => {
   const shareUrl = window.location.href;
@@ -329,12 +324,6 @@ const handleShare = async () => {
       localStorage.setItem("pendingOrderId", backendOrderId);
       localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
       localStorage.setItem("pendingOrderAmount", product?.discountedPrice);
-
-      // console.log("Stored order data:", {
-      //   pendingOrderId: backendOrderId,
-      //   pendingCashfreeOrderId: cashfreeOrderId,
-      //   pendingOrderAmount: grandTotal,
-      // });
 
       // Hide cart UI and show checkout
       setShowProductUI(false);

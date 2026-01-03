@@ -130,29 +130,7 @@ const ShirtEditor = forwardRef(
       loadFonts();
     }, [fonts]);
 
-    /* ================= IOS & SCROLL LOGIC ================= */
-    // const startTextEditing = () => {
-    //   setIsEditing(true);
-
-    //   if (window.innerWidth <= 768) {
-    //     window.scrollTo({
-    //       top: window.innerHeight * 0.3,
-    //       behavior: "smooth",
-    //     });
-    //   }
-
-    //   requestAnimationFrame(() => {
-    //     console.log("inputRef.current", inputRef.current);
-    //     if (inputRef.current) {
-    //       inputRef.current.focus();
-    //       const len = inputRef.current.value.length;
-    //       inputRef.current.setSelectionRange(len, len);
-    //     }
-    //   });
-    // };
-
     const startTextEditing = () => {
-      // ✅ MUST be first (synchronous)
       if (inputRef.current) {
         inputRef.current.focus();
         const len = inputRef.current.value.length;

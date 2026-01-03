@@ -184,12 +184,6 @@ const Cart = () => {
       localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
       localStorage.setItem("pendingOrderAmount", grandTotal.toString());
 
-      console.log("Stored order data:", {
-        pendingOrderId: backendOrderId,
-        pendingCashfreeOrderId: cashfreeOrderId,
-        pendingOrderAmount: grandTotal,
-      });
-
       // Hide cart UI and show checkout
       setShowCartUI(false);
       setCartLodaer(false);
@@ -209,10 +203,7 @@ const Cart = () => {
           setShowCartUI(true);
         }
 
-        // If the payment is completed (success or failure)
         if (result.paymentDetails) {
-          console.log("Payment completed, checking status...");
-          // Force redirect to your success page
           window.location.href = `/order-success?order_id=${cashfreeOrderId}`;
         }
 

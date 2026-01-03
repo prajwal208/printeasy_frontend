@@ -22,12 +22,6 @@ export default function OrderSuccess() {
       const cashfreeOrderId = localStorage.getItem("pendingCashfreeOrderId");
       const orderAmount = localStorage.getItem("pendingOrderAmount");
 
-      console.log("Order data from localStorage:", {
-        orderId,
-        cashfreeOrderId,
-        orderAmount,
-      });
-
       if (!orderId || !cashfreeOrderId) {
         console.error("Missing order data in localStorage");
         toast.error("Order data not found. Please check your orders.");
@@ -73,10 +67,8 @@ export default function OrderSuccess() {
 
   const checkPaymentStatus = async (orderId, cashfreeOrderId) => {
     try {
-      console.log("Checking payment status:", { orderId, cashfreeOrderId });
-
       const res = await api.post(
-        "/v1/payment/status", // Note: singular "payment" not "payments"
+        "/v1/payment/status",
         {
           cashfreeOrderId: cashfreeOrderId,
           orderId: orderId,
@@ -88,8 +80,6 @@ export default function OrderSuccess() {
           },
         }
       );
-
-      console.log("Payment status response:", res.data);
 
       if (res.data.success) {
         localStorage.setItem("orderId",res?.data?.data?.orderId)

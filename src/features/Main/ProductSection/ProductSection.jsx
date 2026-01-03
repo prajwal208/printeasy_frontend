@@ -39,7 +39,6 @@ const ProductSection = () => {
       }
     );
     setCategoryList(res?.data?.data);
-    console.log(res, "sjsjshyyy");
   };
   
 

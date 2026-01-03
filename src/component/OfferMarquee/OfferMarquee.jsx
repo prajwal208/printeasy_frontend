@@ -20,8 +20,6 @@ const OfferMarquee = () => {
     }
   };
 
-  console.log(offerData,"sjsjsuyy")
-
   useEffect(() => {
     getOfferData()
   },[])
