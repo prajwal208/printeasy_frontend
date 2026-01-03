@@ -9,7 +9,7 @@ import api from "@/axiosInstance/axiosInstance";
 const ProductSection = () => {
   const [categoryList, setCategoryList] = useState([]);
   const [product, setProduct] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("H8SZ4VfsFXa4C9cUeonB");
+  const [selectedCategory, setSelectedCategory] = useState("KjYkkJYBXXwIBXnpIgCg");
   const [filter,setFilter]= useState([])
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -30,7 +30,7 @@ const ProductSection = () => {
 
   const getCategoryListData = async (id) => {
     const res = await api.get(
-      `${apiUrl}/v2/product/collections?categoryId=H8SZ4VfsFXa4C9cUeonB&identifier=${id ? id :"aZRFftKgh2F1UedB02Uv"}`,
+      `${apiUrl}/v2/product/collections?categoryId=H8SZ4VfsFXa4C9cUeonB&identifier=${id ? id : "KjYkkJYBXXwIBXnpIgCg"}`,
       {
         headers: {
           "x-api-key":
