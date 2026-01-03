@@ -29,6 +29,8 @@ const Cart = () => {
   const [cartLoader, setCartLodaer] = useState(false);
   const [showCartUI, setShowCartUI] = useState(true);
 
+  
+
   const handleContinue = () => {
     setIsLoginModalVisible(false);
     setIsLoggedIn(true);
@@ -257,9 +259,9 @@ const Cart = () => {
           width: "100%",
           height: showCartUI ? "0" : "auto",
           display: showCartUI ? "none" : "block",
-
           display: "flex",
           justifyContent: "center",
+          overflow:"hidden"
         }}
       />
       {showCartUI && (

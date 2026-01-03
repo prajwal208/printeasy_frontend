@@ -9,7 +9,7 @@ import api from "@/axiosInstance/axiosInstance";
 const ProductSection = () => {
   const [categoryList, setCategoryList] = useState([]);
   const [product, setProduct] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("aZRFftKgh2F1UedB02Uv");
+  const [selectedCategory, setSelectedCategory] = useState("H8SZ4VfsFXa4C9cUeonB");
   const [filter,setFilter]= useState([])
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
