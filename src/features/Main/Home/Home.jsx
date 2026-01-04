@@ -9,6 +9,7 @@ import OfferMarquee from "@/component/OfferMarquee/OfferMarquee";
 
 import styles from "./home.module.scss";
 
+
 const Home = () => {
   // const [showOffer, setShowOffer] = useState(false);
 
@@ -29,6 +30,7 @@ const Home = () => {
       <CategoryGrid />
       <HeroWords />
       <ProductSection />
+       
     </main>
   );
 };
