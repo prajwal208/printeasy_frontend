@@ -125,8 +125,8 @@ const SearchPage = () => {
         {/* PRODUCT GRID */}
         <div className={styles.cardGrid}>
           {filteredProducts.length > 0 ? (
-            filteredProducts.map((item) => (
-              <ProductCard key={item.id} item={item} />
+            filteredProducts.map((item,i) => (
+              <ProductCard key={i} item={item} />
             ))
           ) : (
             <p className={styles.noProducts}>No products found.</p>
