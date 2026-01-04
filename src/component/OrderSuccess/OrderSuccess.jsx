@@ -83,7 +83,6 @@ export default function OrderSuccess() {
 
       if (res.data.success) {
         localStorage.setItem("orderId",res?.data?.data?.orderId)
-        // Check if order was already confirmed (backend processed it)
         if (
           res.data.message?.includes("already confirmed") ||
           res.data.message?.includes("Order placed successfully")

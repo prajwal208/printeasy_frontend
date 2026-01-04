@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import styles from "./addtobagloader.module.scss";
+import Lottie from "lottie-react";
+import loader from "../../assessts/loader.json";
 
 const AddToBagLoader = () => {
   const messages = [
     "Preparing your customized order...",
     "Almost there, preparing your style...",
-    "Hold tight! Finalizing the product..."
+    "Hold tight! Finalizing the product...",
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,7 +22,9 @@ const AddToBagLoader = () => {
 
   return (
     <div className={styles.loaderWrapper}>
-      <div className={styles.spinner}></div>
+      <div style={{ width: 150, height: 150 }}>
+        <Lottie animationData={loader} loop autoplay />
+      </div>
       <p className={styles.text}>{messages[currentIndex]}</p>
     </div>
   );
