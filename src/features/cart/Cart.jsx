@@ -206,7 +206,7 @@ const Cart = () => {
         }
 
         if (result.paymentDetails) {
-          window.location.href = `/order-success?order_id=${cashfreeOrderId}`;
+          window.location.href = `/order-redirect?order_id=${cashfreeOrderId}`;
         }
 
         if (result.redirect) {
