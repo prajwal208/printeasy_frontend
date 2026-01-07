@@ -6,7 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import api from "@/axiosInstance/axiosInstance";
 import { db } from "@/lib/db";
-import styles from "./page.module.css";
+import styles from "./orderRedirect.module.scss"
 
 export default function OrderRedirect() {
   const router = useRouter();
