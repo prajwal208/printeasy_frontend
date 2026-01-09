@@ -26,10 +26,8 @@ const Cart = () => {
   const accessToken = Cookies.get("idToken");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
-  const [cartLoader, setCartLodaer] = useState(false);
+  const [cartLoader, setCartLoader] = useState(false);
   const [showCartUI, setShowCartUI] = useState(true);
-  
-
 
   const handleContinue = () => {
     setIsLoginModalVisible(false);
@@ -74,7 +72,7 @@ const Cart = () => {
 
   const getAddressList = async () => {
     try {
-      const res = await api.get(`/v1/address/all`, {
+      const res = await api.get(/v1/address/all, {
         headers: {
           "x-api-key":
             "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
@@ -88,7 +86,7 @@ const Cart = () => {
 
   const getOfferData = async () => {
     try {
-      const res = await api.get(`/v2/giftreward`, {
+      const res = await api.get(/v2/giftreward, {
         headers: {
           "x-api-key":
             "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
@@ -100,8 +98,6 @@ const Cart = () => {
     }
   };
 
-
-  console.log(cartItems[0]?.productImageUrl,"djsdjsduiuuiuui")
   const orderPayloadItems = cartItems.map((item) => ({
     name: item.name,
     sku: item.sku || item.productId,
@@ -126,7 +122,7 @@ const Cart = () => {
       }
     : null;
 
-  // ----------------- Cashfree Integration -----------------
+  // ----------------- Cashfree EMBEDDED Integration -----------------
   const handlePayNow = async () => {
     if (cartItems.length === 0) {
       toast.warning("Your cart is empty!");
@@ -134,7 +130,7 @@ const Cart = () => {
     }
 
     try {
-      setCartLodaer(true);
+      setCartLoader(true);
       let renderedImageUrl = null;
 
       if (uploadImagePayload) {
@@ -177,47 +173,61 @@ const Cart = () => {
 
       if (!paymentSessionId) {
         toast.error("Payment session not generated");
-        setCartLodaer(false);
+        setCartLoader(false);
         return;
       }
 
-      // Store order data in localStorage for order-success page
+      // Store order data in localStorage for redirect page
       localStorage.setItem("pendingOrderId", backendOrderId);
       localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
       localStorage.setItem("pendingOrderAmount", grandTotal.toString());
 
-      // Hide cart UI and show checkout
+      console.log("Initiating Cashfree EMBEDDED payment:", {
+        backendOrderId,
+        cashfreeOrderId,
+        paymentSessionId,
+      });
+
+      // Hide cart UI and show embedded checkout
       setShowCartUI(false);
-      setCartLodaer(false);
+      setCartLoader(false);
 
       const cashfree = await load({ mode: "production" });
 
-      // Embedded checkout with proper callback structure
+      // EMBEDDED checkout with redirectTarget to specific div
       const checkoutOptions = {
         paymentSessionId: paymentSessionId,
-        redirectTarget: document.getElementById("cashfree-dropin"), // Your embedded div
+        redirectTarget: "#cashfree-dropin", // Embedded in this div
       };
 
       cashfree.checkout(checkoutOptions).then((result) => {
+        console.log("Cashfree SDK result:", result);
+
         if (result.error) {
           console.error("SDK Error:", result.error);
-          // toast.error(result.error.message);
+          toast.error(result.error.message || "Payment failed");
           setShowCartUI(true);
+          return;
         }
-        const sessionKey = `payment_redirect_${cashfreeOrderId}`;
 
+        // When payment is completed in embedded mode
         if (result.paymentDetails) {
-          window.location.href = `/order-redirect?sessionKey=${sessionKey}&order_id=${cashfreeOrderId}`;
+          console.log("Payment completed, details:", result.paymentDetails);
+          
+          // Redirect to order-redirect page to poll status
+          window.location.href = `/order-redirect?order_id=${cashfreeOrderId}&backend_order_id=${backendOrderId}`;
         }
 
+        // Cashfree SDK handles the redirect automatically after payment
         if (result.redirect) {
-          console.log("SDK handled redirection automatically");
+          console.log("SDK is redirecting...");
+          // The redirect will go to the return_url configured in backend
         }
       });
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment");
-      setCartLodaer(false);
+      setCartLoader(false);
       setShowCartUI(true);
     }
   };
@@ -247,17 +257,19 @@ const Cart = () => {
 
   return (
     <>
+      {/* Embedded Cashfree checkout container */}
       <div
         id="cashfree-dropin"
         style={{
           width: "100%",
-          height: showCartUI ? "0" : "auto",
-          display: showCartUI ? "none" : "block",
-          display: "flex",
+          height: showCartUI ? "0" : "100vh",
+          display: showCartUI ? "none" : "flex",
           justifyContent: "center",
-          overflow:"hidden"
+          alignItems: "center",
+          overflow: "hidden",
         }}
       />
+      
       {showCartUI && (
         <div className={styles.cartPage}>
           <ToastContainer position="top-right" autoClose={2000} />
@@ -358,7 +370,7 @@ const Cart = () => {
 
               <DynamicModal
                 open={cartLoader}
-                onClose={() => setCartLodaer(false)}
+                onClose={() => setCartLoader(false)}
               >
                 <AddToBagLoader />
               </DynamicModal>
