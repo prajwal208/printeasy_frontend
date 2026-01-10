@@ -11,88 +11,51 @@ import styles from "./orderRedirect.module.scss";
 export default function OrderRedirect() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("processing");
+
   const pollingRef = useRef(null);
   const attemptsRef = useRef(0);
-  const maxAttempts = 30; // Max 30 attempts (30 seconds with 1s interval)
+  const maxAttempts = 15;
 
   useEffect(() => {
-    const handleRedirect = async () => {
-      try {
-        // Get order_id from URL (Cashfree redirects with order_id)
-        const cashfreeOrderId = searchParams.get("order_id");
-        const backendOrderId = localStorage.getItem("pendingOrderId");
+    const backendOrderId = localStorage.getItem("pendingOrderId");
 
-        console.log("Order redirect page loaded:", {
-          cashfreeOrderId,
-          backendOrderId,
-        });
-
-        if (!cashfreeOrderId && !backendOrderId) {
-          console.error("No order IDs found");
-          toast.error("Order information not found");
-          setStatus("error");
-          setLoading(false);
-          setTimeout(() => router.push("/cart?error=no_order_data"), 2000);
-          return;
-        }
-
-        // Start polling backend for order status
-        pollOrderStatus(backendOrderId);
-      } catch (error) {
-        console.error("Redirect error:", error);
-        toast.error("An error occurred");
-        setStatus("error");
-        setLoading(false);
-        setTimeout(() => router.push("/cart?error=processing_error"), 2000);
-      }
-    };
-
-    handleRedirect();
-
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
-  }, [searchParams, router]);
-
-  const pollOrderStatus = (orderId) => {
-    if (!orderId) {
-      console.error("No order ID for polling");
+    if (!backendOrderId) {
+      toast.error("Order information not found");
       setStatus("error");
       setLoading(false);
       return;
     }
 
-    console.log("Starting to poll order status for:", orderId);
+    pollOrderStatus(backendOrderId);
+
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
+
+  const pollOrderStatus = (orderId) => {
     attemptsRef.current = 0;
-    
-    // Check immediately first
     checkOrderStatus(orderId);
 
-    // Then poll every second
     pollingRef.current = setInterval(() => {
       attemptsRef.current += 1;
-     
-      
+
       if (attemptsRef.current >= maxAttempts) {
         clearInterval(pollingRef.current);
-        console.log("Max polling attempts reached");
         setStatus("timeout");
-        toast.warning("Payment verification taking longer than expected. Please check your orders.");
         setLoading(false);
-        setTimeout(() => router.push("/orders"), 3000);
         return;
       }
-      
+
       checkOrderStatus(orderId);
-    }, 1000); // Poll every 1 second
+    }, 1000);
   };
 
   const checkOrderStatus = async (orderId) => {
     try {
-      console.log("Checking order status:", orderId);
-      
       const response = await api.get(
         `/v1/payment/order-status?orderId=${orderId}`,
         {
@@ -103,58 +66,36 @@ export default function OrderRedirect() {
         }
       );
 
-      console.log("Order status response:", response.data);
+      if (!response.data?.success) return;
 
-      if (response.data.success) {
-        const orderData = response.data.data;
-        const orderStatus = orderData.status;
+      const orderStatus = response.data.data.status;
 
-        console.log("Order status:", orderStatus);
+      if (orderStatus === "confirmed") {
+        clearInterval(pollingRef.current);
+        setStatus("success");
+        toast.success("Payment successful!");
 
-        // Success - Order confirmed
-        if (orderStatus === "confirmed") {
-          if (pollingRef.current) clearInterval(pollingRef.current);
-          setStatus("success");
-          toast.success("Payment successful!");
-          
-          // Clear localStorage
-          localStorage.removeItem("pendingOrderId");
-          localStorage.removeItem("pendingCashfreeOrderId");
-          localStorage.removeItem("pendingOrderAmount");
-          
-          // Clear cart
-          await db.cart.clear();
-          
-          setLoading(false);
-          setTimeout(() => router.push("/order-success"), 1500);
-          return;
-        }
+        localStorage.removeItem("pendingOrderId");
+        localStorage.removeItem("pendingCashfreeOrderId");
+        localStorage.removeItem("pendingOrderAmount");
 
-        // Failed or Cancelled
-        if (orderStatus === "CANCELLED" || orderStatus === "FAILED") {
-          if (pollingRef.current) clearInterval(pollingRef.current);
-          setStatus("failed");
-          toast.error("Payment failed or was cancelled");
-          
-          // Clear localStorage
-          localStorage.removeItem("pendingOrderId");
-          localStorage.removeItem("pendingCashfreeOrderId");
-          localStorage.removeItem("pendingOrderAmount");
-          
-          setLoading(false);
-          setTimeout(() => router.push("/cart?error=payment_failed"), 2000);
-          return;
-        }
+        await db.cart.clear();
+        setLoading(false);
+      }
 
-        // Still pending - continue polling
-        console.log("Order still pending, continuing to poll...");
+      if (orderStatus === "failed" || orderStatus === "cancelled") {
+        clearInterval(pollingRef.current);
+        setStatus("failed");
+        toast.error("Payment failed or cancelled");
+
+        localStorage.removeItem("pendingOrderId");
+        localStorage.removeItem("pendingCashfreeOrderId");
+        localStorage.removeItem("pendingOrderAmount");
+
+        setLoading(false);
       }
     } catch (error) {
-      console.error("Status check error:", error);
-      // Don't stop polling on network errors
-      if (error.response?.status === 404) {
-        console.log("Order not found yet, continuing to poll...");
-      }
+      console.error("Order status check failed", error);
     }
   };
 
@@ -162,53 +103,111 @@ export default function OrderRedirect() {
     <div className={styles.container}>
       <ToastContainer />
       <div className={styles.card}>
+
+        {/* PROCESSING */}
         {loading && status === "processing" && (
           <div className={styles.content}>
-            <div className={styles.spinner}></div>
-            <h2 className={styles.title}>Processing Payment</h2>
-            <p className={styles.subtitle}>
-              Please wait while we confirm your payment...
-            </p>
-            <p className={styles.note}>
-              This may take a few moments. Do not close this page.
-            </p>
+            <div className={styles.spinner} />
+            <h2>Processing Payment</h2>
+            <p>Please wait while we confirm your payment</p>
           </div>
         )}
 
+        {/* SUCCESS */}
         {status === "success" && (
           <div className={styles.successContent}>
             <div className={styles.successIcon}>✓</div>
-            <h2 className={styles.successTitle}>Payment Successful!</h2>
-            <p className={styles.successSubtitle}>Redirecting...</p>
+            <h2>Payment Successful!</h2>
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "20px" }}>
+              <button
+                onClick={() => router.push("/orders")}
+                style={primaryBtn}
+              >
+                View Orders
+              </button>
+
+              <button
+                onClick={() => router.push("/")}
+                style={secondaryBtn}
+              >
+                Continue Shopping
+              </button>
+            </div>
           </div>
         )}
 
+        {/* FAILED */}
         {status === "failed" && (
           <div className={styles.failedContent}>
             <div className={styles.failedIcon}>✕</div>
-            <h2 className={styles.failedTitle}>Payment Failed</h2>
-            <p className={styles.failedSubtitle}>Returning to cart...</p>
+            <h2>Payment Failed</h2>
+
+            <div style={{ marginTop: "20px" }}>
+              <button
+                onClick={() => router.push("/")}
+                style={primaryBtn}
+              >
+                Continue Shopping
+              </button>
+            </div>
           </div>
         )}
 
+        {/* TIMEOUT */}
         {status === "timeout" && (
           <div className={styles.errorContent}>
             <div className={styles.errorIcon}>⏱</div>
-            <h2 className={styles.errorTitle}>Verification In Progress</h2>
-            <p className={styles.errorSubtitle}>
-              Please check your orders page...
-            </p>
+            <h2>Verification In Progress</h2>
+            <p>Please check your orders later.</p>
+
+            <button
+              onClick={() => router.push("/orders")}
+              style={{ ...primaryBtn, marginTop: "16px" }}
+            >
+              Go to Orders
+            </button>
           </div>
         )}
 
+        {/* ERROR */}
         {status === "error" && (
           <div className={styles.errorContent}>
             <div className={styles.errorIcon}>!</div>
-            <h2 className={styles.errorTitle}>Error</h2>
-            <p className={styles.errorSubtitle}>Returning to cart...</p>
+            <h2>Something went wrong</h2>
+
+            <button
+              onClick={() => router.push("/")}
+              style={{ ...primaryBtn, marginTop: "16px" }}
+            >
+              Continue Shopping
+            </button>
           </div>
         )}
+
       </div>
     </div>
   );
 }
+
+/* Button Styles */
+const primaryBtn = {
+  padding: "12px 24px",
+  backgroundColor: "#ff6b00",
+  color: "white",
+  border: "none",
+  borderRadius: "5px",
+  cursor: "pointer",
+  fontSize: "16px",
+  fontWeight: "bold",
+};
+
+const secondaryBtn = {
+  padding: "12px 24px",
+  backgroundColor: "#95a5a6",
+  color: "white",
+  border: "none",
+  borderRadius: "5px",
+  cursor: "pointer",
+  fontSize: "16px",
+};
