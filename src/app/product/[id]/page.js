@@ -51,6 +51,7 @@ const ProductDetails = () => {
   const editorRef = useRef(null);
   const [resumePayment, setResumePayment] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
+  const [editorReady, setEditorReady] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -193,47 +194,54 @@ const ProductDetails = () => {
     }
   };
 
+  useEffect(() => {
+    setEditorReady(false);
+  }, [id]);
 
-  
   const handleShare = async () => {
-  if (!product?.name) return;
+    if (!product?.name) return;
 
-  const slug = createSlug(product?.slug);
-  const shareUrl = `https://onrise.in/product/${slug}`;
-  const title = product.name;
-  const text = title;
+    const slug = createSlug(product?.slug);
+    const shareUrl = `https://onrise.in/product/${slug}`;
+    const title = product.name;
+    const text = title;
 
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title,
-        text,
-        url: shareUrl,
-      });
-    } catch (error) {
-      console.log("Share cancelled", error);
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text,
+          url: shareUrl,
+        });
+      } catch (error) {
+        console.log("Share cancelled", error);
+      }
+    } else {
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(`${title}\n${shareUrl}`)}`,
+        "_blank"
+      );
     }
-  } else {
-    window.open(
-      `https://wa.me/?text=${encodeURIComponent(`${title}\n${shareUrl}`)}`,
-      "_blank"
-    );
-  }
-};
-
+  };
 
   // --- Effects ---
 
   useEffect(() => {
+    let timer;
+
     const fetchProduct = async () => {
       try {
+        setLoading(true);
+
         const res = await api.get(`/v2/product/${id}`, {
           headers: {
             "x-api-key":
               "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
           },
         });
+
         const data = res?.data?.data;
+
         setProduct(data);
         setIsCustomizable(!!data?.isCustomizable);
         setRelatedId(data?.id);
@@ -244,7 +252,12 @@ const ProductDetails = () => {
         setLoading(false);
       }
     };
+
     if (id) fetchProduct();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [id]);
 
   useEffect(() => {
@@ -266,7 +279,9 @@ const ProductDetails = () => {
     }
   }, [relatedId]);
 
-  if (loading && !product) return <ProductDetailsShimmer />;
+  if (loading) {
+    return <ProductDetailsShimmer />;
+  }
 
   const uploadImagePayload = {
     printText: text,
@@ -431,20 +446,24 @@ const ProductDetails = () => {
             </div>
 
             {product?.isCustomizable ? (
-              <ShirtEditor
-                product={product}
-                ref={editorRef}
-                isEditing={isEditing}
-                setIsEditing={setIsEditing}
-                text={text}
-                setText={setText}
-                selectedSize={selectedSize}
-                selectedFont={selectedFont}
-                selectedColor={selectedColor}
-                setSelectedColor={setSelectedColor}
-                setSelectedFont={setSelectedFont}
-                setSelectedSize={setSelectedSize}
-              />
+              <>
+                {!editorReady && <ProductDetailsShimmer />}
+                <ShirtEditor
+                  product={product}
+                  ref={editorRef}
+                  isEditing={isEditing}
+                  setIsEditing={setIsEditing}
+                  text={text}
+                  setText={setText}
+                  selectedSize={selectedSize}
+                  selectedFont={selectedFont}
+                  selectedColor={selectedColor}
+                  setSelectedColor={setSelectedColor}
+                  setSelectedFont={setSelectedFont}
+                  setSelectedSize={setSelectedSize}
+                  onReady={() => setEditorReady(true)}
+                />
+              </>
             ) : (
               <Image
                 src={product?.productImages[0]}
@@ -452,9 +471,8 @@ const ProductDetails = () => {
                 width={500}
                 height={600}
                 className={styles.mainImage}
-                crossOrigin="anonymous"
-                loading="eager"
                 priority
+                onLoad={() => setEditorReady(true)}
               />
             )}
 

@@ -33,6 +33,7 @@ const ShirtEditor = forwardRef(
       setSelectedSize,
       text,
       setText,
+      onReady,
     },
     ref
   ) => {
@@ -48,6 +49,14 @@ const ShirtEditor = forwardRef(
     const inputRef = useRef(null);
     const viewRef = useRef(null);
     const editorRef = useRef(null);
+
+    /* ================= NOTIFY PARENT WHEN EDITOR IS READY ================= */
+    useEffect(() => {
+      if (imageLoaded && fontsLoaded) {
+        console.log("✅ ShirtEditor fully ready");
+        onReady?.();
+      }
+    }, [imageLoaded, fontsLoaded, onReady]);
 
     /* ================= BLINKING CURSOR LOGIC ================= */
     useEffect(() => {
@@ -107,7 +116,7 @@ const ShirtEditor = forwardRef(
             // Method 2: Fallback - load without CORS (won't work for capture but shows image)
             console.log("🔄 Trying fallback load...");
             const fallbackImg = new window.Image();
-            
+
             fallbackImg.onload = () => {
               console.log("✅ Image loaded (fallback mode)");
               setImageDataUrl(product.canvasImage);
@@ -361,7 +370,13 @@ const ShirtEditor = forwardRef(
               <p style={{ fontWeight: "bold", marginBottom: "5px" }}>
                 Image Failed to Load
               </p>
-              <p style={{ fontSize: "12px", color: "#999", marginBottom: "15px" }}>
+              <p
+                style={{
+                  fontSize: "12px",
+                  color: "#999",
+                  marginBottom: "15px",
+                }}
+              >
                 {product?.canvasImage?.substring(0, 60)}...
               </p>
               <button
