@@ -130,26 +130,14 @@ const Cart = () => {
     }
 
     try {
-      setCartLoader(true);
-      let renderedImageUrl = null;
+      const finalItems = orderPayloadItems.map((item) => {
+        if (!item.isCustomizable) return item;
 
-      if (uploadImagePayload) {
-        const uploadRes = await api.post(
-          "/v1/cart/upload-image",
-          { printingImgText: uploadImagePayload },
-          {
-            headers: {
-              "x-api-key":
-                "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-            },
-          }
-        );
-        renderedImageUrl = uploadRes?.data?.data?.renderedImageUrl || null;
-      }
-
-      const finalItems = orderPayloadItems.map((item) =>
-        item.isCustomizable ? { ...item, imageUrl: renderedImageUrl } : item
-      );
+        return {
+          ...item,
+          printingImgText: uploadImagePayload,
+        };
+      });
 
       const orderRes = await api.post(
         "/v1/orders/create",
@@ -197,7 +185,7 @@ const Cart = () => {
       // EMBEDDED checkout with redirectTarget to specific div
       const checkoutOptions = {
         paymentSessionId: paymentSessionId,
-        redirectTarget: document.getElementById("cashfree-dropin")
+        redirectTarget: document.getElementById("cashfree-dropin"),
       };
 
       cashfree.checkout(checkoutOptions).then((result) => {
@@ -213,7 +201,7 @@ const Cart = () => {
         // When payment is completed in embedded mode
         if (result.paymentDetails) {
           console.log("Payment completed, details:", result.paymentDetails);
-          
+
           // Redirect to order-redirect page to poll status
           window.location.href = `/order-redirect?order_id=${cashfreeOrderId}&backend_order_id=${backendOrderId}`;
         }
@@ -262,14 +250,14 @@ const Cart = () => {
         id="cashfree-dropin"
         style={{
           width: "100%",
-          height: showCartUI ? "0" : "100vh",
+          height: showCartUI ? "0" : "10git0vh",
           display: showCartUI ? "none" : "flex",
           justifyContent: "center",
           alignItems: "center",
           overflow: "hidden",
         }}
       />
-      
+
       {showCartUI && (
         <div className={styles.cartPage}>
           <ToastContainer position="top-right" autoClose={2000} />
