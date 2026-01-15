@@ -69,12 +69,12 @@ export default function OrderRedirect() {
       if (!response.data?.success) return;
 
       const orderStatus = response.data.data.status;
-
+      console.log(orderStatus,"sssssssssss")
       if (orderStatus === "confirmed") {
         clearInterval(pollingRef.current);
         setStatus("success");
-        toast.success("Payment successful!");
-        localStorage.setItem("orderId",orderStatus?.orderId)
+        // toast.success("Payment successful!");
+        localStorage.setItem("orderId",response?.data?.data?.orderId)
         localStorage.removeItem("pendingOrderId");
         localStorage.removeItem("pendingCashfreeOrderId");
         localStorage.removeItem("pendingOrderAmount");
@@ -192,7 +192,7 @@ export default function OrderRedirect() {
 
 /* Button Styles */
 const primaryBtn = {
-  padding: "12px 24px",
+  padding: "12px",
   backgroundColor: "#ff6b00",
   color: "white",
   border: "none",
@@ -203,7 +203,7 @@ const primaryBtn = {
 };
 
 const secondaryBtn = {
-  padding: "12px 24px",
+  padding: "12px",
   backgroundColor: "#95a5a6",
   color: "white",
   border: "none",
