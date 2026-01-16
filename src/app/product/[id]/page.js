@@ -529,7 +529,7 @@ const ProductDetails = () => {
 
             {product?.isCustomizable ? (
               <>
-                {!editorReady && <ProductDetailsShimmer />}
+                
                 <ShirtEditor
                   product={product}
                   ref={editorRef}

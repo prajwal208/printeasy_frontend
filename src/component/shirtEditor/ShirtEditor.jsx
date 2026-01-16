@@ -251,7 +251,7 @@ const ShirtEditor = forwardRef(
 
           // Wait for fonts
           await document.fonts.ready;
-          await new Promise((resolve) => setTimeout(resolve, 300));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           // iOS-optimized html2canvas settings
           const canvas = await html2canvas(editorRef.current, {
@@ -357,42 +357,45 @@ const ShirtEditor = forwardRef(
     }, []);
 
     useEffect(() => {
-      if (!fonts.length) return;
+  if (!fonts.length) return;
 
-      const loadFonts = async () => {
-        console.log(`📚 Loading ${fonts.length} fonts...`);
+  const loadFonts = async () => {
+    console.log(`📚 Loading ${fonts.length} fonts...`);
 
-        const fontPromises = fonts.map((font) => {
-          if (loadedFontsRef.current.has(font.family)) return Promise.resolve();
+    const fontPromises = fonts.map(async (font) => {
+      if (loadedFontsRef.current.has(font.family)) return;
 
-          return new Promise((resolve) => {
-            const fontFace = new FontFace(
-              font.family,
-              url(`${font.downloadUrl}`),
-            );
+      try {
+        // 1. Create the FontFace correctly
+        const fontFace = new FontFace(font.family, `url(${font.downloadUrl})`);
+        
+        // 2. Load it
+        const loaded = await fontFace.load();
+        
+        // 3. Add to Document
+        document.fonts.add(loaded);
+        
+        // 4. ALSO inject a style tag as a fallback for html2canvas
+        injectFontCSS(font.family, font.downloadUrl);
+        
+        loadedFontsRef.current.add(font.family);
+        console.log(`✅ Font loaded: ${font.family}`);
+      } catch (err) {
+        console.warn(`⚠️ Font load failed: ${font.family}`, err);
+      }
+    });
 
-            fontFace
-              .load()
-              .then((loaded) => {
-                document.fonts.add(loaded);
-                loadedFontsRef.current.add(font.family);
-                console.log(`✅ Font loaded: ${font.family}`);
-                resolve();
-              })
-              .catch((err) => {
-                console.warn(`⚠️ Font load failed: ${font.family}, err`);
-                resolve(); // Don't break the chain
-              });
-          });
-        });
+    await Promise.all(fontPromises);
+    
+    // Final check to ensure browser is ready to render
+    await document.fonts.ready;
+    
+    setFontsLoaded(true);
+    console.log("✅ All fonts loaded and ready");
+  };
 
-        await Promise.all(fontPromises);
-        setFontsLoaded(true);
-        console.log("✅ All fonts loaded");
-      };
-
-      loadFonts();
-    }, [fonts]);
+  loadFonts();
+}, [fonts]);
 
     const startTextEditing = () => {
       if (inputRef.current) {
