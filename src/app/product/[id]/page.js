@@ -53,7 +53,7 @@ const ProductDetails = () => {
   const [pendingAction, setPendingAction] = useState(null);
   const [editorReady, setEditorReady] = useState(false);
 
-  console.log(sizeInfo,"dbjsdbjsduuiuiuuiui")
+  console.log(sizeInfo, "dbjsdbjsduuiuiuuiui");
 
   useEffect(() => {
     if (product) {
@@ -68,7 +68,7 @@ const ProductDetails = () => {
     setSelectedSize(size);
 
     const match = product?.configuration?.[0]?.options.find(
-      (item) => item.value === size
+      (item) => item.value === size,
     );
 
     setSizeInfo(match || null);
@@ -98,16 +98,108 @@ const ProductDetails = () => {
     await processAddToCart(selectedSize);
   };
 
+  // const processAddToCart = async (sizeInfo) => {
+  //   setLoader(true);
+  //   let capturedImageUrl = "";
+
+  //   try {
+  //     if (isCustomizable && editorRef.current) {
+  //       capturedImageUrl = await editorRef.current.captureImage();
+  //     }
+  //   } catch (error) {
+  //     console.error("Capture image error:", error);
+  //   }
+
+  //   const payload = {
+  //     productId: product.id,
+  //     categoryId: product.categoryId,
+  //     name: product.name,
+  //     sku: product.sku,
+  //     quantity,
+  //     basePrice: product.basePrice,
+  //     discountPrice: product.discountedPrice || product.basePrice,
+  //     totalPrice: (product.discountedPrice || product.basePrice) * quantity,
+  //     isCustomizable: product.isCustomizable,
+  //     productImageUrl: capturedImageUrl || product.productImages?.[0] || "",
+  //     renderedImageUrl: product.productImages?.[0],
+  //     dimensions: {
+  //       length: product.dimension?.length || 0,
+  //       width: product.dimension?.width || 0,
+  //       height: product.dimension?.height || 0,
+  //       weight: product.dimension?.weight || 0,
+  //     },
+  //     options: sizeInfo,
+  //     addedAt: new Date().toISOString(),
+  //     presetText: text,
+  //     textColor: selectedColor,
+  //     fontFamily: selectedFont,
+  //     fontSize: selectedSize,
+  //     canvasImage: product.canvasImage,
+  //     illustrationImage: product.illustrationImage,
+  //     fullProductUrl: product.productImages[0],
+  //   };
+
+  //   try {
+  //     const existingItem = await db.cart
+  //       .where("productId")
+  //       .equals(product.id)
+  //       .first();
+
+  //     if (existingItem) {
+  //       await db.cart.update(existingItem.id, {
+  //         quantity: existingItem.quantity + quantity,
+  //         totalPrice:
+  //           (existingItem.discountPrice || existingItem.basePrice) *
+  //           (existingItem.quantity + quantity),
+  //         productImageUrl: capturedImageUrl || existingItem.productImageUrl,
+  //       });
+  //     } else {
+  //       await db.cart.add(payload);
+  //     }
+
+  //     const updatedCartItems = await db.cart.toArray();
+  //     updateCart(updatedCartItems.length);
+  //     setShowSuccessCart(true);
+  //   } catch (err) {
+  //     console.error("Dexie error:", err);
+  //     toast.error("Failed to add to cart");
+  //   } finally {
+  //     setLoader(false);
+  //   }
+  // };
+  // In ProductDetails.jsx - Replace the processAddToCart function
+
   const processAddToCart = async (sizeInfo) => {
     setLoader(true);
     let capturedImageUrl = "";
 
     try {
       if (isCustomizable && editorRef.current) {
-        capturedImageUrl = await editorRef.current.captureImage();
+        console.log("🎨 Attempting image capture...");
+
+        // Add timeout to prevent infinite waiting on iOS
+        const capturePromise = editorRef.current.captureImage();
+        const timeoutPromise = new Promise(
+          (resolve) =>
+            setTimeout(() => {
+              console.warn(
+                "⏱️ Image capture timeout - proceeding without custom image",
+              );
+              resolve(null);
+            }, 5000), // 5 second timeout
+        );
+
+        capturedImageUrl = await Promise.race([capturePromise, timeoutPromise]);
+
+        if (capturedImageUrl) {
+          console.log("✅ Image captured successfully");
+        } else {
+          console.warn("⚠️ Using fallback image");
+        }
       }
     } catch (error) {
-      console.error("Capture image error:", error);
+      console.error("❌ Capture image error:", error);
+      // Continue without captured image rather than failing
     }
 
     const payload = {
@@ -120,6 +212,7 @@ const ProductDetails = () => {
       discountPrice: product.discountedPrice || product.basePrice,
       totalPrice: (product.discountedPrice || product.basePrice) * quantity,
       isCustomizable: product.isCustomizable,
+      // ✅ Use captured image if available, otherwise fall back to original
       productImageUrl: capturedImageUrl || product.productImages?.[0] || "",
       renderedImageUrl: product.productImages?.[0],
       dimensions: {
@@ -160,14 +253,15 @@ const ProductDetails = () => {
       const updatedCartItems = await db.cart.toArray();
       updateCart(updatedCartItems.length);
       setShowSuccessCart(true);
+
+      console.log("✅ Item added to cart successfully");
     } catch (err) {
-      console.error("Dexie error:", err);
+      console.error("❌ Dexie error:", err);
       toast.error("Failed to add to cart");
     } finally {
       setLoader(false);
     }
   };
-
   const handleWishlistClick = async () => {
     if (!accessToken) {
       toast.warning("Please login to Add to Wishlist");
@@ -175,7 +269,7 @@ const ProductDetails = () => {
     }
     try {
       const res = await api.post(
-        `/v2/wishlist`,
+        /v2/wishlist,
         { productId: product.id },
         {
           headers: {
@@ -183,7 +277,7 @@ const ProductDetails = () => {
             "x-api-key":
               "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
           },
-        }
+        },
       );
       if (res.status === 200) {
         setIsWishlisted(true);
@@ -191,7 +285,7 @@ const ProductDetails = () => {
       }
     } catch (error) {
       toast.error(
-        error?.response?.data?.message || "Failed to add to wishlist"
+        error?.response?.data?.message || "Failed to add to wishlist",
       );
     }
   };
@@ -341,7 +435,7 @@ const ProductDetails = () => {
             "x-api-key":
               "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
           },
-        }
+        },
       );
 
       const orderData = orderRes?.data?.data;
@@ -380,7 +474,7 @@ const ProductDetails = () => {
       toast.error("Failed to initiate payment");
       setShowProductUI(true);
     } finally {
-      setImageUploadLoader(false);  
+      setImageUploadLoader(false);
     }
   };
 
@@ -483,7 +577,7 @@ const ProductDetails = () => {
                     {Math.round(
                       ((product.basePrice - product.discountedPrice) /
                         product.basePrice) *
-                        100
+                        100,
                     )}
                     % OFF
                   </span>

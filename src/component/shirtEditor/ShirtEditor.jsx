@@ -35,7 +35,7 @@ const ShirtEditor = forwardRef(
       setText,
       onReady,
     },
-    ref
+    ref,
   ) => {
     const [fonts, setFonts] = useState([]);
     const [activeTab, setActiveTab] = useState("font");
@@ -141,9 +141,9 @@ const ShirtEditor = forwardRef(
     }, [product?.canvasImage]);
 
     const injectFontCSS = (fontFamily, fontUrl) => {
-      const existingStyle = document.querySelector(
-        `style[data-font="${fontFamily}"]`
-      );
+      const existingStyle = document.querySelector(`
+        style[data-font="${fontFamily}"],
+      `);
       if (existingStyle) return;
 
       const style = document.createElement("style");
@@ -159,6 +159,80 @@ const ShirtEditor = forwardRef(
     };
 
     /* ================= IMAGE CAPTURE WITH html2canvas ================= */
+    // useImperativeHandle(ref, () => ({
+    //   captureImage: async () => {
+    //     if (!editorRef.current) {
+    //       console.error("❌ Editor ref not found");
+    //       return null;
+    //     }
+
+    //     try {
+    //       // Load selected font
+    //       const selectedFontObj = fonts.find((f) => f.family === selectedFont);
+    //       if (selectedFontObj) {
+    //         injectFontCSS(selectedFontObj.family, selectedFontObj.downloadUrl);
+    //       }
+
+    //       await document.fonts.ready;
+
+    //       await new Promise((resolve) => setTimeout(resolve, 500));
+
+    //       console.log("📷 Capturing with html2canvas...");
+
+    //       const canvas = await html2canvas(editorRef.current, {
+    //         allowTaint: true,
+    //         useCORS: true,
+    //         scale: 2,
+    //         backgroundColor: null,
+    //         logging: true,
+    //         imageTimeout: 15000,
+    //         removeContainer: true,
+    //         // iOS-specific options
+    //         foreignObjectRendering: false,
+    //         onclone: (clonedDoc) => {
+    //           console.log("🔄 Cloning document for capture...");
+    //           // Ensure all images are loaded in the clone
+    //           const images = clonedDoc.querySelectorAll("img");
+    //           images.forEach((img) => {
+    //             if (!img.complete) {
+    //               console.warn("⚠️ Image not complete in clone");
+    //             }
+    //           });
+    //         },
+    //       });
+
+    //       console.log("✅ Canvas created successfully");
+
+    //       // Convert canvas to data URL
+    //       const dataUrl = canvas.toDataURL("image/png", 1.0);
+    //       console.log("✅ Capture complete!");
+
+    //       return dataUrl;
+    //     } catch (error) {
+    //       console.error("❌ html2canvas capture failed:", error);
+
+    //       // Fallback method using simpler settings
+    //       try {
+    //         console.log("🔄 Trying fallback capture...");
+    //         await new Promise((resolve) => setTimeout(resolve, 300));
+
+    //         const canvas = await html2canvas(editorRef.current, {
+    //           allowTaint: true,
+    //           useCORS: false,
+    //           scale: 1,
+    //           logging: false,
+    //         });
+
+    //         return canvas.toDataURL("image/png");
+    //       } catch (fallbackError) {
+    //         console.error("❌ Fallback capture also failed:", fallbackError);
+    //         return null;
+    //       }
+    //     }
+    //   },
+    // }));
+    // In ShirtEditor.jsx - Replace the useImperativeHandle section
+
     useImperativeHandle(ref, () => ({
       captureImage: async () => {
         if (!editorRef.current) {
@@ -167,71 +241,103 @@ const ShirtEditor = forwardRef(
         }
 
         try {
+          console.log("📷 Starting iOS-compatible capture...");
+
           // Load selected font
           const selectedFontObj = fonts.find((f) => f.family === selectedFont);
           if (selectedFontObj) {
             injectFontCSS(selectedFontObj.family, selectedFontObj.downloadUrl);
           }
 
+          // Wait for fonts
           await document.fonts.ready;
+          await new Promise((resolve) => setTimeout(resolve, 300));
 
-          await new Promise((resolve) => setTimeout(resolve, 500));
-
-          console.log("📷 Capturing with html2canvas...");
-
+          // iOS-optimized html2canvas settings
           const canvas = await html2canvas(editorRef.current, {
-            allowTaint: true,
+            allowTaint: false,
             useCORS: true,
-            scale: 2,
+            scale: window.devicePixelRatio || 2, // Use device pixel ratio
             backgroundColor: null,
-            logging: true,
-            imageTimeout: 15000,
+            logging: false, // Disable logging for performance
+            imageTimeout: 10000,
             removeContainer: true,
-            // iOS-specific options
             foreignObjectRendering: false,
+            windowWidth: editorRef.current.scrollWidth,
+            windowHeight: editorRef.current.scrollHeight,
+            // iOS-specific: Pre-load all images
             onclone: (clonedDoc) => {
-              console.log("🔄 Cloning document for capture...");
-              // Ensure all images are loaded in the clone
               const images = clonedDoc.querySelectorAll("img");
               images.forEach((img) => {
-                if (!img.complete) {
-                  console.warn("⚠️ Image not complete in clone");
-                }
+                // Force image to be visible
+                img.style.opacity = "1";
+                img.style.display = "block";
+              });
+
+              // Force text to render
+              const textElements = clonedDoc.querySelectorAll(`
+                .${styles.presetText}`,
+              );
+              textElements.forEach((el) => {
+                el.style.fontFamily = selectedFont;
+                el.style.color = selectedColor;
+                el.style.fontSize = `${selectedSize}px`;
               });
             },
           });
 
           console.log("✅ Canvas created successfully");
 
-          // Convert canvas to data URL
-          const dataUrl = canvas.toDataURL("image/png", 1.0);
-          console.log("✅ Capture complete!");
+          // Convert to blob first (better for iOS)
+          return await new Promise((resolve) => {
+            canvas.toBlob(
+              (blob) => {
+                if (!blob) {
+                  console.error("❌ Failed to create blob");
+                  resolve(null);
+                  return;
+                }
 
-          return dataUrl;
+                // Convert blob to data URL
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  console.log("✅ Image conversion complete");
+                  resolve(reader.result);
+                };
+                reader.onerror = () => {
+                  console.error("❌ FileReader error");
+                  resolve(null);
+                };
+                reader.readAsDataURL(blob);
+              },
+              "image/png",
+              0.95,
+            ); // Reduce quality slightly for better iOS performance
+          });
         } catch (error) {
-          console.error("❌ html2canvas capture failed:", error);
+          console.error("❌ Capture failed:", error);
 
-          // Fallback method using simpler settings
+          // iOS fallback: Try simpler capture
           try {
-            console.log("🔄 Trying fallback capture...");
-            await new Promise((resolve) => setTimeout(resolve, 300));
+            console.log("🔄 Trying iOS fallback...");
 
             const canvas = await html2canvas(editorRef.current, {
-              allowTaint: true,
+              allowTaint: false,
               useCORS: false,
-              scale: 1,
+              scale: 1, // Lower quality for compatibility
               logging: false,
+              backgroundColor: null,
+              foreignObjectRendering: false,
             });
 
-            return canvas.toDataURL("image/png");
+            return canvas.toDataURL("image/png", 0.8);
           } catch (fallbackError) {
-            console.error("❌ Fallback capture also failed:", fallbackError);
-            return null;
+            console.error("❌ All capture methods failed:", fallbackError);
+            return null; // Return null instead of throwing
           }
         }
       },
     }));
-
     /* ================= FETCH & LOAD FONTS ================= */
     useEffect(() => {
       const fetchFonts = async () => {
@@ -262,7 +368,7 @@ const ShirtEditor = forwardRef(
           return new Promise((resolve) => {
             const fontFace = new FontFace(
               font.family,
-              `url(${font.downloadUrl})`
+              url(`${font.downloadUrl}`),
             );
 
             fontFace
@@ -274,7 +380,7 @@ const ShirtEditor = forwardRef(
                 resolve();
               })
               .catch((err) => {
-                console.warn(`⚠️ Font load failed: ${font.family}`, err);
+                console.warn(`⚠️ Font load failed: ${font.family}, err`);
                 resolve(); // Don't break the chain
               });
           });
@@ -568,7 +674,7 @@ const ShirtEditor = forwardRef(
         </div>
       </section>
     );
-  }
+  },
 );
 
 ShirtEditor.displayName = "ShirtEditor";
