@@ -98,77 +98,6 @@ const ProductDetails = () => {
     await processAddToCart(selectedSize);
   };
 
-  // const processAddToCart = async (sizeInfo) => {
-  //   setLoader(true);
-  //   let capturedImageUrl = "";
-
-  //   try {
-  //     if (isCustomizable && editorRef.current) {
-  //       capturedImageUrl = await editorRef.current.captureImage();
-  //     }
-  //   } catch (error) {
-  //     console.error("Capture image error:", error);
-  //   }
-
-  //   const payload = {
-  //     productId: product.id,
-  //     categoryId: product.categoryId,
-  //     name: product.name,
-  //     sku: product.sku,
-  //     quantity,
-  //     basePrice: product.basePrice,
-  //     discountPrice: product.discountedPrice || product.basePrice,
-  //     totalPrice: (product.discountedPrice || product.basePrice) * quantity,
-  //     isCustomizable: product.isCustomizable,
-  //     productImageUrl: capturedImageUrl || product.productImages?.[0] || "",
-  //     renderedImageUrl: product.productImages?.[0],
-  //     dimensions: {
-  //       length: product.dimension?.length || 0,
-  //       width: product.dimension?.width || 0,
-  //       height: product.dimension?.height || 0,
-  //       weight: product.dimension?.weight || 0,
-  //     },
-  //     options: sizeInfo,
-  //     addedAt: new Date().toISOString(),
-  //     presetText: text,
-  //     textColor: selectedColor,
-  //     fontFamily: selectedFont,
-  //     fontSize: selectedSize,
-  //     canvasImage: product.canvasImage,
-  //     illustrationImage: product.illustrationImage,
-  //     fullProductUrl: product.productImages[0],
-  //   };
-
-  //   try {
-  //     const existingItem = await db.cart
-  //       .where("productId")
-  //       .equals(product.id)
-  //       .first();
-
-  //     if (existingItem) {
-  //       await db.cart.update(existingItem.id, {
-  //         quantity: existingItem.quantity + quantity,
-  //         totalPrice:
-  //           (existingItem.discountPrice || existingItem.basePrice) *
-  //           (existingItem.quantity + quantity),
-  //         productImageUrl: capturedImageUrl || existingItem.productImageUrl,
-  //       });
-  //     } else {
-  //       await db.cart.add(payload);
-  //     }
-
-  //     const updatedCartItems = await db.cart.toArray();
-  //     updateCart(updatedCartItems.length);
-  //     setShowSuccessCart(true);
-  //   } catch (err) {
-  //     console.error("Dexie error:", err);
-  //     toast.error("Failed to add to cart");
-  //   } finally {
-  //     setLoader(false);
-  //   }
-  // };
-  // In ProductDetails.jsx - Replace the processAddToCart function
-
   const processAddToCart = async (sizeInfo) => {
     setLoader(true);
     let capturedImageUrl = "";
@@ -212,7 +141,6 @@ const ProductDetails = () => {
       discountPrice: product.discountedPrice || product.basePrice,
       totalPrice: (product.discountedPrice || product.basePrice) * quantity,
       isCustomizable: product.isCustomizable,
-      // ✅ Use captured image if available, otherwise fall back to original
       productImageUrl: capturedImageUrl || product.productImages?.[0] || "",
       renderedImageUrl: product.productImages?.[0],
       dimensions: {
@@ -233,10 +161,9 @@ const ProductDetails = () => {
     };
 
     try {
-      const existingItem = await db.cart
-        .where("productId")
-        .equals(product.id)
-        .first();
+      const existingItem = !product.isCustomizable
+        ? await db.cart.where("productId").equals(product.id).first()
+        : null;
 
       if (existingItem) {
         await db.cart.update(existingItem.id, {
@@ -244,7 +171,6 @@ const ProductDetails = () => {
           totalPrice:
             (existingItem.discountPrice || existingItem.basePrice) *
             (existingItem.quantity + quantity),
-          productImageUrl: capturedImageUrl || existingItem.productImageUrl,
         });
       } else {
         await db.cart.add(payload);
@@ -315,7 +241,7 @@ const ProductDetails = () => {
     } else {
       window.open(
         `https://wa.me/?text=${encodeURIComponent(`${title}\n${shareUrl}`)}`,
-        "_blank"
+        "_blank",
       );
     }
   };
@@ -529,7 +455,6 @@ const ProductDetails = () => {
 
             {product?.isCustomizable ? (
               <>
-                
                 <ShirtEditor
                   product={product}
                   ref={editorRef}
