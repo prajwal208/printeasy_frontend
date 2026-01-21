@@ -161,7 +161,7 @@ const Cart = () => {
             "x-api-key":
               "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
           },
-        }
+        },
       );
 
       const orderData = orderRes?.data?.data;
@@ -238,7 +238,7 @@ const Cart = () => {
             "x-api-key":
               "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
           },
-        }
+        },
       );
       toast.success("Added to wishlist!");
     } catch (error) {
@@ -344,8 +344,6 @@ const Cart = () => {
                     offerData={offerData}
                   />
                 </div>
-
-                
               </div>
 
               <DynamicModal
@@ -366,10 +364,9 @@ const Cart = () => {
                 <AddToBagLoader />
               </DynamicModal>
 
-
-                  <div className={styles.cartsuggestion}>
-              <CartSuggestion/>
-                  </div>
+              <div className={styles.cartsuggestion}>
+                <CartSuggestion />
+              </div>
             </>
           ) : (
             <NoResult

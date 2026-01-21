@@ -40,7 +40,7 @@ const Page = () => {
             "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
         },
       });
-
+      console.log(res,"sisosioioioi")
       const data = Array.isArray(res?.data?.data)
         ? res.data.data
         : [res.data.data];
@@ -118,70 +118,67 @@ const Page = () => {
       
       <h2>Your Orders</h2>
 
-      {orders.map((order) => {
-        const item = order.items?.[0];
+    {orders.map((order) => (
+  <div className={styles.order_card} key={order.orderId}>
+    {/* HEADER */}
+    <div className={styles.order_header}>
+      <div>
+        <p className={styles.order_id}>Order #{order.orderId}</p>
+        <p className={styles.order_date}>
+          Placed on {new Date(order.orderDate).toDateString()}
+        </p>
+      </div>
 
-        return (
-          <div className={styles.order_card} key={order.orderId}>
-            {/* HEADER */}
-            <div className={styles.order_header}>
-              <div>
-                <p className={styles.order_id}>Order #{order.orderId}</p>
-                <p className={styles.order_date}>
-                  Placed on {new Date(order.orderDate).toDateString()}
-                </p>
-              </div>
+      <span className={`${styles.status} ${styles.confirmed}`}>
+        {order.status}
+      </span>
+    </div>
 
-              <span className={`${styles.status} ${styles.confirmed}`}>
-                {order.status}
-              </span>
-            </div>
+    {/* ✅ MULTIPLE PRODUCTS */}
+    {order.items?.map((item, index) => (
+      <div className={styles.product_section} key={index}>
+        <img
+          src={item.renderedImageUrl || item.productImageUrl}
+          alt={item.name}
+          className={styles.product_image}
+        />
 
-            {/* PRODUCT */}
-            {item && (
-              <div className={styles.product_section}>
-                <img
-                  src={item.productImageUrl}
-                  alt={item.name}
-                  className={styles.product_image}
-                />
+        <div className={styles.product_info}>
+          <h3>{item.name}</h3>
+          <p>Qty: {item.quantity}</p>
+          <p className={styles.price}>₹{item.totalPrice}</p>
+        </div>
+      </div>
+    ))}
 
-                <div className={styles.product_info}>
-                  <h3>{item.name}</h3>
-                  <p>Qty: {item.quantity}</p>
-                  <p className={styles.price}>₹{order.totalAmount}</p>
-                </div>
-              </div>
-            )}
+    {/* ADDRESS */}
+    <div className={styles.address_section}>
+      <h4>Delivery Address</h4>
+      <p><strong>{order.shipAddress.name}</strong></p>
+      <p>{order.shipAddress.addressLine1}</p>
+      <p>
+        {order.shipAddress.city}, {order.shipAddress.state}{" "}
+        {order.shipAddress.pinCode}
+      </p>
+      <p>Phone: {order.shipAddress.phone}</p>
+    </div>
 
-            {/* ADDRESS */}
-            <div className={styles.address_section}>
-              <h4>Delivery Address</h4>
-              <p><strong>{order.shipAddress.name}</strong></p>
-              <p>{order.shipAddress.addressLine1}</p>
-              <p>
-                {order.shipAddress.city}, {order.shipAddress.state}{" "}
-                {order.shipAddress.pinCode}
-              </p>
-              <p>Phone: {order.shipAddress.phone}</p>
-            </div>
+    {/* SHIPMENT */}
+    {order.shiprocket && (
+      <div className={styles.shipment_section}>
+        <div>
+          <span>Shipment ID</span>
+          <p>{order.shiprocket.shipmentId}</p>
+        </div>
+        <div>
+          <span>Order Number</span>
+          <p>{order.shiprocket.orderNumber}</p>
+        </div>
+      </div>
+    )}
+  </div>
+))}
 
-            {/* SHIPMENT */}
-            {order.shiprocket && (
-              <div className={styles.shipment_section}>
-                <div>
-                  <span>Shipment ID</span>
-                  <p>{order.shiprocket.shipmentId}</p>
-                </div>
-                <div>
-                  <span>Order Number</span>
-                  <p>{order.shiprocket.orderNumber}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      })}
     </div>
     </>
   );
