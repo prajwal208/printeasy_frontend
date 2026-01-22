@@ -11,7 +11,6 @@ import styles from "./shirtEditor.module.scss";
 import Image from "next/image";
 import { COLORS, SIZES } from "@/constants";
 import api from "@/axiosInstance/axiosInstance";
-import html2canvas from "html2canvas";
 
 import fontIcon from "../../assessts/font.svg";
 import letterIcon from "../../assessts/letter1.svg";
@@ -45,7 +44,7 @@ const ShirtEditor = forwardRef(
     const [imageError, setImageError] = useState(false);
     const [imageDataUrl, setImageDataUrl] = useState(null);
     const loadedFontsRef = useRef(new Set());
-
+    const canvasRef = useRef(null);
     const inputRef = useRef(null);
     const viewRef = useRef(null);
     const editorRef = useRef(null);
@@ -117,65 +116,83 @@ const ShirtEditor = forwardRef(
       document.head.appendChild(style);
     };
 
-    /* ================= HTML2CANVAS CAPTURE FOR BACKEND ================= */
     useImperativeHandle(ref, () => ({
       captureImage: async () => {
-        if (!editorRef.current) return null;
-
         try {
-          const selectedFontObj = fonts.find((f) => f.family === selectedFont);
-          if (selectedFontObj) injectFontCSS(selectedFontObj.family, selectedFontObj.downloadUrl);
+          const canvas = canvasRef.current;
+          if (!canvas || !imageDataUrl) return null;
+
+          const ctx = canvas.getContext("2d");
+
+          // Load base product image
+          const img = new window.Image();
+          img.crossOrigin = "anonymous";
+          img.src = imageDataUrl;
+
+          await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+          });
+
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
           await document.fonts.ready;
-          await new Promise((r) => setTimeout(r, 500));
 
-          const canvas = await html2canvas(editorRef.current, {
-            allowTaint: false,
-            useCORS: true,
-            scale: window.devicePixelRatio || 2,
-            backgroundColor: null,
-            logging: false,
-            imageTimeout: 10000,
-            removeContainer: true,
-            foreignObjectRendering: false,
-            windowWidth: editorRef.current.scrollWidth,
-            windowHeight: editorRef.current.scrollHeight,
-            onclone: (clonedDoc) => {
-              const images = clonedDoc.querySelectorAll("img");
-              images.forEach((img) => {
-                img.style.opacity = "1";
-                img.style.display = "block";
-              });
-              const textElements = clonedDoc.querySelectorAll(`.${styles.presetText}`);
-              textElements.forEach((el) => {
-                el.style.fontFamily = selectedFont;
-                el.style.color = selectedColor;
-                el.style.fontSize = `${selectedSize}px`;
-              });
-            },
-          });
+          // ---- TEXT BOX SETTINGS ----
+          const maxWidth = 267;
+          const maxHeight = 67;
+          const lineHeight = 30
+          const fontSize = 40;
 
-          return await new Promise((resolve) => {
-            canvas.toBlob((blob) => {
-              if (!blob) return resolve(null);
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result);
-              reader.readAsDataURL(blob);
-            }, "image/png", 0.95);
-          });
-        } catch {
-          try {
-            const fallbackCanvas = await html2canvas(editorRef.current, {
-              allowTaint: false,
-              useCORS: false,
-              scale: 1,
-              backgroundColor: null,
-              foreignObjectRendering: false,
-            });
-            return fallbackCanvas.toDataURL("image/png", 0.8);
-          } catch {
-            return null;
+          ctx.fillStyle = selectedColor;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.font = `${fontSize}px "${selectedFont}", Arial`;
+
+          const textX = canvas.width / 2;
+          const textY = canvas.height / 2 + 80;
+
+          const finalText = text?.trim() || "Your Text Here";
+
+          // ---- WRAPPING ALGORITHM ----
+          const words = finalText.split(" ");
+          let line = "";
+          const lines = [];
+
+          for (let n = 0; n < words.length; n++) {
+            let testLine = line + words[n] + " ";
+            let metrics = ctx.measureText(testLine);
+            let testWidth = metrics.width;
+
+            if (testWidth > maxWidth && n > 0) {
+              lines.push(line);
+              line = words[n] + " ";
+            } else {
+              line = testLine;
+            }
           }
+          lines.push(line);
+
+          // ---- RENDERING ----
+          // Calculate total height to center vertically within the 67px height
+          const totalTextHeight = lines.length * lineHeight;
+          let startY = textY - totalTextHeight / 2 + lineHeight / 2;
+
+          lines.forEach((l, index) => {
+            // Only draw if within the 67px height limit
+            if ((index + 1) * lineHeight <= maxHeight) {
+              ctx.fillText(l.trim(), textX, startY + index * lineHeight);
+            }
+          });
+
+          return canvas.toDataURL("image/png", 1.0);
+        } catch (err) {
+          console.error("❌ Canvas capture failed:", err);
+          return null;
         }
       },
     }));
@@ -229,13 +246,17 @@ const ShirtEditor = forwardRef(
 
       if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
         setTimeout(() => {
-          window.scrollTo({ top: window.innerHeight * 0.3, behavior: "smooth" });
+          window.scrollTo({
+            top: window.innerHeight * 0.3,
+            behavior: "smooth",
+          });
         }, 100);
       }
     };
 
     const handleBlur = (e) => {
-      if (e.relatedTarget && editorRef.current?.contains(e.relatedTarget)) return;
+      if (e.relatedTarget && editorRef.current?.contains(e.relatedTarget))
+        return;
       setIsEditing(false);
     };
 
@@ -259,7 +280,12 @@ const ShirtEditor = forwardRef(
     };
 
     return (
-      <section className={styles.img_main_wrap} ref={editorRef} tabIndex="-1" style={{ outline: "none" }}>
+      <section
+        className={styles.img_main_wrap}
+        ref={editorRef}
+        tabIndex="-1"
+        style={{ outline: "none" }}
+      >
         <div className={styles.img_wrap}>
           {!imageLoaded && !imageError && (
             <div className={styles.shimmerWrapper}>
@@ -268,16 +294,67 @@ const ShirtEditor = forwardRef(
           )}
 
           {imageError && (
-            <div style={{ padding: "20px", textAlign: "center", color: "#666", minHeight: "400px", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", background: "#f5f5f5", borderRadius: "8px" }}>
+            <div
+              style={{
+                padding: "20px",
+                textAlign: "center",
+                color: "#666",
+                minHeight: "400px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+                background: "#f5f5f5",
+                borderRadius: "8px",
+              }}
+            >
               <p style={{ fontSize: "48px", marginBottom: "10px" }}>⚠️</p>
-              <p style={{ fontWeight: "bold", marginBottom: "5px" }}>Image Failed to Load</p>
-              <p style={{ fontSize: "12px", color: "#999", marginBottom: "15px" }}>{product?.canvasImage?.substring(0, 60)}...</p>
-              <button onClick={() => window.location.reload()} style={{ padding: "12px 24px", background: "#000", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "14px", fontWeight: "500" }}>Reload Page</button>
+              <p style={{ fontWeight: "bold", marginBottom: "5px" }}>
+                Image Failed to Load
+              </p>
+              <p
+                style={{
+                  fontSize: "12px",
+                  color: "#999",
+                  marginBottom: "15px",
+                }}
+              >
+                {product?.canvasImage?.substring(0, 60)}...
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                style={{
+                  padding: "12px 24px",
+                  background: "#000",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                Reload Page
+              </button>
             </div>
           )}
 
           {imageDataUrl && (
-            <img src={imageDataUrl} alt="product canvas" className={styles.mainImage} onLoad={() => setImageLoaded(true)} onError={() => setImageError(true)} style={{ opacity: imageLoaded ? 1 : 0, transition: "opacity 0.3s ease", width: "100%", maxWidth: "500px", display: "block", margin: "0 auto" }} />
+            <img
+              src={imageDataUrl}
+              alt="product canvas"
+              className={styles.mainImage}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageError(true)}
+              style={{
+                opacity: imageLoaded ? 1 : 0,
+                transition: "opacity 0.3s ease",
+                width: "100%",
+                maxWidth: "500px",
+                display: "block",
+                margin: "0 auto",
+              }}
+            />
           )}
 
           {product && imageLoaded && (
@@ -300,38 +377,116 @@ const ShirtEditor = forwardRef(
                   data-enable-grammarly="false"
                 />
               ) : (
-                <div ref={viewRef} className={styles.presetText} onClick={startTextEditing} style={{ ...dynamicStyles, cursor: "text" }}>
+                <div
+                  ref={viewRef}
+                  className={styles.presetText}
+                  onClick={startTextEditing}
+                  style={{ ...dynamicStyles, cursor: "text" }}
+                >
                   {text.trim() || "Your Text Here"}
-                  <span style={{ opacity: showCursor ? 1 : 0, transition: "opacity 0.1s", marginLeft: "2px", fontWeight: "100", color: selectedColor }}>|</span>
+                  <span
+                    style={{
+                      opacity: showCursor ? 1 : 0,
+                      transition: "opacity 0.1s",
+                      marginLeft: "2px",
+                      fontWeight: "100",
+                      color: selectedColor,
+                    }}
+                  >
+                    |
+                  </span>
                 </div>
               )}
             </>
           )}
 
           {isEditing && (
-            <div className={styles.floatingToolbar} tabIndex="-1" style={{ outline: "none" }}>
-              <button onClick={() => setActiveTab("size")} className={`${styles.toolButton} ${activeTab === "size" ? styles.activeTool : ""}`}><Image src={letterIcon} alt="size" /><span>Font Size</span></button>
-              <button onClick={() => setActiveTab("color")} className={`${styles.toolButton} ${activeTab === "color" ? styles.activeTool : ""}`}><Image src={fontIcon} alt="color" /><span>Colour</span></button>
-              <button onClick={() => setActiveTab("font")} className={`${styles.toolButton} ${activeTab === "font" ? styles.activeTool : ""}`}><Image src={familyIcon} alt="font" /><span>Fonts</span></button>
-              <div className={styles.toolButton} onClick={startTextEditing}><Image src={keyboardIcon} alt="edit" /><span>Edit</span></div>
-              <button className={styles.closeToolbarBtn} onClick={() => setIsEditing(false)}>×</button>
+            <div
+              className={styles.floatingToolbar}
+              tabIndex="-1"
+              style={{ outline: "none" }}
+            >
+              <button
+                onClick={() => setActiveTab("size")}
+                className={`${styles.toolButton} ${activeTab === "size" ? styles.activeTool : ""}`}
+              >
+                <Image src={letterIcon} alt="size" />
+                <span>Font Size</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("color")}
+                className={`${styles.toolButton} ${activeTab === "color" ? styles.activeTool : ""}`}
+              >
+                <Image src={fontIcon} alt="color" />
+                <span>Colour</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("font")}
+                className={`${styles.toolButton} ${activeTab === "font" ? styles.activeTool : ""}`}
+              >
+                <Image src={familyIcon} alt="font" />
+                <span>Fonts</span>
+              </button>
+              <div className={styles.toolButton} onClick={startTextEditing}>
+                <Image src={keyboardIcon} alt="edit" />
+                <span>Edit</span>
+              </div>
+              <button
+                className={styles.closeToolbarBtn}
+                onClick={() => setIsEditing(false)}
+              >
+                ×
+              </button>
 
               <div className={styles.optionsPanel}>
-                {activeTab === "font" && <div className={styles.fontOptions}>{fonts.map((font) => (
-                  <button key={font.family} onClick={() => onFontSelect(font)} className={`${styles.fontOption} ${selectedFont === font.family ? styles.active : ""}`} style={{ fontFamily: font.family }}>{font.family}<Image src={lineIcon} alt="line" /></button>
-                ))}</div>}
+                {activeTab === "font" && (
+                  <div className={styles.fontOptions}>
+                    {fonts.map((font) => (
+                      <button
+                        key={font.family}
+                        onClick={() => onFontSelect(font)}
+                        className={`${styles.fontOption} ${selectedFont === font.family ? styles.active : ""}`}
+                        style={{ fontFamily: font.family }}
+                      >
+                        {font.family}
+                        <Image src={lineIcon} alt="line" />
+                      </button>
+                    ))}
+                  </div>
+                )}
 
-                {activeTab === "color" && <div className={styles.colorOptions}>{COLORS.map((c) => (
-                  <button key={c} onClick={() => onColorSelect(c)} className={`${styles.colorSwatch} ${selectedColor === c ? styles.activeColor : ""}`} style={{ backgroundColor: c }} />
-                ))}</div>}
+                {activeTab === "color" && (
+                  <div className={styles.colorOptions}>
+                    {COLORS.map((c) => (
+                      <button
+                        key={c}
+                        onClick={() => onColorSelect(c)}
+                        className={`${styles.colorSwatch} ${selectedColor === c ? styles.activeColor : ""}`}
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
+                  </div>
+                )}
 
-                {activeTab === "size" && <div className={styles.sizeOptions}>{SIZES.map((s) => (
-                  <button key={s} onClick={() => onSizeSelect(s)} className={`${styles.sizeBtn} ${selectedSize === s ? styles.activeSize : ""}`}>{s}</button>
-                ))}</div>}
+                {activeTab === "size" && (
+                  <div className={styles.sizeOptions}>
+                    {SIZES.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => onSizeSelect(s)}
+                        className={`${styles.sizeBtn} ${selectedSize === s ? styles.activeSize : ""}`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
         </div>
+
+        <canvas ref={canvasRef} style={{ display: "none" }} />
       </section>
     );
   },
