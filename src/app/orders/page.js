@@ -138,7 +138,7 @@ const Page = () => {
     {order.items?.map((item, index) => (
       <div className={styles.product_section} key={index}>
         <img
-          src={item.renderedImageUrl || item.productImageUrl}
+          src={item.shirtImageUrl || item.renderedImageUrl || item.productImageUrl}
           alt={item.name}
           className={styles.product_image}
         />
