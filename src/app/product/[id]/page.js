@@ -53,6 +53,13 @@ const ProductDetails = () => {
   const [pendingAction, setPendingAction] = useState(null);
   const [editorReady, setEditorReady] = useState(false);
   const [selectedSizeYear, setSelectedSizeYear] = useState("");
+  const cashfreeRef = useRef(null);
+
+  useEffect(() => {
+  load({ mode: "production" }).then((cf) => {
+    cashfreeRef.current = cf;
+  });
+}, []);
 
   useEffect(() => {
     if (product) {
@@ -62,6 +69,8 @@ const ProductDetails = () => {
       setSelectedSize(product.fontSize || 28);
     }
   }, [product]);
+
+  console.log(sizeInfo, "sosospopopo");
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
@@ -328,6 +337,8 @@ const ProductDetails = () => {
       return;
     }
 
+    setShowProductUI(false);
+
     await proceedWithPayment();
   };
 
@@ -524,13 +535,47 @@ const ProductDetails = () => {
                   <h4>SELECT SIZE</h4>
                   {sizeInfo && (
                     <div className={styles.sizeDetailsBox}>
-                      <span>Chest: {sizeInfo?.options[0]?.value} cm</span>
-                      <span>Length: {sizeInfo?.options[1]?.value} cm</span>
-                      {sizeInfo?.options.length > 2 && (
-                        <span>Sleeves: {sizeInfo?.options[2]?.value} cm</span>
+                      {sizeInfo.options?.find((opt) => opt.label === "Chest")
+                        ?.value && (
+                        <span>
+                          Chest:{" "}
+                          {
+                            sizeInfo.options.find(
+                              (opt) => opt.label === "Chest",
+                            ).value
+                          }{" "}
+                          cm
+                        </span>
+                      )}
+
+                      {sizeInfo.options?.find((opt) => opt.label === "Length")
+                        ?.value && (
+                        <span>
+                          Length:{" "}
+                          {
+                            sizeInfo.options.find(
+                              (opt) => opt.label === "Length",
+                            ).value
+                          }{" "}
+                          cm
+                        </span>
+                      )}
+
+                      {sizeInfo.options?.find((opt) => opt.label === "Sleeves")
+                        ?.value && (
+                        <span>
+                          Sleeves:{" "}
+                          {
+                            sizeInfo.options.find(
+                              (opt) => opt.label === "Sleeves",
+                            ).value
+                          }{" "}
+                          cm
+                        </span>
                       )}
                     </div>
                   )}
+
                   <div className={styles.sizeOptions}>
                     {product?.configuration[0].options.map((s) => (
                       <button
