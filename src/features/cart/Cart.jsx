@@ -100,7 +100,7 @@ const Cart = () => {
     }
   };
 
-  console.log(cartItems,"sososppppoooooo")
+  console.log(cartItems, "sososppppoooooo");
 
   const orderPayloadItems = cartItems.map((item) => ({
     name: item.name,
@@ -110,7 +110,7 @@ const Cart = () => {
     categoryId: item.categoryId,
     isCustomizable: !!item.isCustomizable,
     productImageUrl: item?.renderedImageUrl,
-    sizeInfo:item?.options,
+    sizeInfo: item?.options,
     discount: item.discount || 0,
     tax: item.tax || 0,
     hsn: item.hsn || null,
@@ -120,10 +120,9 @@ const Cart = () => {
       fontFamily: item.fontFamily || "",
       fontSize: item.fontSize || "",
       illustrationImage: item?.illustrationImage,
-      shirtImage:item?.canvasImage
+      shirtImage: item?.canvasImage,
     },
   }));
-
 
   const customizableItem = cartItems.find((item) => item.isCustomizable);
   const uploadImagePayload = customizableItem
@@ -255,12 +254,12 @@ const Cart = () => {
         id="cashfree-dropin"
         style={{
           width: "100%",
-          minHeight: showCartUI ? "0" : "500px",
-          height: showCartUI ? "0" : "auto",
-          display: showCartUI ? "none" : "flex",
-          justifyContent: "center",
-          overflow: "hidden",
-          order: -1
+          // Use minHeight to ensure visibility, but allow it to grow
+          minHeight: showCartUI ? "0" : "100vh",
+          display: showCartUI ? "none" : "block", // 'block' is safer for flow than 'flex'
+          paddingBottom: "50px", // Extra space for the update/pay buttons
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch", // Better scrolling for mobile
         }}
       />
 
@@ -305,7 +304,7 @@ const Cart = () => {
                               onChange={(e) =>
                                 handleQuantityChange(
                                   item.id,
-                                  parseInt(e.target.value)
+                                  parseInt(e.target.value),
                                 )
                               }
                             >
