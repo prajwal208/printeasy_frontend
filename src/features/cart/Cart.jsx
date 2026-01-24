@@ -218,6 +218,10 @@ const Cart = () => {
           console.log("SDK is redirecting...");
         }
       });
+
+       const dropin = document.getElementById("cashfree-dropin");
+  if (dropin) dropin.innerHTML = ""; 
+  setShowCartUI(true);
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment");
