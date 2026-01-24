@@ -255,7 +255,7 @@ const Cart = () => {
         id="cashfree-dropin"
         style={{
           width: "100%",
-          minHeight: showProductUI ? "0" : "500px",
+          minHeight: showCartUI ? "0" : "500px",
           height: showCartUI ? "0" : "auto",
           display: showCartUI ? "none" : "flex",
           justifyContent: "center",
