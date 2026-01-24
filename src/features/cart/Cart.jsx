@@ -100,7 +100,7 @@ const Cart = () => {
     }
   };
 
-  console.log(cartItems,"sososppppoooooo")
+  console.log(cartItems, "sososppppoooooo");
 
   const orderPayloadItems = cartItems.map((item) => ({
     name: item.name,
@@ -110,7 +110,7 @@ const Cart = () => {
     categoryId: item.categoryId,
     isCustomizable: !!item.isCustomizable,
     productImageUrl: item?.renderedImageUrl,
-    sizeInfo:item?.options,
+    sizeInfo: item?.options,
     discount: item.discount || 0,
     tax: item.tax || 0,
     hsn: item.hsn || null,
@@ -120,10 +120,9 @@ const Cart = () => {
       fontFamily: item.fontFamily || "",
       fontSize: item.fontSize || "",
       illustrationImage: item?.illustrationImage,
-      shirtImage:item?.canvasImage
+      shirtImage: item?.canvasImage,
     },
   }));
-
 
   const customizableItem = cartItems.find((item) => item.isCustomizable);
   const uploadImagePayload = customizableItem
@@ -219,9 +218,7 @@ const Cart = () => {
         }
       });
 
-       const dropin = document.getElementById("cashfree-dropin");
-  if (dropin) dropin.innerHTML = ""; 
-  setShowCartUI(true);
+      setShowCartUI(true);
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment");
@@ -252,8 +249,6 @@ const Cart = () => {
       toast.error("Failed to add to wishlist");
     }
   };
-
-  
 
   return (
     <>
@@ -309,7 +304,7 @@ const Cart = () => {
                               onChange={(e) =>
                                 handleQuantityChange(
                                   item.id,
-                                  parseInt(e.target.value)
+                                  parseInt(e.target.value),
                                 )
                               }
                             >
