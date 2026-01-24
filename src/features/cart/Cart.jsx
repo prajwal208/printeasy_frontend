@@ -100,7 +100,7 @@ const Cart = () => {
     }
   };
 
-  console.log(cartItems, "sososppppoooooo");
+  console.log(cartItems,"sososppppoooooo")
 
   const orderPayloadItems = cartItems.map((item) => ({
     name: item.name,
@@ -110,7 +110,7 @@ const Cart = () => {
     categoryId: item.categoryId,
     isCustomizable: !!item.isCustomizable,
     productImageUrl: item?.renderedImageUrl,
-    sizeInfo: item?.options,
+    sizeInfo:item?.options,
     discount: item.discount || 0,
     tax: item.tax || 0,
     hsn: item.hsn || null,
@@ -120,9 +120,10 @@ const Cart = () => {
       fontFamily: item.fontFamily || "",
       fontSize: item.fontSize || "",
       illustrationImage: item?.illustrationImage,
-      shirtImage: item?.canvasImage,
+      shirtImage:item?.canvasImage
     },
   }));
+
 
   const customizableItem = cartItems.find((item) => item.isCustomizable);
   const uploadImagePayload = customizableItem
@@ -217,7 +218,10 @@ const Cart = () => {
           console.log("SDK is redirecting...");
         }
       });
-      setShowCartUI(true);
+
+       const dropin = document.getElementById("cashfree-dropin");
+  if (dropin) dropin.innerHTML = ""; 
+  setShowCartUI(true);
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment");
@@ -249,25 +253,7 @@ const Cart = () => {
     }
   };
 
-  useEffect(() => {
-    if (showCartUI) return;
-
-    const dropin = document.getElementById("cashfree-dropin");
-    if (!dropin) return;
-
-    const observer = new MutationObserver(() => {
-      // Cashfree removes iframe when user clicks "Yes, leave"
-      if (dropin.children.length === 0) {
-        console.log("User exited Cashfree checkout");
-
-        setShowCartUI(true);
-      }
-    });
-
-    observer.observe(dropin, { childList: true });
-
-    return () => observer.disconnect();
-  }, [showCartUI]);
+  
 
   return (
     <>
@@ -323,7 +309,7 @@ const Cart = () => {
                               onChange={(e) =>
                                 handleQuantityChange(
                                   item.id,
-                                  parseInt(e.target.value),
+                                  parseInt(e.target.value)
                                 )
                               }
                             >
