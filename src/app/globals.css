@@ -16,12 +16,20 @@ iframe[src*="cashfree"] {
   height: 100vh !important;
 }
 
-/* .modal-body.svelte-1enjjul {
+.wrapper{
+  height: 110vh !important;
+}
+
+.svelte-1enjjul{
+  height: 100vh;
+}
+
+.modal-body.svelte-1enjjul {
   height: 100vh !important;
   overflow-y: auto !important;
   display: flex !important;
   flex-direction: column !important;
-} */
+}
 
 
 
