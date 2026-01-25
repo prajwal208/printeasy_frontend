@@ -7,19 +7,9 @@
 
 html,
 body {
-  height: 100%;
-  height: -webkit-fill-available;
+ width: 100%;
 }
 
-
-iframe[src*="cashfree"] {
-  height: 100vh !important;
-}
-
-.addressContainer.svelte-nuqu5k {
-    position: relative !important;
-    height: 140% !important;
-}
 
 
 @media (max-width: 768px) {
@@ -30,9 +20,5 @@ iframe[src*="cashfree"] {
   .slick-dots {
     bottom: 35 !important;
   }
-  
-  .addressContainer.svelte-nuqu5k {
-    position: relative !important;
-    height: 140% !important;
-}
+
 }

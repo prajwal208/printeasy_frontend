@@ -248,7 +248,6 @@ const Cart = () => {
     }
   };
 
-
   return (
     <>
       {/* <div
@@ -263,16 +262,13 @@ const Cart = () => {
           order: -1
         }}
       /> */}
-
-      <div id="cashfree-dropin" 
-      style={{
-        width: "100%",
-        display:"flex",
-        justifyContent: "center",
-        overflow:"hidden",
-      }}
-      className={!showCartUI ? "active" : ""}
-      />
+      {
+        !showCartUI && 
+        <div className={styles.cashfree_modal}>
+        <div id="cashfree-dropin" className={!showCartUI ? "active" : ""} />
+      </div>
+      }
+      
 
       {showCartUI && (
         <div className={styles.cartPage}>
