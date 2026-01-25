@@ -15,6 +15,14 @@ html, body {
   height: "auto" !important;
 }
 
+@media screen and (min-width: 767.5px) {
+    .modal-body.svelte-1enjjul {
+        height: 70vh !important;
+        overflow-y: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+  }
 
 @media (max-width: 768px) {
   .navbar-wrapper {
