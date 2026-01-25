@@ -53,9 +53,8 @@ const ProductDetails = () => {
   const [pendingAction, setPendingAction] = useState(null);
   const [editorReady, setEditorReady] = useState(false);
   const [selectedSizeYear, setSelectedSizeYear] = useState("");
-  
 
-useEffect(() => {
+  useEffect(() => {
     if (product) {
       setText(product.presetText || "Empty Text");
       setSelectedColor(product.fontColor || "#000");
@@ -292,6 +291,17 @@ useEffect(() => {
   }, [id]);
 
   useEffect(() => {
+    if (window.fbq && product) {
+      fbq("track", "ViewContent", {
+        content_ids: [product.id],
+        content_type: "product",
+        value: product.discountedPrice,
+        currency: "INR",
+      });
+    }
+  }, [product]);
+
+  useEffect(() => {
     if (relatedId) {
       const getRelatedProduct = async () => {
         try {
@@ -429,9 +439,11 @@ useEffect(() => {
           display: showProductUI ? "none" : "flex",
           justifyContent: "center",
           overflow: "hidden",
-          order: -1
+          order: -1,
         }}
       />
+
+      <ProductSchema product={product} />
 
       {showProductUI && (
         <>
