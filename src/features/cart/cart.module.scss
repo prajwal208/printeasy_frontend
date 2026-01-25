@@ -13,15 +13,13 @@
 
   @media (max-width: 768px) {
     padding: 10px;
-    min-height: 600px; // Mobile usually needs more vertical space
+    min-height: 600px;
+    min-height: 500px;
+    height: 100vh;          
+  max-height: 100vh; 
   }
 }
 
-.cartPage {
-  min-height: 100vh;
-  padding: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  
   #cashfree-dropin {
     position: fixed;
     inset: 0;
@@ -36,6 +34,13 @@
     background: rgba(0, 0, 0, 0.6);
   
 }
+
+.cartPage {
+  min-height: 100vh;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+
 
   .iconBtn {
     background: transparent;

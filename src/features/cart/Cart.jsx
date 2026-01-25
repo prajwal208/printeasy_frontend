@@ -248,18 +248,6 @@ const Cart = () => {
     }
   };
 
-  useEffect(() => {
-  const interval = setInterval(() => {
-    const iframe = document.querySelector('iframe[src*="cashfree"]');
-    if (iframe) {
-      iframe.style.height = "100vh";
-      iframe.style.maxHeight = "100vh";
-      clearInterval(interval);
-    }
-  }, 300);
-
-  return () => clearInterval(interval);
-}, []);
 
 
   return (

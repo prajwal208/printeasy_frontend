@@ -16,22 +16,6 @@ iframe[src*="cashfree"] {
   height: 100vh !important;
 }
 
-.wrapper{
-  height: 110vh !important;
-}
-
-.svelte-1enjjul{
-  height: 100vh;
-}
-
-.modal-body.svelte-1enjjul {
-  height: 100vh !important;
-  overflow-y: auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-}
-
-
 
 @media (max-width: 768px) {
   .navbar-wrapper {
