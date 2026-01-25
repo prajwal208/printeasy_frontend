@@ -250,7 +250,7 @@ const Cart = () => {
 
   return (
     <>
-      {/* <div
+      <div
         id="cashfree-dropin"
         style={{
          width: "100%",
@@ -261,19 +261,7 @@ const Cart = () => {
           overflow:"hidden",
           order: -1
         }}
-      /> */}
-<div
-  id="cashfree-dropin"
-  className={!showCartUI ? "active" : ""}
-  style={{
-    position: "fixed",
-    inset: 0,
-    width: showCartUI ? "0" : "100%",
-    height: showCartUI ? "0" : "100dvh",
-    overflow: "hidden",
-    backgroundColor: "transparent",
-  }}
-/>
+      />
 
 
 
