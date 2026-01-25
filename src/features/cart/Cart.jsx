@@ -248,7 +248,34 @@ const Cart = () => {
     }
   };
 
+  useEffect(() => {
+  if (!showCartUI) {
+    const interval = setInterval(() => {
+      const modalBody = document.querySelector(
+        '[class*="modal-body"][class*="svelte"]'
+      );
 
+      if (modalBody) {
+        modalBody.style.height = "100vh";
+        modalBody.style.maxHeight = "100vh";
+        modalBody.style.minHeight = "100vh";
+        modalBody.style.overflowY = "auto";
+        modalBody.style.display = "flex";
+        modalBody.style.flexDirection = "column";
+
+        clearInterval(interval);
+      }
+    }, 200);
+
+    return () => clearInterval(interval);
+  }
+}, [showCartUI]);
+
+const iframe = document.querySelector('iframe[src*="cashfree"]');
+if (iframe) {
+  iframe.style.height = "100vh";
+  iframe.style.maxHeight = "100vh";
+}
 
 
   return (
