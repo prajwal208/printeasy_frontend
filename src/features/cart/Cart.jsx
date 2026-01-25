@@ -253,13 +253,14 @@ const Cart = () => {
       <div
         id="cashfree-dropin"
         style={{
-          width: "100%",
-          // Use minHeight to ensure visibility, but allow it to grow
-          minHeight: showCartUI ? "0" : "100vh",
-          display: showCartUI ? "none" : "block", // 'block' is safer for flow than 'flex'
-          paddingBottom: "50px", // Extra space for the update/pay buttons
-          overflowY: "auto",
-          WebkitOverflowScrolling: "touch", // Better scrolling for mobile
+         width: "100%",
+          minHeight: showCartUI ? "0" : "500px",
+          height: showCartUI ? "0" : "auto",
+          display: showCartUI ? "none" : "flex",
+          justifyContent: "center",
+          overflowY: "scroll",
+          overflowX:"hidden",
+          order: -1
         }}
       />
 
