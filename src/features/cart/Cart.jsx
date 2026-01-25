@@ -271,11 +271,11 @@ const Cart = () => {
   }
 }, [showCartUI]);
 
-const iframe = document.querySelector('iframe[src*="cashfree"]');
-if (iframe) {
-  iframe.style.height = "100vh";
-  iframe.style.maxHeight = "100vh";
-}
+// const iframe = document.querySelector('iframe[src*="cashfree"]');
+// if (iframe) {
+//   iframe.style.height = "100vh";
+//   iframe.style.maxHeight = "100vh";
+// }
 
 
   return (
