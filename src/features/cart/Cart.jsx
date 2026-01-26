@@ -37,19 +37,29 @@ const Cart = () => {
   const getAddressList = async () => {
     try {
       const res = await api.get(`/v1/address/all`, {
-        headers: { "x-api-key": "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10" },
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
       });
       setAddressList(res?.data?.data || []);
-    } catch (error) { console.error(error); }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const getOfferData = async () => {
     try {
       const res = await api.get(`/v2/giftreward`, {
-        headers: { "x-api-key": "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10" },
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
       });
       setOfferData(res?.data?.data || []);
-    } catch (error) { console.error(error); }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleQuantityChange = async (id, newQuantity) => {
@@ -66,7 +76,11 @@ const Cart = () => {
     }
   };
 
-  const bagTotal = cartItems.reduce((sum, item) => sum + (Number(item.discountPrice) || 0) * (item.quantity || 1), 0);
+  const bagTotal = cartItems.reduce(
+    (sum, item) =>
+      sum + (Number(item.discountPrice) || 0) * (item.quantity || 1),
+    0,
+  );
   const grandTotal = bagTotal;
 
   const handlePayNow = async () => {
@@ -74,21 +88,29 @@ const Cart = () => {
 
     try {
       setCartLoader(true);
-      const orderRes = await api.post("/v1/orders/create", {
-        paymentMethod: "ONLINE",
-        totalAmount: grandTotal,
-        items: cartItems.map(item => ({
-          name: item.name,
-          sku: item.sku || item.productId,
-          totalPrice: item.totalPrice,
-          quantity: item.quantity,
-          categoryId: item.categoryId
-        })),
-      }, {
-        headers: { "x-api-key": "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10" },
-      });
+      const orderRes = await api.post(
+        "/v1/orders/create",
+        {
+          paymentMethod: "ONLINE",
+          totalAmount: grandTotal,
+          items: cartItems.map((item) => ({
+            name: item.name,
+            sku: item.sku || item.productId,
+            totalPrice: item.totalPrice,
+            quantity: item.quantity,
+            categoryId: item.categoryId,
+          })),
+        },
+        {
+          headers: {
+            "x-api-key":
+              "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+          },
+        },
+      );
 
-      const { sessionId: paymentSessionId, orderId: cashfreeOrderId } = orderRes.data.data.cashfree;
+      const { sessionId: paymentSessionId, orderId: cashfreeOrderId } =
+        orderRes.data.data.cashfree;
       const backendOrderId = orderRes.data.data.orderId;
 
       if (!paymentSessionId) throw new Error("No session ID");
@@ -99,25 +121,26 @@ const Cart = () => {
       setCartLoader(false);
 
       const cashfree = await load({ mode: "production" });
-      
+
       // Delay mounting slightly to let React finish unmounting the Cart UI
       setTimeout(() => {
         const dropinContainer = document.getElementById("cashfree-dropin");
         if (!dropinContainer) return;
 
-        cashfree.checkout({
-          paymentSessionId,
-          redirectTarget: dropinContainer,
-        }).then((result) => {
-          if (result.error) {
-            toast.error(result.error.message);
-            setShowCartUI(true);
-          } else if (result.paymentDetails) {
-            window.location.href = `/order-redirect?order_id=${cashfreeOrderId}&backend_order_id=${backendOrderId}`;
-          }
-        });
+        cashfree
+          .checkout({
+            paymentSessionId,
+            redirectTarget: dropinContainer,
+          })
+          .then((result) => {
+            if (result.error) {
+              toast.error(result.error.message);
+              setShowCartUI(true);
+            } else if (result.paymentDetails) {
+              window.location.href = `/order-redirect?order_id=${cashfreeOrderId}&backend_order_id=${backendOrderId}`;
+            }
+          });
       }, 400);
-
     } catch (error) {
       toast.error("Payment failed to start");
       setCartLoader(false);
@@ -126,7 +149,9 @@ const Cart = () => {
   };
 
   return (
-    <div className={`${styles.cartPage} ${!showCartUI ? styles.paymentActive : ""}`}>
+    <div
+      className={`${styles.cartPage} ${!showCartUI ? styles.paymentActive : ""}`}
+    >
       <ToastContainer position="top-right" autoClose={2000} />
 
       {showCartUI ? (
@@ -140,17 +165,30 @@ const Cart = () => {
               <div className={styles.cartItems}>
                 {cartItems.map((item) => (
                   <div key={item.id} className={styles.cartItem}>
-                    <div className={styles.itemImage}><img src={item.productImageUrl} alt={item.name} /></div>
+                    <div className={styles.itemImage}>
+                      <img src={item.productImageUrl} alt={item.name} />
+                    </div>
                     <div className={styles.itemDetails}>
                       <div className={styles.itemHeader}>
                         <h3 className={styles.itemName}>{item.name}</h3>
-                        <button onClick={() => removeFromCart(item.productId)} className={styles.removeBtn}><Trash2 size={20} /></button>
+                        <button
+                          onClick={() => removeFromCart(item.productId)}
+                          className={styles.removeBtn}
+                        >
+                          <Trash2 size={20} />
+                        </button>
                       </div>
-                      <div className={styles.itemMeta}><span>{item.options?.[0]?.value} | QTY {item.quantity}</span></div>
+                      <div className={styles.itemMeta}>
+                        <span>
+                          {item.options?.[0]?.value} | QTY {item.quantity}
+                        </span>
+                      </div>
                       <div className={styles.itemFooter}>
                         <button className={styles.wishlistBtn}>WISHLIST</button>
                         <div className={styles.itemPrice}>
-                          <span className={styles.strikeValue}>₹{item.basePrice}</span>
+                          <span className={styles.strikeValue}>
+                            ₹{item.basePrice}
+                          </span>
                           <span>₹{item.discountPrice}</span>
                         </div>
                       </div>
@@ -159,22 +197,41 @@ const Cart = () => {
                 ))}
               </div>
               <div className={styles.rightSection}>
-                <DefaultAddress addressList={addressList} onChange={() => router.push("/address")} />
-                <PriceList bagTotal={bagTotal} grandTotal={grandTotal} handlePayNow={handlePayNow} offerData={offerData} />
+                <DefaultAddress
+                  addressList={addressList}
+                  onChange={() => router.push("/address")}
+                />
+                <PriceList
+                  bagTotal={bagTotal}
+                  grandTotal={grandTotal}
+                  handlePayNow={handlePayNow}
+                  offerData={offerData}
+                />
               </div>
             </div>
-            <div className={styles.cartsuggestion}><CartSuggestion /></div>
+            <div className={styles.cartsuggestion}>
+              <CartSuggestion />
+            </div>
           </>
         ) : (
-          <NoResult title="Your Cart is Empty" onButtonClick={() => router.push("/")} />
+          <NoResult
+            title="Your Cart is Empty"
+            onButtonClick={() => router.push("/")}
+          />
         )
       ) : (
         /* This div replaces EVERYTHING else, ensuring a single layer */
-        <div id="cashfree-dropin" />
+        <div className={styles.paymentOverlay}>
+          {/* Optional: Add a small Close/Back button here if you want */}
+          <div id="cashfree-dropin" />
+        </div>
       )}
 
       {/* Persistent Modals */}
-      <DynamicModal open={isLoginModalVisible} onClose={() => setIsLoginModalVisible(false)}>
+      <DynamicModal
+        open={isLoginModalVisible}
+        onClose={() => setIsLoginModalVisible(false)}
+      >
         <LoginForm setIsLoginModalVisible={setIsLoginModalVisible} />
       </DynamicModal>
       <DynamicModal open={cartLoader} onClose={() => setCartLoader(false)}>
@@ -185,10 +242,6 @@ const Cart = () => {
 };
 
 export default Cart;
-
-
-
-
 
 // "use client";
 // import React, { useEffect, useState } from "react";
@@ -329,7 +382,7 @@ export default Cart;
 
 //   // ----------------- Cashfree EMBEDDED Integration -----------------
 //   const handlePayNow = async () => {
-    
+
 //     if (cartItems.length === 0) {
 //       toast.warning("Your cart is empty!");
 //       return;

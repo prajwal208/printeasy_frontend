@@ -1,3 +1,22 @@
+.paymentOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff;
+  z-index: 99999; // Above everything else
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+#cashfree-dropin {
+  width: 100%;
+  flex: 1;
+  border: none;
+}
+
 .cartPage {
   padding: 16px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
