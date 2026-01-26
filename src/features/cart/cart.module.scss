@@ -1,43 +1,27 @@
 
  
-// #cashfree-dropin {
-//   position: fixed;
-//   inset: 0;
-//   z-index: 999999;
-//   background: rgba(0, 0, 0, 0.6);
-
-//   display: none;
-//   overflow: hidden;
-// }
-
-// #cashfree-dropin.active {
-//   display: flex;
-//   justify-content: center !important;
-//   align-items: center !important;
-// }
-
-// #cashfree-dropin iframe {
-//   width: 100%;
-//   max-width: 420px;
-// }
-
-
 #cashfree-dropin {
-  padding: 40px 15px;
-  
-  /* Force the iframe to expand so it doesn't create its own scrollbar */
-  iframe {
-    width: 100% !important;
-    min-height: 800px !important; 
-    border: none !important;
-  }
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(0, 0, 0, 0.6);
+
+  display: none;
+  overflow: hidden;
 }
 
-/* Ensure the parent doesn't trap the height */
-body:has(#cashfree-dropin:not([style*="display: none"])) {
-  overflow-y: auto;
-  height: auto;
+#cashfree-dropin.active {
+  display: flex;
+  justify-content: center !important;
+  align-items: center !important;
 }
+
+#cashfree-dropin iframe {
+  width: 100%;
+  max-width: 420px;
+}
+
+
 
 
 

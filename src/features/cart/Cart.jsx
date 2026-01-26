@@ -251,31 +251,16 @@ const Cart = () => {
 
   return (
     <>
-  <div
-  id="cashfree-dropin"
-  style={{
-    display: showCartUI ? "none" : "flex",
-    width: "100%",
-    justifyContent:"center",   // This centers the block horizontally
-    minHeight: "100vh", // Ensures the page is long enough
-    overflow: "hidden" // Allows the main window to handle scrolling
-  }}
-/>
-
-{/* <div
+      <div
         id="cashfree-dropin"
         style={{
-         width: "100%",
-          // minHeight: showCartUI ? "0" : "900px",
+          width: "100%",
           height: showCartUI ? "0" : "auto",
           display: showCartUI ? "none" : "flex",
           justifyContent: "center",
-          overflow:"hidden",
-          order: -1
+          overflow: "hidden",
         }}
-      /> */}
-
-
+      />
 
       {showCartUI && (
         <div className={styles.cartPage}>
@@ -401,8 +386,3 @@ const Cart = () => {
 };
 
 export default Cart;
-
-
-
-
-

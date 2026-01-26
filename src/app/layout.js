@@ -64,7 +64,7 @@ export default function RootLayout({ children }) {
             <Navbar />
           </div>
           <main>{children}</main>
-          {/* <Footer /> */}
+          <Footer />
           <WhatsAppFloat />
         </CartProvider>
       </body>
