@@ -137,6 +137,7 @@ const Cart = () => {
 
   // ----------------- Cashfree EMBEDDED Integration -----------------
   const handlePayNow = async () => {
+    
     if (cartItems.length === 0) {
       toast.warning("Your cart is empty!");
       return;
@@ -195,6 +196,7 @@ const Cart = () => {
 
       const cashfree = await load({ mode: "production" });
 
+      setTimeout(() => {
       // EMBEDDED checkout with redirectTarget to specific div
       const checkoutOptions = {
         paymentSessionId: paymentSessionId,
@@ -218,6 +220,7 @@ const Cart = () => {
           console.log("SDK is redirecting...");
         }
       });
+    },1000)
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment");
@@ -249,37 +252,9 @@ const Cart = () => {
     }
   };
 
-
-
-
   return (
     <>
-      {/* <div
-        id="cashfree-dropin"
-        style={{
-          width: "100%",
-          height: showCartUI ? "0" : "auto",
-          display: showCartUI ? "none" : "flex",
-          justifyContent: "center",
-          overflow: "hidden",
-        }}
-      /> */}
-
-  
-  <div
-    id="cashfree-dropin"
-    style={{
-      height: showCartUI ? "0" : "auto",
-          display: showCartUI ? "none" : "flex",
-       // mobile-like
-      background: "#fff",
-      overflow: "hidden",
-    }}
-  />
-
-
-
-      {showCartUI && (
+      {showCartUI ? (
         <div className={styles.cartPage}>
           <ToastContainer position="top-right" autoClose={2000} />
           {cartItems?.length > 0 ? (
@@ -397,6 +372,17 @@ const Cart = () => {
             />
           )}
         </div>
+      ) : (
+        <div
+          id="cashfree-dropin"
+          style={{
+            width: "100%",
+            minHeight: "500px",
+            height: "auto",
+            justifyContent: "center",
+            overflow: "hidden",
+          }}
+        />
       )}
     </>
   );
