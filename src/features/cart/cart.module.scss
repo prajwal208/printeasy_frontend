@@ -1,45 +1,42 @@
-.paymentOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: #ffffff;
-  z-index: 99999; // Above everything else
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-}
 
-#cashfree-dropin {
-  width: 100%;
-  flex: 1;
-  border: none;
-}
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
 
 .cartPage {
   padding: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  min-height: 100vh;
-  background-color: #f9f9f9;
-  transition: all 0.2s ease-in-out;
-
-  /* This class removes the "double layer" look */
-  &.paymentActive {
-    padding: 0 !important;
-    margin: 0 !important;
-    background-color: #ffffff;
-  }
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   .iconBtn {
     background: transparent;
     border: none;
     padding: 0;
-    display: none;
+    display: flex;
     align-items: center;
     cursor: pointer;
-    margin-bottom: 1rem;
-    svg { stroke: #000; }
+    display: none;
+
+    svg {
+      stroke: #000;
+    }
   }
 }
 
@@ -56,12 +53,14 @@
   }
 }
 
+/* LEFT COLUMN */
 .cartItems {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+/* RIGHT COLUMN */
 .rightSection {
   display: flex;
   flex-direction: column;
@@ -70,6 +69,7 @@
   top: 100px;
 }
 
+/* Cart Item */
 .cartItem {
   background-color: white;
   border-radius: 8px;
@@ -93,9 +93,19 @@
   border-radius: 8px;
   overflow: hidden;
 
+  @media (max-width: 1024px) {
+    width: 160px;
+    height: 200px;
+  }
+
   @media (max-width: 700px) {
     width: 120px;
     height: 150px;
+  }
+
+  @media (max-width: 480px) {
+    width: 100px;
+    height: 130px;
   }
 
   img {
@@ -116,20 +126,31 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  margin-bottom: 10px;
 }
 
 .itemName {
   font-size: 18px;
   font-weight: 500;
-  margin: 0;
+  margin: 0 0 8px 0;
   color: #333;
+
+  @media (max-width: 480px) {
+    font-size: 15px;
+  }
 }
 
 .removeBtn {
   background: none;
   border: none;
   cursor: pointer;
+  padding: 4px;
   color: #999;
+  transition: color 0.3s;
+
+  &:hover {
+    color: #666;
+  }
 }
 
 .itemMeta {
@@ -137,24 +158,47 @@
   gap: 5px;
   font-size: 14px;
   color: #666;
+  margin-bottom: 10px;
+
+  @media (max-width: 480px) {
+    font-size: 12px;
+  }
+}
+
+.quantitySelector {
+  display: flex;
+  align-items: center;
+
+  select {
+    margin-left: 5px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+
+    &:focus {
+      outline: none;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 12px;
+    }
+  }
 }
 
 .itemFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
 
-.itemPrice {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.strikeValue {
-  color: #999;
-  text-decoration: line-through;
-  font-size: 14px;
-  margin-right: 5px;
+  .strikeValue {
+    color: #999;
+    font-size: 14px;
+    text-decoration: line-through;
+    opacity: 0.7;
+    margin-right: 4px;
+  }
 }
 
 .wishlistBtn {
@@ -163,286 +207,61 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: opacity 0.3s;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 12px;
+  }
+}
+
+.itemPrice {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+
+  @media (max-width: 480px) {
+    font-size: 16px;
+  }
 }
 
 .cartsuggestion {
   margin-top: 4rem;
 }
 
-/* This is where the SDK iframe lives */
-#cashfree-dropin {
-  width: 100%;
-  min-height: 100vh;
-}
+/* Checkout Button */
+.checkoutBtn {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s;
 
-@media screen and (max-width: 700px) {
-  .cartPage .iconBtn {
-    display: flex;
+  &:hover {
+    background-color: #005ad3;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+    padding: 10px;
   }
 }
 
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-// .cartPage {
-//   padding: 16px;
-//   font-family:
-//     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
-//   .iconBtn {
-//     background: transparent;
-//     border: none;
-//     padding: 0;
-//     display: flex;
-//     align-items: center;
-//     cursor: pointer;
-//     display: none;
-
-//     svg {
-//       stroke: #000;
-//     }
-//   }
-// }
-
-// .cartContainer {
-//   max-width: 1200px;
-//   margin: 0 auto;
-//   display: grid;
-//   grid-template-columns: 1fr;
-//   gap: 20px;
-
-//   @media (min-width: 992px) {
-//     grid-template-columns: 2fr 1fr;
-//     align-items: start;
-//   }
-// }
-
-// /* LEFT COLUMN */
-// .cartItems {
-//   display: flex;
-//   flex-direction: column;
-//   gap: 20px;
-// }
-
-// /* RIGHT COLUMN */
-// .rightSection {
-//   display: flex;
-//   flex-direction: column;
-//   gap: 20px;
-//   position: sticky;
-//   top: 100px;
-// }
-
-// /* Cart Item */
-// .cartItem {
-//   background-color: white;
-//   border-radius: 8px;
-//   padding: 20px;
-//   display: flex;
-//   gap: 20px;
-//   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-//   position: relative;
-
-//   @media (max-width: 700px) {
-//     gap: 10px;
-//     padding: 12px;
-//   }
-// }
-
-// .itemImage {
-//   width: 200px;
-//   height: 250px;
-//   flex-shrink: 0;
-//   background-color: #f0f0f0;
-//   border-radius: 8px;
-//   overflow: hidden;
-
-//   @media (max-width: 1024px) {
-//     width: 160px;
-//     height: 200px;
-//   }
-
-//   @media (max-width: 700px) {
-//     width: 120px;
-//     height: 150px;
-//   }
-
-//   @media (max-width: 480px) {
-//     width: 100px;
-//     height: 130px;
-//   }
-
-//   img {
-//     width: 100%;
-//     height: 100%;
-//     object-fit: cover;
-//   }
-// }
-
-// .itemDetails {
-//   flex: 1;
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: space-between;
-// }
-
-// .itemHeader {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: flex-start;
-//   margin-bottom: 10px;
-// }
-
-// .itemName {
-//   font-size: 18px;
-//   font-weight: 500;
-//   margin: 0 0 8px 0;
-//   color: #333;
-
-//   @media (max-width: 480px) {
-//     font-size: 15px;
-//   }
-// }
-
-// .removeBtn {
-//   background: none;
-//   border: none;
-//   cursor: pointer;
-//   padding: 4px;
-//   color: #999;
-//   transition: color 0.3s;
-
-//   &:hover {
-//     color: #666;
-//   }
-// }
-
-// .itemMeta {
-//   display: flex;
-//   gap: 5px;
-//   font-size: 14px;
-//   color: #666;
-//   margin-bottom: 10px;
-
-//   @media (max-width: 480px) {
-//     font-size: 12px;
-//   }
-// }
-
-// .quantitySelector {
-//   display: flex;
-//   align-items: center;
-
-//   select {
-//     margin-left: 5px;
-//     border: none;
-//     background: none;
-//     cursor: pointer;
-//     font-size: 14px;
-//     color: #666;
-
-//     &:focus {
-//       outline: none;
-//     }
-
-//     @media (max-width: 480px) {
-//       font-size: 12px;
-//     }
-//   }
-// }
-
-// .itemFooter {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-
-//   .strikeValue {
-//     color: #999;
-//     font-size: 14px;
-//     text-decoration: line-through;
-//     opacity: 0.7;
-//     margin-right: 4px;
-//   }
-// }
-
-// .wishlistBtn {
-//   background: none;
-//   border: none;
-//   font-size: 14px;
-//   font-weight: 500;
-//   cursor: pointer;
-//   text-transform: uppercase;
-//   letter-spacing: 0.5px;
-//   transition: opacity 0.3s;
-
-//   &:hover {
-//     opacity: 0.7;
-//   }
-
-//   @media (max-width: 480px) {
-//     font-size: 12px;
-//   }
-// }
-
-// .itemPrice {
-//   font-size: 18px;
-//   font-weight: 600;
-//   color: #333;
-
-//   @media (max-width: 480px) {
-//     font-size: 16px;
-//   }
-// }
-
-// .cartsuggestion {
-//   margin-top: 4rem;
-// }
-
-// /* Checkout Button */
-// .checkoutBtn {
-//   background-color: #0070f3;
-//   color: white;
-//   border: none;
-//   border-radius: 8px;
-//   padding: 12px;
-//   font-size: 16px;
-//   font-weight: 500;
-//   cursor: pointer;
-//   transition: background 0.3s;
-
-//   &:hover {
-//     background-color: #005ad3;
-//   }
-
-//   @media (max-width: 480px) {
-//     font-size: 14px;
-//     padding: 10px;
-//   }
-// }
-
-// @media screen and (max-width: 700px) {
-//   .cartPage {
-//     .iconBtn {
-//       display: flex;
-//     }
-//   }
-// }
+@media screen and (max-width: 700px) {
+  .cartPage {
+    .iconBtn {
+      display: flex;
+    }
+  }
+}
 
 
