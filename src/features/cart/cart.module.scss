@@ -1,36 +1,348 @@
 
  
-#cashfree-dropin {
+// #cashfree-dropin {
+//   position: fixed;
+//   inset: 0;
+//   z-index: 999999;
+//   background: rgba(0, 0, 0, 0.6);
+
+//   display: none;
+//   overflow: hidden;
+// }
+
+// #cashfree-dropin.active {
+//   display: flex;
+//   justify-content: center !important;
+//   align-items: center !important;
+// }
+
+// #cashfree-dropin iframe {
+//   width: 100%;
+//   max-width: 420px;
+// }
+
+
+
+
+
+
+
+// .cartPage {
+//   padding: 16px;
+//   font-family:
+//     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+//   .iconBtn {
+//     background: transparent;
+//     border: none;
+//     padding: 0;
+//     display: flex;
+//     align-items: center;
+//     cursor: pointer;
+//     display: none;
+
+//     svg {
+//       stroke: #000;
+//     }
+//   }
+// }
+
+// .cartContainer {
+//   max-width: 1200px;
+//   margin: 0 auto;
+//   display: grid;
+//   grid-template-columns: 1fr;
+//   gap: 20px;
+
+//   @media (min-width: 992px) {
+//     grid-template-columns: 2fr 1fr;
+//     align-items: start;
+//   }
+// }
+
+// /* LEFT COLUMN */
+// .cartItems {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 20px;
+// }
+
+// /* RIGHT COLUMN */
+// .rightSection {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 20px;
+//   position: sticky;
+//   top: 100px;
+// }
+
+// /* Cart Item */
+// .cartItem {
+//   background-color: white;
+//   border-radius: 8px;
+//   padding: 20px;
+//   display: flex;
+//   gap: 20px;
+//   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+//   position: relative;
+
+//   @media (max-width: 700px) {
+//     gap: 10px;
+//     padding: 12px;
+//   }
+// }
+
+// .itemImage {
+//   width: 200px;
+//   height: 250px;
+//   flex-shrink: 0;
+//   background-color: #f0f0f0;
+//   border-radius: 8px;
+//   overflow: hidden;
+
+//   @media (max-width: 1024px) {
+//     width: 160px;
+//     height: 200px;
+//   }
+
+//   @media (max-width: 700px) {
+//     width: 120px;
+//     height: 150px;
+//   }
+
+//   @media (max-width: 480px) {
+//     width: 100px;
+//     height: 130px;
+//   }
+
+//   img {
+//     width: 100%;
+//     height: 100%;
+//     object-fit: cover;
+//   }
+// }
+
+// .itemDetails {
+//   flex: 1;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: space-between;
+// }
+
+// .itemHeader {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: flex-start;
+//   margin-bottom: 10px;
+// }
+
+// .itemName {
+//   font-size: 18px;
+//   font-weight: 500;
+//   margin: 0 0 8px 0;
+//   color: #333;
+
+//   @media (max-width: 480px) {
+//     font-size: 15px;
+//   }
+// }
+
+// .removeBtn {
+//   background: none;
+//   border: none;
+//   cursor: pointer;
+//   padding: 4px;
+//   color: #999;
+//   transition: color 0.3s;
+
+//   &:hover {
+//     color: #666;
+//   }
+// }
+
+// .itemMeta {
+//   display: flex;
+//   gap: 5px;
+//   font-size: 14px;
+//   color: #666;
+//   margin-bottom: 10px;
+
+//   @media (max-width: 480px) {
+//     font-size: 12px;
+//   }
+// }
+
+// .quantitySelector {
+//   display: flex;
+//   align-items: center;
+
+//   select {
+//     margin-left: 5px;
+//     border: none;
+//     background: none;
+//     cursor: pointer;
+//     font-size: 14px;
+//     color: #666;
+
+//     &:focus {
+//       outline: none;
+//     }
+
+//     @media (max-width: 480px) {
+//       font-size: 12px;
+//     }
+//   }
+// }
+
+// .itemFooter {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+
+//   .strikeValue {
+//     color: #999;
+//     font-size: 14px;
+//     text-decoration: line-through;
+//     opacity: 0.7;
+//     margin-right: 4px;
+//   }
+// }
+
+// .wishlistBtn {
+//   background: none;
+//   border: none;
+//   font-size: 14px;
+//   font-weight: 500;
+//   cursor: pointer;
+//   text-transform: uppercase;
+//   letter-spacing: 0.5px;
+//   transition: opacity 0.3s;
+
+//   &:hover {
+//     opacity: 0.7;
+//   }
+
+//   @media (max-width: 480px) {
+//     font-size: 12px;
+//   }
+// }
+
+// .itemPrice {
+//   font-size: 18px;
+//   font-weight: 600;
+//   color: #333;
+
+//   @media (max-width: 480px) {
+//     font-size: 16px;
+//   }
+// }
+
+// .cartsuggestion {
+//   margin-top: 4rem;
+// }
+
+// /* Checkout Button */
+// .checkoutBtn {
+//   background-color: #0070f3;
+//   color: white;
+//   border: none;
+//   border-radius: 8px;
+//   padding: 12px;
+//   font-size: 16px;
+//   font-weight: 500;
+//   cursor: pointer;
+//   transition: background 0.3s;
+
+//   &:hover {
+//     background-color: #005ad3;
+//   }
+
+//   @media (max-width: 480px) {
+//     font-size: 14px;
+//     padding: 10px;
+//   }
+// }
+
+// @media screen and (max-width: 700px) {
+//   .cartPage {
+//     .iconBtn {
+//       display: flex;
+//     }
+//   }
+// }
+
+
+
+
+.paymentContainer {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 500px;
+  padding: 15px;
+  background: #fff;
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    padding: 10px;
+    min-height: 600px;
+  }
+}
+
+.cashfreeContainer {
   position: fixed;
   inset: 0;
-  z-index: 999999;
+  z-index: 9999;
   background: rgba(0, 0, 0, 0.6);
-
   display: none;
-  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  
+  &.active {
+    display: flex;
+  }
 }
 
-#cashfree-dropin.active {
+.backToCartBtn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10000;
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
   display: flex;
-  justify-content: center !important;
-  align-items: center !important;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  &:hover {
+    background: #f5f5f5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  @media (max-width: 480px) {
+    top: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
 }
-
-#cashfree-dropin iframe {
-  width: 100%;
-  max-width: 420px;
-}
-
-
-
-
-
-
 
 .cartPage {
+  min-height: 100vh;
+  background-color: #f8f8f8;
   padding: 16px;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   .iconBtn {
     background: transparent;
@@ -235,10 +547,6 @@
   @media (max-width: 480px) {
     font-size: 16px;
   }
-}
-
-.cartsuggestion {
-  margin-top: 4rem;
 }
 
 /* Checkout Button */
