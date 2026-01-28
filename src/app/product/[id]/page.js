@@ -24,6 +24,7 @@ import AddToBagLoader from "@/component/AddToBagLoader/AddToBagLoader";
 import { createSlug } from "@/app/helper";
 import ProductSchema from "@/component/seo/ProductSchema";
 import ProductPixel from "@/component/seo/ProductPixel";
+import YouMayLikeSection from "@/component/YouMayLikeSection/YouMayLikeSection";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -55,6 +56,7 @@ const ProductDetails = () => {
   const [pendingAction, setPendingAction] = useState(null);
   const [editorReady, setEditorReady] = useState(false);
   const [selectedSizeYear, setSelectedSizeYear] = useState("");
+  const [collectionId,setCollectionId] = useState("")
 
   useEffect(() => {
     if (product) {
@@ -278,6 +280,7 @@ const ProductDetails = () => {
         setIsCustomizable(!!data?.isCustomizable);
         setRelatedId(data?.id);
         setIsWishlisted(data?.isInWishlist);
+        setCollectionId(data?.collectionIds[0])
       } catch (error) {
         toast.error("Failed to fetch product.");
       } finally {
@@ -690,8 +693,13 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          <section style={{ width: "100%", overflowX: "auto" }}>
-            <Suggested relatedData={relatedData} />
+          <section style={{ width: "100%", overflowX: "auto",marginTop:"16px" }}>
+                  {
+                    collectionId ? 
+                    <YouMayLikeSection categoryId={collectionId}/>
+                    : 
+              <Suggested relatedData={relatedData} />
+                  }
           </section>
         </>
       )}
