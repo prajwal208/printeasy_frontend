@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@cashfreepayments/cashfree-js": "^1.0.5",
+    "@lottiefiles/dotlottie-react": "^0.17.13",
     "antd": "^5.27.6",
     "axios": "^1.13.1",
     "dexie": "^4.2.1",

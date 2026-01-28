@@ -80,11 +80,11 @@
 /* 👇 Overlay image */
 .overlayLoader {
   position: absolute;
-  width: 120px;
-  height: 120px;
+  width: 100%;
+  height: 100%;
 
   /* anchor near end of text */
-  right: -40px;        // tweak as needed
+  right: -60px;        // tweak as needed
   top: 50%;
   transform: translateY(-50%);
 

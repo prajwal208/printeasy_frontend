@@ -17,6 +17,7 @@ import letterIcon from "../../assessts/letter1.svg";
 import familyIcon from "../../assessts/family.svg";
 import keyboardIcon from "../../assessts/keyboard.svg";
 import lineIcon from "../../assessts/Line.svg";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const ShirtEditor = forwardRef(
   (
@@ -394,13 +395,14 @@ const ShirtEditor = forwardRef(
   
 
   {!hasUserInteracted && (
-    <Image
-      src={loader.src}
-      alt="tap to type"
-      width={120}
-      height={120}
-      className={styles.overlayLoader}
-    />
+    // <Image
+    //   src={loader.src}
+    //   alt="tap to type"
+    //   width={120}
+    //   height={120}
+    //   className={styles.overlayLoader}
+    // />
+    <DotLottieReact src="https://lottie.host/62e86d1a-c1c4-4325-836b-2bf856f7c628/VjcOjevAOa.lottie" loop autoplay  className={styles.overlayLoader}/>
   )}
 </div>
 
