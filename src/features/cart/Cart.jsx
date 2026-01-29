@@ -399,6 +399,7 @@
 
 "use client";
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Trash2, ChevronLeft } from "lucide-react";
 import styles from "./cart.module.scss";
 import NoResult from "@/component/NoResult/NoResult";
@@ -679,23 +680,26 @@ const Cart = () => {
     }
   };
 
+  // Portal: render Cashfree overlay at document.body (same URL, no layout/scroll conflict)
+  const paymentOverlayContent = (
+    <div id="cashfree-portal-root" className={styles.cashfreeOverlay}>
+      <button
+        type="button"
+        className={styles.cashfreeBackBtn}
+        onClick={() => setIsPaymentMode(false)}
+        aria-label="Back to cart"
+      >
+        <ChevronLeft size={24} />
+      </button>
+      <div id="cashfree-dropin" className={styles.cashfreeDropin} />
+    </div>
+  );
+
   return (
     <>
-      {/* Full-screen payment container - single scroll (no double scroll) */}
-      <div
-        className={styles.cashfreeOverlay}
-        style={{ display: isPaymentMode ? "block" : "none" }}
-      >
-        <button
-          type="button"
-          className={styles.cashfreeBackBtn}
-          onClick={() => setIsPaymentMode(false)}
-          aria-label="Back to cart"
-        >
-          <ChevronLeft size={24} />
-        </button>
-        <div id="cashfree-dropin" className={styles.cashfreeDropin} />
-      </div>
+      {/* Cashfree overlay via portal to body - same URL, full height, single scroll */}
+      {typeof document !== "undefined" &&
+        createPortal(isPaymentMode ? paymentOverlayContent : null, document.body)}
 
       {/* Cart UI - Only shown when not in payment mode */}
       {!isPaymentMode && (
