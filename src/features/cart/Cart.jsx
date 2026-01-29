@@ -398,8 +398,7 @@
 
 
 "use client";
-import React, { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import React, { useEffect, useState, useRef } from "react";
 import { Trash2, ChevronLeft } from "lucide-react";
 import styles from "./cart.module.scss";
 import NoResult from "@/component/NoResult/NoResult";
@@ -412,7 +411,6 @@ import "react-toastify/dist/ReactToastify.css";
 import api from "@/axiosInstance/axiosInstance";
 import { db } from "@/lib/db";
 import Cookies from "js-cookie";
-import { load } from "@cashfreepayments/cashfree-js";
 import DynamicModal from "@/component/Modal/Modal";
 import LoginForm from "../signup/LogIn/LoginForm";
 import AddToBagLoader from "@/component/AddToBagLoader/AddToBagLoader";
@@ -430,6 +428,8 @@ const Cart = () => {
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [cartLoader, setCartLoader] = useState(false);
   const [isPaymentMode, setIsPaymentMode] = useState(false);
+  const [paymentSession, setPaymentSession] = useState(null);
+  const cashfreeInitialized = useRef(false);
 
   const handleContinue = () => {
     setIsLoginModalVisible(false);
@@ -442,7 +442,7 @@ const Cart = () => {
     getOfferData();
   }, []);
 
-  // Full-height single scroll (like Cashfree demo): lock html/body when payment is open
+  // Lock body scroll when payment overlay is open (single scroll inside Cashfree iframe)
   useEffect(() => {
     if (isPaymentMode) {
       document.documentElement.style.overflow = "hidden";
@@ -454,6 +454,7 @@ const Cart = () => {
       document.documentElement.style.height = "";
       document.body.style.overflow = "";
       document.body.style.height = "";
+      cashfreeInitialized.current = false;
     }
     return () => {
       document.documentElement.style.overflow = "";
@@ -462,6 +463,64 @@ const Cart = () => {
       document.body.style.height = "";
     };
   }, [isPaymentMode]);
+
+  // Cashfree embedded checkout (per docs: same domain via redirectTarget + returnUrl)
+  useEffect(() => {
+    if (!isPaymentMode || !paymentSession || cashfreeInitialized.current) return;
+
+    let cancelled = false;
+    cashfreeInitialized.current = true;
+
+    const initCashfree = async () => {
+      try {
+        const container = document.getElementById("cashfree-dropin");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const { load } = await import("@cashfreepayments/cashfree-js");
+        const cashfree = await load({ mode: "production" });
+
+        if (cancelled) return;
+
+        const returnUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/order-redirect?order_id=${paymentSession.cashfreeOrderId}&backend_order_id=${paymentSession.backendOrderId}`;
+
+        const checkoutOptions = {
+          paymentSessionId: paymentSession.sessionId,
+          redirectTarget: container,
+          returnUrl,
+        };
+
+        cashfree.checkout(checkoutOptions).then((result) => {
+          if (cancelled) return;
+          if (result.error) {
+            toast.error(result.error.message || "Payment failed");
+            setIsPaymentMode(false);
+            setPaymentSession(null);
+            return;
+          }
+          if (result.paymentDetails) {
+            window.location.href = `/order-redirect?order_id=${paymentSession.cashfreeOrderId}&backend_order_id=${paymentSession.backendOrderId}`;
+          }
+          if (result.redirect) {
+            // User may be redirected within iframe; returnUrl keeps same domain
+          }
+        });
+      } catch (err) {
+        if (!cancelled) {
+          console.error("Cashfree init error:", err);
+          toast.error("Failed to load payment");
+          setIsPaymentMode(false);
+          setPaymentSession(null);
+        }
+      }
+    };
+
+    const t = setTimeout(initCashfree, 150);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [isPaymentMode, paymentSession]);
 
   const handleQuantityChange = async (id, newQuantity) => {
     if (newQuantity < 1) return;
@@ -556,7 +615,7 @@ const Cart = () => {
       }
     : null;
 
-  // ----------------- Cashfree EMBEDDED Integration -----------------
+  // ----------------- Cashfree embedded (docs: inline checkout, same domain) -----------------
   const handlePayNow = async () => {
     if (cartItems.length === 0) {
       toast.warning("Your cart is empty!");
@@ -566,13 +625,10 @@ const Cart = () => {
     try {
       setCartLoader(true);
       window.scrollTo(0, 0);
-      const finalItems = orderPayloadItems.map((item) => {
-        if (!item.isCustomizable) return item;
 
-        return {
-          ...item,
-        };
-      });
+      const finalItems = orderPayloadItems.map((item) => ({
+        ...item,
+      }));
 
       const orderRes = await api.post(
         "/v1/orders/create",
@@ -590,71 +646,35 @@ const Cart = () => {
       );
 
       const orderData = orderRes?.data?.data;
-      const paymentSessionId = orderData?.cashfree?.sessionId;
+      const sessionId = orderData?.cashfree?.sessionId;
       const cashfreeOrderId = orderData?.cashfree?.orderId;
       const backendOrderId = orderData?.orderId;
 
-      if (!paymentSessionId) {
+      if (!sessionId) {
         toast.error("Payment session not generated");
         setCartLoader(false);
         return;
       }
 
-      // Store order data in localStorage for redirect page
       localStorage.setItem("pendingOrderId", backendOrderId);
       localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
       localStorage.setItem("pendingOrderAmount", grandTotal.toString());
 
-      console.log("Initiating Cashfree EMBEDDED payment:", {
-        backendOrderId,
-        cashfreeOrderId,
-        paymentSessionId,
-      });
-
-      // Switch to payment mode
+      setPaymentSession({ sessionId, cashfreeOrderId, backendOrderId });
       setIsPaymentMode(true);
       setCartLoader(false);
-
-      // Clear any existing content in the container
-      const container = document.getElementById("cashfree-dropin");
-      if (container) {
-        container.innerHTML = "";
-      }
-
-      // Add a small delay to ensure DOM is ready
-      setTimeout(async () => {
-        const cashfree = await load({ mode: "production" });
-
-        // EMBEDDED checkout with redirectTarget to specific div
-        const checkoutOptions = {
-          paymentSessionId: paymentSessionId,
-          redirectTarget: document.getElementById("cashfree-dropin"),
-        };
-
-        cashfree.checkout(checkoutOptions).then((result) => {
-          console.log("Cashfree SDK result:", result);
-
-          if (result.error) {
-            console.error("SDK Error:", result.error);
-            toast.error(result.error.message || "Payment failed");
-            setIsPaymentMode(false);
-            return;
-          }
-          if (result.paymentDetails) {
-            console.log("Payment completed, details:", result.paymentDetails);
-            window.location.href = `/order-redirect?order_id=${cashfreeOrderId}&backend_order_id=${backendOrderId}`;
-          }
-          if (result.redirect) {
-            console.log("SDK is redirecting...");
-          }
-        });
-      }, 100);
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment");
       setCartLoader(false);
-      setIsPaymentMode(false);
     }
+  };
+
+  const handleClosePayment = () => {
+    setIsPaymentMode(false);
+    setPaymentSession(null);
+    const el = document.getElementById("cashfree-dropin");
+    if (el) el.innerHTML = "";
   };
 
   const addToWishlist = async (productId) => {
@@ -680,28 +700,24 @@ const Cart = () => {
     }
   };
 
-  // Portal: render Cashfree overlay at document.body (same URL, no layout/scroll conflict)
-  const paymentOverlayContent = (
-    <div id="cashfree-portal-root" className={styles.cashfreeOverlay}>
-      <button
-        type="button"
-        className={styles.cashfreeBackBtn}
-        onClick={() => setIsPaymentMode(false)}
-        aria-label="Back to cart"
-      >
-        <ChevronLeft size={24} />
-      </button>
-      <div id="cashfree-dropin" className={styles.cashfreeDropin} />
-    </div>
-  );
-
   return (
     <>
-      {/* Cashfree overlay via portal to body - same URL, full height, single scroll */}
-      {typeof document !== "undefined" &&
-        createPortal(isPaymentMode ? paymentOverlayContent : null, document.body)}
+      {/* Cashfree embedded overlay - same domain, full viewport, single scroll (per docs) */}
+      {isPaymentMode && (
+        <div className={styles.cashfreeOverlay} role="dialog" aria-modal="true">
+          <button
+            type="button"
+            className={styles.cashfreeBackBtn}
+            onClick={handleClosePayment}
+            aria-label="Back to cart"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <div id="cashfree-dropin" className={styles.cashfreeDropin} />
+        </div>
+      )}
 
-      {/* Cart UI - Only shown when not in payment mode */}
+      {/* Cart UI */}
       {!isPaymentMode && (
         <div className={styles.cartPage}>
           <ToastContainer position="top-right" autoClose={2000} />
