@@ -441,18 +441,24 @@ const Cart = () => {
     getOfferData();
   }, []);
 
-  // Single scroll: lock body when payment overlay is open so only Cashfree content scrolls
+  // Full-height single scroll (like Cashfree demo): lock html/body when payment is open
   useEffect(() => {
     if (isPaymentMode) {
-      document.body.style.overflow = "hidden";
       document.documentElement.style.overflow = "hidden";
+      document.documentElement.style.height = "100%";
+      document.body.style.overflow = "hidden";
+      document.body.style.height = "100%";
     } else {
-      document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
+      document.documentElement.style.height = "";
+      document.body.style.overflow = "";
+      document.body.style.height = "";
     }
     return () => {
-      document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
+      document.documentElement.style.height = "";
+      document.body.style.overflow = "";
+      document.body.style.height = "";
     };
   }, [isPaymentMode]);
 

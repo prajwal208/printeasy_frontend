@@ -10,11 +10,22 @@ body {
   width: 100%;
 }
 
-/* Cashfree embedded - single scroll: only iframe content scrolls, no double scroll */
+/* Cashfree embedded - full height, single scroll (like one-click-checkout-demo) */
 #cashfree-dropin,
+.cashfreeDropin {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
 #cashfree-dropin > div,
-.cashfreeDropin,
 .cashfreeDropin > div {
+  width: 100% !important;
   height: 100% !important;
   min-height: 100% !important;
   overflow: hidden !important;
@@ -23,6 +34,9 @@ body {
 #cashfree-dropin iframe,
 .cashfreeDropin iframe,
 [id*="cashfree"] iframe {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
   width: 100% !important;
   height: 100% !important;
   min-height: 100vh !important;
