@@ -70,7 +70,7 @@ const ProductDetails = () => {
   console.log(sizeInfo, "sosospopopo");
 
   const handleSizeSelect = (size) => {
-    setSelectedSize(size);
+    setSelectedSizeYear(size);
 
     const match = product?.configuration?.[0]?.options.find(
       (item) => item.value === size,
@@ -79,7 +79,7 @@ const ProductDetails = () => {
     setSizeInfo(match || null);
 
     if (match) {
-      setSelectedSizeYear(match.value); // still keep for UI
+      setSelectedSizeYear(match.value);
     }
 
     setShowSizeSheet(false);
@@ -159,7 +159,7 @@ const ProductDetails = () => {
         height: product.dimension?.height || 0,
         weight: product.dimension?.weight || 0,
       },
-      options: sizeInfo,
+      options: selectedSizeYear || sizeInfo,
       addedAt: new Date().toISOString(),
       presetText: text,
       textColor: selectedColor,
@@ -596,7 +596,7 @@ const ProductDetails = () => {
                         key={s.value}
                         onClick={() => handleSizeSelect(s.value)}
                         className={`${styles.sizeBtn} ${
-                          selectedSize === s.value ? styles.activeSize : ""
+                          selectedSizeYear === s.value ? styles.activeSize : ""
                         }`}
                       >
                         {s.label}

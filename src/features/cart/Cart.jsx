@@ -31,6 +31,8 @@ const Cart = () => {
   const [cartLoader, setCartLoader] = useState(false);
   const [showCartUI, setShowCartUI] = useState(true);
 
+  console.log(cartItems,"shssjsuuyyy")
+
   const handleContinue = () => {
     setIsLoginModalVisible(false);
     setIsLoggedIn(true);
