@@ -138,95 +138,135 @@ const Cart = () => {
     : null;
 
   // ----------------- Cashfree EMBEDDED Integration -----------------
+  // const handlePayNow = async () => {
+  //   if (cartItems.length === 0) {
+  //     toast.warning("Your cart is empty!");
+  //     return;
+  //   }
+
+  //   try {
+  //     window.scrollTo(0, 0);
+  //     const finalItems = orderPayloadItems.map((item) => {
+  //       if (!item.isCustomizable) return item;
+
+  //       return {
+  //         ...item,
+  //       };
+  //     });
+
+  //     const orderRes = await api.post(
+  //       "/v1/orders/create",
+  //       {
+  //         paymentMethod: "ONLINE",
+  //         totalAmount: grandTotal,
+  //         items: finalItems,
+  //       },
+  //       {
+  //         headers: {
+  //           "x-api-key":
+  //             "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+  //         },
+  //       },
+  //     );
+
+  //     const orderData = orderRes?.data?.data;
+  //     const paymentSessionId = orderData?.cashfree?.sessionId;
+  //     const cashfreeOrderId = orderData?.cashfree?.orderId;
+  //     const backendOrderId = orderData?.orderId;
+
+  //     if (!paymentSessionId) {
+  //       toast.error("Payment session not generated");
+  //       setCartLoader(false);
+  //       return;
+  //     }
+
+  //     // Store order data in localStorage for redirect page
+  //     localStorage.setItem("pendingOrderId", backendOrderId);
+  //     localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
+  //     localStorage.setItem("pendingOrderAmount", grandTotal.toString());
+
+  //     console.log("Initiating Cashfree EMBEDDED payment:", {
+  //       backendOrderId,
+  //       cashfreeOrderId,
+  //       paymentSessionId,
+  //     });
+
+  //     // Hide cart UI and show embedded checkout
+  //     setShowCartUI(false);
+  //     setCartLoader(false);
+
+  //     const cashfree = await load({ mode: "production" });
+
+  //     // EMBEDDED checkout with redirectTarget to specific div
+  //     const checkoutOptions = {
+  //       paymentSessionId: paymentSessionId,
+  //       redirectTarget: document.getElementById("cashfree-dropin"),
+  //     };
+
+  //     cashfree.checkout(checkoutOptions).then((result) => {
+  //       console.log("Cashfree SDK result:", result);
+
+  //       if (result.error) {
+  //         console.error("SDK Error:", result.error);
+  //         toast.error(result.error.message || "Payment failed");
+  //         setShowCartUI(true);
+  //         return;
+  //       }
+  //       if (result.paymentDetails) {
+  //         console.log("Payment completed, details:", result.paymentDetails);
+  //         window.location.href = `/order-redirect?order_id=${cashfreeOrderId}&backend_order_id=${backendOrderId}`;
+  //       }
+  //       if (result.redirect) {
+  //         console.log("SDK is redirecting...");
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.error("Payment error:", error);
+  //     toast.error("Failed to initiate payment");
+  //     setCartLoader(false);
+  //     setShowCartUI(true);
+  //   }
+  // };
+
   const handlePayNow = async () => {
-    if (cartItems.length === 0) {
-      toast.warning("Your cart is empty!");
+  if (cartItems.length === 0) {
+    toast.warning("Your cart is empty!");
+    return;
+  }
+
+  try {
+    const orderRes = await api.post(
+      "/v1/orders/create",
+      {
+        paymentMethod: "ONLINE",
+        totalAmount: grandTotal,
+        items: orderPayloadItems,
+      },
+      {
+        headers: {
+          "x-api-key": "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      }
+    );
+
+    const orderData = orderRes?.data?.data;
+    const paymentSessionId = orderData?.cashfree?.sessionId;
+    const cashfreeOrderId = orderData?.cashfree?.orderId;
+
+    if (!paymentSessionId) {
+      toast.error("Payment session not generated");
       return;
     }
 
-    try {
-      window.scrollTo(0, 0);
-      const finalItems = orderPayloadItems.map((item) => {
-        if (!item.isCustomizable) return item;
+    // Navigate ONLY
+    router.push(
+      `/checkout/payment?sessionId=${paymentSessionId}&orderId=${cashfreeOrderId}`
+    );
+  } catch (err) {
+    toast.error("Failed to initiate payment");
+  }
+};
 
-        return {
-          ...item,
-        };
-      });
-
-      const orderRes = await api.post(
-        "/v1/orders/create",
-        {
-          paymentMethod: "ONLINE",
-          totalAmount: grandTotal,
-          items: finalItems,
-        },
-        {
-          headers: {
-            "x-api-key":
-              "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-          },
-        },
-      );
-
-      const orderData = orderRes?.data?.data;
-      const paymentSessionId = orderData?.cashfree?.sessionId;
-      const cashfreeOrderId = orderData?.cashfree?.orderId;
-      const backendOrderId = orderData?.orderId;
-
-      if (!paymentSessionId) {
-        toast.error("Payment session not generated");
-        setCartLoader(false);
-        return;
-      }
-
-      // Store order data in localStorage for redirect page
-      localStorage.setItem("pendingOrderId", backendOrderId);
-      localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
-      localStorage.setItem("pendingOrderAmount", grandTotal.toString());
-
-      console.log("Initiating Cashfree EMBEDDED payment:", {
-        backendOrderId,
-        cashfreeOrderId,
-        paymentSessionId,
-      });
-
-      // Hide cart UI and show embedded checkout
-      setShowCartUI(false);
-      setCartLoader(false);
-
-      const cashfree = await load({ mode: "production" });
-
-      // EMBEDDED checkout with redirectTarget to specific div
-      const checkoutOptions = {
-        paymentSessionId: paymentSessionId,
-        redirectTarget: document.getElementById("cashfree-dropin"),
-      };
-
-      cashfree.checkout(checkoutOptions).then((result) => {
-        console.log("Cashfree SDK result:", result);
-
-        if (result.error) {
-          console.error("SDK Error:", result.error);
-          toast.error(result.error.message || "Payment failed");
-          setShowCartUI(true);
-          return;
-        }
-        if (result.paymentDetails) {
-          console.log("Payment completed, details:", result.paymentDetails);
-          window.location.href = `/order-redirect?order_id=${cashfreeOrderId}&backend_order_id=${backendOrderId}`;
-        }
-        if (result.redirect) {
-          console.log("SDK is redirecting...");
-        }
-      });
-    } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Failed to initiate payment");
-      setCartLoader(false);
-      setShowCartUI(true);
-    }
-  };
 
   const addToWishlist = async (productId) => {
     if (!accessToken) {
@@ -254,7 +294,7 @@ const Cart = () => {
   return (
     <>
      
-
+{/* 
       <div
         id="cashfree-dropin"
         style={{
@@ -264,7 +304,7 @@ const Cart = () => {
           justifyContent: "center",
           overflow:"hidden",
         }}
-      />
+      /> */}
 
       {showCartUI && (
         <div className={styles.cartPage}>

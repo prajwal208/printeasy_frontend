@@ -1,3 +1,4 @@
+
 import { Poppins, Montserrat, Raleway, Rubik, Nunito } from "next/font/google";
 import Script from "next/script";
 import Footer from "@/features/footer/Footer";
@@ -5,6 +6,7 @@ import Navbar from "@/features/Main/Navbar/Navbar";
 import { CartProvider } from "@/context/CartContext";
 import WhatsAppFloat from "./WhatsAppFloat/WhatsAppFloat";
 import "./globals.css";
+import LayoutShell from "./LayoutShell";
 
 // 1. Optimize Fonts using next/font
 const poppins = Poppins({
@@ -40,10 +42,14 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+
   return (
     <html lang="en" className={`${poppins.variable} ${montserrat.variable}`}>
       <body>
-       
+         <Script
+        src="https://sdk.cashfree.com/js/v3/cashfree.js"
+        strategy="afterInteractive"
+      />
         <Script id="fb-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -68,11 +74,7 @@ export default function RootLayout({ children }) {
         </noscript>
 
         <CartProvider>
-          <div className="navbar-wrapper">
-            <Navbar />
-          </div>
-          <main>{children}</main>
-          <Footer />
+        <LayoutShell>{children}</LayoutShell>
           <WhatsAppFloat />
         </CartProvider>
       </body>
