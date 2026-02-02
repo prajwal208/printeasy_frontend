@@ -20,6 +20,7 @@ const Footer = () => {
       <div className={styles.logoSection}>
         <Image src={logo} alt="Onrise" width={35} height={35} />
         <h2>ONRISE</h2>
+        <p>By Print Easy</p>
       </div>
 
       {/* Description */}
