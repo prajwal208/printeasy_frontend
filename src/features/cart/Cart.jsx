@@ -200,7 +200,7 @@ const Cart = () => {
       // EMBEDDED checkout with redirectTarget to specific div
       const checkoutOptions = {
         paymentSessionId: paymentSessionId,
-        redirectTarget: "#cashfree-dropin",
+        redirectTarget: document.getElementById("cashfree-dropin")
       };
 
       cashfree.checkout(checkoutOptions).then((result) => {
