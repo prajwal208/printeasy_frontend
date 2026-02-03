@@ -200,7 +200,7 @@ const Cart = () => {
       // EMBEDDED checkout with redirectTarget to specific div
       const checkoutOptions = {
         paymentSessionId: paymentSessionId,
-        redirectTarget: "cashfree-dropin"
+        redirectTarget: document.getElementById("cashfree-dropin")
       };
 
       cashfree.checkout(checkoutOptions).then((result) => {
@@ -212,13 +212,13 @@ const Cart = () => {
           setShowCartUI(true);
           return;
         }
-        // if (result.paymentDetails) {
-        //   console.log("Payment completed, details:", result.paymentDetails);
-        //   window.location.href = `/order-redirect?order_id=${cashfreeOrderId}&backend_order_id=${backendOrderId}`;
-        // }
-        // if (result.redirect) {
-        //   console.log("SDK is redirecting...");
-        // }
+        if (result.paymentDetails) {
+          console.log("Payment completed, details:", result.paymentDetails);
+          window.location.href = `/order-redirect?order_id=${cashfreeOrderId}&backend_order_id=${backendOrderId}`;
+        }
+        if (result.redirect) {
+          console.log("SDK is redirecting...");
+        }
       });
     } catch (error) {
       console.error("Payment error:", error);
@@ -306,7 +306,7 @@ const Cart = () => {
     <>
      
 
-      <div
+      {/* <div
         id="cashfree-dropin"
         style={{
          width: "100%",
@@ -315,9 +315,9 @@ const Cart = () => {
           justifyContent: "center",
           overflow:"hidden",
         }}
-      />
+      /> */}
 
-      {showCartUI && (
+      
         <div className={styles.cartPage}>
           <ToastContainer position="top-right" autoClose={2000} />
           {cartItems?.length > 0 ? (
@@ -435,7 +435,7 @@ const Cart = () => {
             />
           )}
         </div>
-      )}
+      
     </>
   );
 };
