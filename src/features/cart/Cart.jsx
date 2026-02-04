@@ -192,7 +192,7 @@ const Cart = () => {
       });
 
       // Hide cart UI and show embedded checkout
-      setShowCartUI(false);
+      // setShowCartUI(false);
       setCartLoader(false);
 
       const cashfree = await load({ mode: "production" });
@@ -200,7 +200,7 @@ const Cart = () => {
       // EMBEDDED checkout with redirectTarget to specific div
       const checkoutOptions = {
         paymentSessionId: paymentSessionId,
-        redirectTarget: document.getElementById("cashfree-dropin")
+        redirectTarget: "cashfree-dropin"
       };
 
       cashfree.checkout(checkoutOptions).then((result) => {
@@ -209,7 +209,7 @@ const Cart = () => {
         if (result.error) {
           console.error("SDK Error:", result.error);
           toast.error(result.error.message || "Payment failed");
-          setShowCartUI(true);
+          // setShowCartUI(true);
           return;
         }
         if (result.paymentDetails) {
@@ -224,60 +224,10 @@ const Cart = () => {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment");
       setCartLoader(false);
-      setShowCartUI(true);
+      // setShowCartUI(true);
     }
   };
 
-//   const handlePayNow = async () => {
-//   if (cartItems.length === 0) {
-//     toast.warning("Your cart is empty!");
-//     return;
-//   }
-
-//   try {
-//     window.scrollTo(0, 0);
-//     setCartLoader(true);
-
-//     const finalItems = orderPayloadItems.map((item) => {
-//       if (!item.isCustomizable) return item;
-//       return { ...item };
-//     });
-
-//     const orderRes = await api.post(
-//       "/v1/orders/create",
-//       {
-//         paymentMethod: "ONLINE",
-//         totalAmount: grandTotal,
-//         items: finalItems,
-//       },
-//       {
-//         headers: {
-//           "x-api-key":
-//             "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-//         },
-//       }
-//     );
-
-//     const orderData = orderRes?.data?.data;
-//     const paymentSessionId = orderData?.cashfree?.sessionId;
-
-//     if (!paymentSessionId) {
-//       toast.error("Payment session not generated");
-//       setCartLoader(false);
-//       return;
-//     }
-
-//     const cashfree = await load({ mode: "production" });
-//     cashfree.checkout({
-//       paymentSessionId,
-//       redirectTarget: "_self",  // Redirect in same tab - user goes to Cashfree hosted page
-//     });
-//   } catch (error) {
-//     console.error("Payment error:", error);
-//     toast.error("Failed to initiate payment");
-//     setCartLoader(false);
-//   }
-// };
 
   const addToWishlist = async (productId) => {
     if (!accessToken) {

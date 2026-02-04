@@ -56,7 +56,7 @@ const ProductDetails = () => {
   const [pendingAction, setPendingAction] = useState(null);
   const [editorReady, setEditorReady] = useState(false);
   const [selectedSizeYear, setSelectedSizeYear] = useState("");
-  const [collectionId,setCollectionId] = useState("")
+  const [collectionId, setCollectionId] = useState("");
 
   useEffect(() => {
     if (product) {
@@ -280,7 +280,7 @@ const ProductDetails = () => {
         setIsCustomizable(!!data?.isCustomizable);
         setRelatedId(data?.id);
         setIsWishlisted(data?.isInWishlist);
-        setCollectionId(data?.collectionIds[0])
+        setCollectionId(data?.collectionIds[0]);
       } catch (error) {
         toast.error("Failed to fetch product.");
       } finally {
@@ -346,7 +346,7 @@ const ProductDetails = () => {
       return;
     }
 
-    setShowProductUI(false);
+    // setShowProductUI(false);
 
     await proceedWithPayment();
   };
@@ -407,7 +407,7 @@ const ProductDetails = () => {
       localStorage.setItem("pendingCashfreeOrderId", cashfreeOrderId);
       localStorage.setItem("pendingOrderAmount", product?.discountedPrice);
 
-      setShowProductUI(false);
+      // setShowProductUI(false);
 
       const cashfree = await load({ mode: "production" });
 
@@ -421,13 +421,13 @@ const ProductDetails = () => {
             window.location.href = `/order-redirect?order_id=${cashfreeOrderId}`;
           } else if (result?.error) {
             toast.error("Payment failed");
-            setShowProductUI(true);
+            // setShowProductUI(true);
           }
         });
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment");
-      setShowProductUI(true);
+      // setShowProductUI(true);
     } finally {
       setImageUploadLoader(false);
     }
@@ -435,7 +435,7 @@ const ProductDetails = () => {
 
   return (
     <>
-      <div
+      {/* <div
         id="cashfree-dropin"
         style={{
           width: "100%",
@@ -446,263 +446,260 @@ const ProductDetails = () => {
           overflow: "hidden",
           order: -1,
         }}
-      />
+      /> */}
 
       <ProductSchema product={product} />
-      <ProductPixel product={product} /> 
+      <ProductPixel product={product} />
 
-      {showProductUI && (
-        <>
-          <div className={styles.container}>
-            <ToastContainer position="top-right" autoClose={2000} />
+      <>
+        <div className={styles.container}>
+          <ToastContainer position="top-right" autoClose={2000} />
 
-            {/* Header Icons */}
-            <div className={styles.back} onClick={() => router.back()}>
-              <ChevronLeft size={30} />
-            </div>
-            <div className={styles.mobileIconsContainer}>
-              <div className={styles.mobileIconsRight}>
-                <button
-                  className={styles.mobileIcon}
-                  onClick={() => router.push("/cart")}
-                >
-                  {cartCount > 0 && (
-                    <span className={styles.badge}>{cartCount}</span>
-                  )}
-                  <Image src={bag} alt="bag" />
-                </button>
-                <button
-                  className={styles.mobileIcon}
-                  onClick={handleWishlistClick}
-                >
-                  <Heart
-                    size={40}
-                    stroke={isWishlisted ? "red" : "black"}
-                    fill={isWishlisted ? "red" : "transparent"}
-                  />
-                </button>
-                <button className={styles.mobileIcon} onClick={handleShare}>
-                  <Image src={share} alt="share" />
-                </button>
-              </div>
-            </div>
-
-            {product?.isCustomizable ? (
-              <>
-                <ShirtEditor
-                  product={product}
-                  ref={editorRef}
-                  isEditing={isEditing}
-                  setIsEditing={setIsEditing}
-                  text={text}
-                  setText={setText}
-                  selectedSize={selectedSize}
-                  selectedFont={selectedFont}
-                  selectedColor={selectedColor}
-                  setSelectedColor={setSelectedColor}
-                  setSelectedFont={setSelectedFont}
-                  setSelectedSize={setSelectedSize}
-                  onReady={() => setEditorReady(true)}
-                />
-              </>
-            ) : (
-              <Image
-                src={product?.productImages[0]}
-                alt="product"
-                width={500}
-                height={600}
-                className={styles.mainImage}
-                priority
-                onLoad={() => setEditorReady(true)}
-              />
-            )}
-
-            {/* Info Section */}
-            <div
-              className={`${styles.infoSection} ${
-                !isCustomizable && styles.infoSection_img
-              }`}
-            >
-              <div className={styles.priceSection}>
-                <h1>{product?.name}</h1>
-              </div>
-              <div className={styles.dis_price}>
-                <p className={styles.discountedPrice}>
-                  ₹ {product?.discountedPrice}
-                </p>
-                <p className={styles.basePrice}>₹ {product?.basePrice}</p>
-                {product?.discountedPrice && product?.basePrice && (
-                  <span className={styles.offerTag}>
-                    {Math.round(
-                      ((product.basePrice - product.discountedPrice) /
-                        product.basePrice) *
-                        100,
-                    )}
-                    % OFF
-                  </span>
-                )}
-              </div>
-
-              {/* Size Selection */}
-              {product?.configuration?.[0]?.options?.length > 0 && (
-                <div className={styles.sizes}>
-                  <h4>SELECT SIZE</h4>
-                  {sizeInfo && (
-                    <div className={styles.sizeDetailsBox}>
-                      {sizeInfo.options?.find((opt) => opt.label === "Chest")
-                        ?.value && (
-                        <span>
-                          Chest:{" "}
-                          {
-                            sizeInfo.options.find(
-                              (opt) => opt.label === "Chest",
-                            ).value
-                          }{" "}
-                          cm
-                        </span>
-                      )}
-
-                      {sizeInfo.options?.find((opt) => opt.label === "Length")
-                        ?.value && (
-                        <span>
-                          Length:{" "}
-                          {
-                            sizeInfo.options.find(
-                              (opt) => opt.label === "Length",
-                            ).value
-                          }{" "}
-                          cm
-                        </span>
-                      )}
-
-                      {sizeInfo.options?.find((opt) => opt.label === "Sleeves")
-                        ?.value && (
-                        <span>
-                          Sleeves:{" "}
-                          {
-                            sizeInfo.options.find(
-                              (opt) => opt.label === "Sleeves",
-                            ).value
-                          }{" "}
-                          cm
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  <div className={styles.sizeOptions}>
-                    {product?.configuration[0].options.map((s) => (
-                      <button
-                        key={s.value}
-                        onClick={() => handleSizeSelect(s.value)}
-                        className={`${styles.sizeBtn} ${
-                          selectedSizeYear === s.value ? styles.activeSize : ""
-                        }`}
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className={styles.button_wrapper}>
-                <button className={styles.buyit_btn} onClick={handlePayNow}>
-                  {"BUY IT NOW"}
-                  <p>(click to select size)</p>
-                </button>
-                <button
-                  className={styles.addToCart}
-                  onClick={addToCart}
-                  disabled={loader}
-                >
-                  {loader ? "ADDING..." : "ADD TO BAG"}
-                  <p>(click to select size)</p>
-                </button>
-              </div>
-
-              {/* Details Accordion */}
-              <div className={styles.accordion}>
-                {[
-                  { title: "DETAILS", content: product?.description },
-                  { title: "CARE", content: product?.care },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className={styles.accordionItem}
-                    onClick={() =>
-                      setActiveSection(activeSection === i ? null : i)
-                    }
-                  >
-                    <div className={styles.accordionHeader}>
-                      <h3>{item.title}</h3>
-                      {activeSection === i ? (
-                        <Minus size={20} />
-                      ) : (
-                        <Plus size={20} />
-                      )}
-                    </div>
-                    <div
-                      className={`${styles.accordionContent} ${
-                        activeSection === i ? styles.active : ""
-                      }`}
-                    >
-                      <p>{item.content}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Size Selection Sheet (Triggered if no size selected) */}
-              <BottomSheet
-                open={showSizeSheet}
-                onClose={() => setShowSizeSheet(false)}
+          {/* Header Icons */}
+          <div className={styles.back} onClick={() => router.back()}>
+            <ChevronLeft size={30} />
+          </div>
+          <div className={styles.mobileIconsContainer}>
+            <div className={styles.mobileIconsRight}>
+              <button
+                className={styles.mobileIcon}
+                onClick={() => router.push("/cart")}
               >
-                <h3 style={{ textAlign: "center", marginBottom: "15px" }}>
-                  SELECT A SIZE
-                </h3>
-                <div className={styles.sizeOptionsSheet}>
-                  {product?.configuration?.[0]?.options.map((s) => (
+                {cartCount > 0 && (
+                  <span className={styles.badge}>{cartCount}</span>
+                )}
+                <Image src={bag} alt="bag" />
+              </button>
+              <button
+                className={styles.mobileIcon}
+                onClick={handleWishlistClick}
+              >
+                <Heart
+                  size={40}
+                  stroke={isWishlisted ? "red" : "black"}
+                  fill={isWishlisted ? "red" : "transparent"}
+                />
+              </button>
+              <button className={styles.mobileIcon} onClick={handleShare}>
+                <Image src={share} alt="share" />
+              </button>
+            </div>
+          </div>
+
+          {product?.isCustomizable ? (
+            <>
+              <ShirtEditor
+                product={product}
+                ref={editorRef}
+                isEditing={isEditing}
+                setIsEditing={setIsEditing}
+                text={text}
+                setText={setText}
+                selectedSize={selectedSize}
+                selectedFont={selectedFont}
+                selectedColor={selectedColor}
+                setSelectedColor={setSelectedColor}
+                setSelectedFont={setSelectedFont}
+                setSelectedSize={setSelectedSize}
+                onReady={() => setEditorReady(true)}
+              />
+            </>
+          ) : (
+            <Image
+              src={product?.productImages[0]}
+              alt="product"
+              width={500}
+              height={600}
+              className={styles.mainImage}
+              priority
+              onLoad={() => setEditorReady(true)}
+            />
+          )}
+
+          {/* Info Section */}
+          <div
+            className={`${styles.infoSection} ${
+              !isCustomizable && styles.infoSection_img
+            }`}
+          >
+            <div className={styles.priceSection}>
+              <h1>{product?.name}</h1>
+            </div>
+            <div className={styles.dis_price}>
+              <p className={styles.discountedPrice}>
+                ₹ {product?.discountedPrice}
+              </p>
+              <p className={styles.basePrice}>₹ {product?.basePrice}</p>
+              {product?.discountedPrice && product?.basePrice && (
+                <span className={styles.offerTag}>
+                  {Math.round(
+                    ((product.basePrice - product.discountedPrice) /
+                      product.basePrice) *
+                      100,
+                  )}
+                  % OFF
+                </span>
+              )}
+            </div>
+
+            {/* Size Selection */}
+            {product?.configuration?.[0]?.options?.length > 0 && (
+              <div className={styles.sizes}>
+                <h4>SELECT SIZE</h4>
+                {sizeInfo && (
+                  <div className={styles.sizeDetailsBox}>
+                    {sizeInfo.options?.find((opt) => opt.label === "Chest")
+                      ?.value && (
+                      <span>
+                        Chest:{" "}
+                        {
+                          sizeInfo.options.find((opt) => opt.label === "Chest")
+                            .value
+                        }{" "}
+                        cm
+                      </span>
+                    )}
+
+                    {sizeInfo.options?.find((opt) => opt.label === "Length")
+                      ?.value && (
+                      <span>
+                        Length:{" "}
+                        {
+                          sizeInfo.options.find((opt) => opt.label === "Length")
+                            .value
+                        }{" "}
+                        cm
+                      </span>
+                    )}
+
+                    {sizeInfo.options?.find((opt) => opt.label === "Sleeves")
+                      ?.value && (
+                      <span>
+                        Sleeves:{" "}
+                        {
+                          sizeInfo.options.find(
+                            (opt) => opt.label === "Sleeves",
+                          ).value
+                        }{" "}
+                        cm
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <div className={styles.sizeOptions}>
+                  {product?.configuration[0].options.map((s) => (
                     <button
                       key={s.value}
                       onClick={() => handleSizeSelect(s.value)}
                       className={`${styles.sizeBtn} ${
-                        selectedSize === s.value ? styles.activeSize : ""
+                        selectedSizeYear === s.value ? styles.activeSize : ""
                       }`}
                     >
                       {s.label}
                     </button>
                   ))}
                 </div>
-              </BottomSheet>
+              </div>
+            )}
 
-              <DynamicModal
-                open={imageUploadLoader}
-                onClose={() => setImageUploadLoader(false)}
+            <div className={styles.button_wrapper}>
+              <button className={styles.buyit_btn} onClick={handlePayNow}>
+                {"BUY IT NOW"}
+                <p>(click to select size)</p>
+              </button>
+              <button
+                className={styles.addToCart}
+                onClick={addToCart}
+                disabled={loader}
               >
-                <AddToBagLoader />
-              </DynamicModal>
-
-              {/* Success Sheet */}
-              <BottomSheet
-                open={showSuccessCart}
-                onClose={() => setShowSuccessCart(false)}
-              >
-                <AddToCartSuccessSheet relatedData={relatedData} />
-              </BottomSheet>
+                {loader ? "ADDING..." : "ADD TO BAG"}
+                <p>(click to select size)</p>
+              </button>
             </div>
-          </div>
 
-          <section style={{ width: "100%", overflowX: "auto",marginTop:"16px" }}>
-                  {
-                    collectionId ? 
-                    <YouMayLikeSection categoryId={collectionId}/>
-                    : 
-              <Suggested relatedData={relatedData} />
+            {/* Details Accordion */}
+            <div className={styles.accordion}>
+              {[
+                { title: "DETAILS", content: product?.description },
+                { title: "CARE", content: product?.care },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className={styles.accordionItem}
+                  onClick={() =>
+                    setActiveSection(activeSection === i ? null : i)
                   }
-          </section>
-        </>
-      )}
+                >
+                  <div className={styles.accordionHeader}>
+                    <h3>{item.title}</h3>
+                    {activeSection === i ? (
+                      <Minus size={20} />
+                    ) : (
+                      <Plus size={20} />
+                    )}
+                  </div>
+                  <div
+                    className={`${styles.accordionContent} ${
+                      activeSection === i ? styles.active : ""
+                    }`}
+                  >
+                    <p>{item.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Size Selection Sheet (Triggered if no size selected) */}
+            <BottomSheet
+              open={showSizeSheet}
+              onClose={() => setShowSizeSheet(false)}
+            >
+              <h3 style={{ textAlign: "center", marginBottom: "15px" }}>
+                SELECT A SIZE
+              </h3>
+              <div className={styles.sizeOptionsSheet}>
+                {product?.configuration?.[0]?.options.map((s) => (
+                  <button
+                    key={s.value}
+                    onClick={() => handleSizeSelect(s.value)}
+                    className={`${styles.sizeBtn} ${
+                      selectedSize === s.value ? styles.activeSize : ""
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </BottomSheet>
+
+            <DynamicModal
+              open={imageUploadLoader}
+              onClose={() => setImageUploadLoader(false)}
+            >
+              <AddToBagLoader />
+            </DynamicModal>
+
+            {/* Success Sheet */}
+            <BottomSheet
+              open={showSuccessCart}
+              onClose={() => setShowSuccessCart(false)}
+            >
+              <AddToCartSuccessSheet relatedData={relatedData} />
+            </BottomSheet>
+          </div>
+        </div>
+
+        <section
+          style={{ width: "100%", overflowX: "auto", marginTop: "16px" }}
+        >
+          {collectionId ? (
+            <YouMayLikeSection categoryId={collectionId} />
+          ) : (
+            <Suggested relatedData={relatedData} />
+          )}
+        </section>
+      </>
     </>
   );
 };
