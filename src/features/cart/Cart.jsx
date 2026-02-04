@@ -196,30 +196,33 @@ const Cart = () => {
       setCartLoader(false);
 
       const cashfree = await load({ mode: "production" });
+      cashfree.checkout({
+  paymentSessionId,
+  redirect: true,
+});
+      // // EMBEDDED checkout with redirectTarget to specific div
+      // const checkoutOptions = {
+      //   paymentSessionId: paymentSessionId,
+      //   redirect: true,
+      // };
 
-      // EMBEDDED checkout with redirectTarget to specific div
-      const checkoutOptions = {
-        paymentSessionId: paymentSessionId,
-        redirectTarget: "cashfree-dropin"
-      };
+      // cashfree.checkout(checkoutOptions).then((result) => {
+      //   console.log("Cashfree SDK result:", result);
 
-      cashfree.checkout(checkoutOptions).then((result) => {
-        console.log("Cashfree SDK result:", result);
-
-        if (result.error) {
-          console.error("SDK Error:", result.error);
-          toast.error(result.error.message || "Payment failed");
-          // setShowCartUI(true);
-          return;
-        }
-        if (result.paymentDetails) {
-          console.log("Payment completed, details:", result.paymentDetails);
-          window.location.href = `/order-redirect?order_id=${cashfreeOrderId}&backend_order_id=${backendOrderId}`;
-        }
-        if (result.redirect) {
-          console.log("SDK is redirecting...");
-        }
-      });
+      //   if (result.error) {
+      //     console.error("SDK Error:", result.error);
+      //     toast.error(result.error.message || "Payment failed");
+      //     // setShowCartUI(true);
+      //     return;
+      //   }
+      //   if (result.paymentDetails) {
+      //     console.log("Payment completed, details:", result.paymentDetails);
+      //     window.location.href = `/order-redirect?order_id=${cashfreeOrderId}&backend_order_id=${backendOrderId}`;
+      //   }
+      //   if (result.redirect) {
+      //     console.log("SDK is redirecting...");
+      //   }
+      // });
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment");
