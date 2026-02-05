@@ -98,7 +98,7 @@ export default function OrderRedirect() {
       console.error("Order status check failed", error);
     }
   };
-
+``
   return (
     <div className={styles.container}>
       <ToastContainer />
@@ -158,15 +158,15 @@ export default function OrderRedirect() {
         {status === "timeout" && (
           <div className={styles.errorContent}>
             <div className={styles.errorIcon}>⏱</div>
-            <h2>Verification In Progress</h2>
-            <p>Please check your orders later.</p>
+            <h2>Payment Cancelled</h2>
+            <p>Order failed! Please try again</p>
 
             <button
-              onClick={() => router.push("/orders")}
-              style={{ ...primaryBtn, marginTop: "16px" }}
-            >
-              Go to Orders
-            </button>
+                onClick={() => router.push("/")}
+                style={primaryBtn}
+              >
+                Continue Shopping
+              </button>
           </div>
         )}
 
