@@ -25,6 +25,7 @@ import { createSlug } from "@/app/helper";
 import ProductSchema from "@/component/seo/ProductSchema";
 import ProductPixel from "@/component/seo/ProductPixel";
 import YouMayLikeSection from "@/component/YouMayLikeSection/YouMayLikeSection";
+import { ChevronUp } from "lucide-react";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -57,6 +58,8 @@ const ProductDetails = () => {
   const [editorReady, setEditorReady] = useState(false);
   const [selectedSizeYear, setSelectedSizeYear] = useState("");
   const [collectionId, setCollectionId] = useState("");
+  const [offers, setOffers] = useState([]);
+  const [showOfferSheet, setShowOfferSheet] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -67,13 +70,33 @@ const ProductDetails = () => {
     }
   }, [product]);
 
+  const getOfferData = async () => {
+    try {
+      const res = await api.get(`/v2/giftreward`, {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      });
+      setOffers(res?.data?.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (product) {
+      getOfferData();
+    }
+  }, [product]);
+
   console.log(sizeInfo, "sosospopopo");
 
   const handleSizeSelect = (size) => {
     setSelectedSizeYear(size);
 
     const match = product?.configuration?.[0]?.options.find(
-      (item) => item.value === size,
+      (item) => item.value === size
     );
 
     setSizeInfo(match || null);
@@ -122,10 +145,10 @@ const ProductDetails = () => {
           (resolve) =>
             setTimeout(() => {
               console.warn(
-                "⏱️ Image capture timeout - proceeding without custom image",
+                "⏱️ Image capture timeout - proceeding without custom image"
               );
               resolve(null);
-            }, 10000), // 5 second timeout
+            }, 10000) // 5 second timeout
         );
 
         capturedImageUrl = await Promise.race([capturePromise, timeoutPromise]);
@@ -213,7 +236,7 @@ const ProductDetails = () => {
             "x-api-key":
               "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
           },
-        },
+        }
       );
       if (res.status === 200) {
         setIsWishlisted(true);
@@ -221,7 +244,7 @@ const ProductDetails = () => {
       }
     } catch (error) {
       toast.error(
-        error?.response?.data?.message || "Failed to add to wishlist",
+        error?.response?.data?.message || "Failed to add to wishlist"
       );
     }
   };
@@ -253,7 +276,7 @@ const ProductDetails = () => {
     } else {
       window.open(
         `https://wa.me/?text=${encodeURIComponent(`${title}\n${shareUrl}`)}`,
-        "_blank",
+        "_blank"
       );
     }
   };
@@ -390,7 +413,7 @@ const ProductDetails = () => {
             "x-api-key":
               "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
           },
-        },
+        }
       );
 
       const orderData = orderRes?.data?.data;
@@ -538,7 +561,7 @@ const ProductDetails = () => {
                   {Math.round(
                     ((product.basePrice - product.discountedPrice) /
                       product.basePrice) *
-                      100,
+                      100
                   )}
                   % OFF
                 </span>
@@ -581,7 +604,7 @@ const ProductDetails = () => {
                         Sleeves:{" "}
                         {
                           sizeInfo.options.find(
-                            (opt) => opt.label === "Sleeves",
+                            (opt) => opt.label === "Sleeves"
                           ).value
                         }{" "}
                         cm
@@ -610,7 +633,19 @@ const ProductDetails = () => {
               <button className={styles.buyit_btn} onClick={handlePayNow}>
                 {"BUY IT NOW"}
                 <p>(click to select size)</p>
+                <div
+                  className={styles.offerBanner}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowOfferSheet(true);
+                  }}
+                >
+                  <div className={styles.offerIcon}>
+                    Offers <ChevronUp size={14} />
+                  </div>
+                </div>
               </button>
+
               <button
                 className={styles.addToCart}
                 onClick={addToCart}
@@ -689,6 +724,29 @@ const ProductDetails = () => {
               onClose={() => setShowSuccessCart(false)}
             >
               <AddToCartSuccessSheet relatedData={relatedData} />
+            </BottomSheet>
+
+            <BottomSheet
+              open={showOfferSheet}
+              onClose={() => setShowOfferSheet(false)}
+            >
+              <div className={styles.offerSheet}>
+                <h3>Available Offers</h3>
+
+                {offers?.map((item) => (
+                  <div key={item.id} className={styles.offerCard}>
+                    {/* <div className={styles.offerEmoji}>🎁</div> */}
+
+                    <div className={styles.offerlist}>
+                      <p className={styles.offerCardTitle}>{item.title}</p>
+
+                      <span className={styles.offerMin}>
+                        <strong>Min Order ₹{item.minOrderAmount}</strong>
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </BottomSheet>
           </div>
         </div>
