@@ -545,7 +545,7 @@ const ProductDetails = () => {
           <div className={styles.mobview}>
                 <OfferMarquee />
                 </div>
-          {/* Info Section */}
+          
           <div
             className={`${styles.infoSection} ${
               !isCustomizable && styles.infoSection_img
