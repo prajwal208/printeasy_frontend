@@ -1,14 +1,35 @@
 "use client";
 import React from "react";
 import styles from "./cartRewards.module.scss";
-import { Truck, Gift, Shield } from "lucide-react";
+import { TbTruckDelivery, TbRosetteDiscount, TbGift } from "react-icons/tb";
+
+const iconSize = 20;
+const iconStrokeWidth = 1.75;
 
 const CartRewards = ({ totalAmount }) => {
+  const iconProps = {
+    size: iconSize,
+    strokeWidth: iconStrokeWidth,
+    className: styles.tierIcon,
+  };
+
   const milestones = [
     { amount: 0, label: "", icon: null },
-    { amount: 500, label: "Free Shipping", icon: <Truck size={18} /> },
-    { amount: 600, label: "Exclusive Offer", icon: <Shield size={18} /> },
-    { amount: 900, label: "Gift Unlocked", icon: <Gift size={18} /> },
+    {
+      amount: 500,
+      label: "Free Shipping",
+      icon: <TbTruckDelivery {...iconProps} />,
+    },
+    {
+      amount: 600,
+      label: "Exclusive Offer",
+      icon: <TbRosetteDiscount {...iconProps} />,
+    },
+    {
+      amount: 900,
+      label: "Gift Unlocked",
+      icon: <TbGift {...iconProps} />,
+    },
   ];
 
   // 🧮 Find which milestone range we are in
@@ -18,15 +39,18 @@ const CartRewards = ({ totalAmount }) => {
   const prevMilestone = milestones[currentIndex - 1] || milestones[0];
   const nextMilestone = milestones[currentIndex] || milestones[milestones.length - 1];
 
+  const segmentDivisor = Math.max(1, milestones.length - 1);
+
+  const denom = nextMilestone.amount - prevMilestone.amount;
   // 🧠 Calculate progress between milestones
   const segmentProgress =
-    ((totalAmount - prevMilestone.amount) /
-      (nextMilestone.amount - prevMilestone.amount)) *
-    (100 / (milestones.length - 1));
+    denom <= 0
+      ? 0
+      : ((totalAmount - prevMilestone.amount) / denom) * (100 / segmentDivisor);
 
   const totalProgress =
-    (currentIndex - 1) * (100 / (milestones.length - 1)) +
-    Math.min(segmentProgress, 100 / (milestones.length - 1));
+    (currentIndex - 1) * (100 / segmentDivisor) +
+    Math.min(segmentProgress, 100 / segmentDivisor);
 
   // Determine if milestone is active
   const isActive = (amount) => totalAmount >= amount;

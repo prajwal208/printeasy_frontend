@@ -34,7 +34,7 @@
   display: flex;
   justify-content: space-between;
   position: relative;
-  top: -12px;
+  top: -24px;
 }
 
 .milestone {
@@ -42,8 +42,8 @@
   color: #aaa;
 
   .iconCircle {
-    width: 26px;
-    height: 26px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: #d8d8d8;
     margin: 0 auto 6px;
@@ -51,12 +51,25 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
+    color: #555;
+
+    .tierIcon {
+      flex-shrink: 0;
+      display: block;
+      stroke: currentColor;
+      fill: none;
+    }
   }
 
   &.active .iconCircle {
     background: #e67e22;
     color: white;
     box-shadow: 0 0 6px rgba(230, 126, 34, 0.6);
+
+    .tierIcon {
+      color: white;
+      stroke: currentColor;
+    }
   }
 
   .iconCircle.empty {
