@@ -26,13 +26,10 @@ const Navbar = () => {
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [count, setCount] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    () => typeof window !== "undefined" && !!Cookies.get("idToken")
+  );
   const router = useRouter();
-
-  useEffect(() => {
-    const token = Cookies.get("idToken");
-    setIsLoggedIn(!!token);
-  }, []);
 
   const navItems = [
     { icon: Briefcase, label: "Orders", link: "/orders" },
@@ -89,30 +86,20 @@ const Navbar = () => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [menuOpen]);
 
-  // const getCartCount = async () => {
-  //   const res = await api.get("/v1/cart/count", {
-  //     headers: {
-  //       "x-api-key":
-  //         "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-  //     },
-  //   });
-  //   setCount(res?.data?.data?.count);
-  //   localStorage.setItem("count", res?.data?.data?.count);
-  // };
-
   const getCartCount = async () => {
-  try {
-    const count = await db.cart.count();
-
-    setCount(count);
-    localStorage.setItem("count", count);
-  } catch (error) {
-    console.error("Error getting cart count:", error);
-  }
-};
+    try {
+      const nextCount = await db.cart.count();
+      setCount(nextCount);
+      localStorage.setItem("count", String(nextCount));
+    } catch (error) {
+      console.error("Error getting cart count:", error);
+    }
+  };
 
   useEffect(() => {
-    getCartCount();
+    queueMicrotask(() => {
+      void getCartCount();
+    });
   }, []);
 
   return (

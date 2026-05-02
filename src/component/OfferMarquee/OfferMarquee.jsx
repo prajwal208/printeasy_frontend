@@ -21,8 +21,10 @@ const OfferMarquee = () => {
   };
 
   useEffect(() => {
-    getOfferData()
-  },[])
+    queueMicrotask(() => {
+      void getOfferData();
+    });
+  }, []);
 
 
   return (

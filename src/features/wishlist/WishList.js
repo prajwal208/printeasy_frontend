@@ -28,7 +28,9 @@ const WishList = () => {
   };
 
   useEffect(() => {
-    getwishList();
+    queueMicrotask(() => {
+      void getwishList();
+    });
   }, []);
 
   return (

@@ -1,16 +1,15 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartCount, setCartCount] = useState(0);
-
-  useEffect(() => {
+  const [cartCount, setCartCount] = useState(() => {
+    if (typeof window === "undefined") return 0;
     const savedCount = localStorage.getItem("count");
-    if (savedCount) setCartCount(Number(savedCount));
-  }, []);
+    return savedCount ? Number(savedCount) : 0;
+  });
 
   const updateCart = (newCount) => {
     setCartCount(newCount);

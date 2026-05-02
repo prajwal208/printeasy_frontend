@@ -55,8 +55,10 @@ const SearchPage = () => {
   };
 
   useEffect(() => {
-    getSubCategoriesList();
-    getProductList();
+    queueMicrotask(() => {
+      void getSubCategoriesList();
+      void getProductList();
+    });
   }, []);
 
   // ====================================

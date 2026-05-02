@@ -19,41 +19,6 @@ export default function OrderRedirect() {
   const attemptsRef = useRef(0);
   const maxAttempts = 15;
 
-  useEffect(() => {
-    const backendOrderId = localStorage.getItem("pendingOrderId");
-
-    if (!backendOrderId) {
-      toast.error("Order information not found");
-      setStatus("error");
-      setLoading(false);
-      return;
-    }
-
-    pollOrderStatus(backendOrderId);
-
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
-  }, []);
-
-  const pollOrderStatus = (orderId) => {
-    attemptsRef.current = 0;
-    checkOrderStatus(orderId);
-
-    pollingRef.current = setInterval(() => {
-      attemptsRef.current += 1;
-
-      if (attemptsRef.current >= maxAttempts) {
-        clearInterval(pollingRef.current);
-        setStatus("timeout");
-        setLoading(false);
-        return;
-      }
-
-      checkOrderStatus(orderId);
-    }, 1000);
-  };
-
   const checkOrderStatus = async (orderId) => {
     try {
       const response = await api.get(
@@ -98,7 +63,48 @@ export default function OrderRedirect() {
       console.error("Order status check failed", error);
     }
   };
-``
+
+  const pollOrderStatus = (orderId) => {
+    attemptsRef.current = 0;
+    checkOrderStatus(orderId);
+
+    pollingRef.current = setInterval(() => {
+      attemptsRef.current += 1;
+
+      if (attemptsRef.current >= maxAttempts) {
+        clearInterval(pollingRef.current);
+        setStatus("timeout");
+        setLoading(false);
+        return;
+      }
+
+      checkOrderStatus(orderId);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    const backendOrderId = localStorage.getItem("pendingOrderId");
+
+    if (!backendOrderId) {
+      queueMicrotask(() => {
+        toast.error("Order information not found");
+        setStatus("error");
+        setLoading(false);
+      });
+      return undefined;
+    }
+
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) pollOrderStatus(backendOrderId);
+    });
+
+    return () => {
+      cancelled = true;
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
+
   return (
     <div className={styles.container}>
       <ToastContainer />

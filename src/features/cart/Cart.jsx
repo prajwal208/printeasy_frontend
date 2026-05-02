@@ -38,10 +38,40 @@ const Cart = () => {
     setIsLoggedIn(true);
   };
 
+  const getAddressList = async () => {
+    try {
+      const res = await api.get(`/v1/address/all`, {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      });
+      setAddressList(res?.data?.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getOfferData = async () => {
+    try {
+      const res = await api.get(`/v2/giftreward`, {
+        headers: {
+          "x-api-key":
+            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
+        },
+      });
+      setOfferData(res?.data?.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    db.cart.toArray().then(setCartItems);
-    getAddressList();
-    getOfferData();
+    queueMicrotask(() => {
+      void db.cart.toArray().then(setCartItems);
+      void getAddressList();
+      void getOfferData();
+    });
   }, []);
 
   const handleQuantityChange = async (id, newQuantity) => {
@@ -71,34 +101,6 @@ const Cart = () => {
       setCartItems((prev) => prev.filter((i) => i.productId !== productId));
     } catch (err) {
       toast.error("Failed to remove item");
-    }
-  };
-
-  const getAddressList = async () => {
-    try {
-      const res = await api.get(`/v1/address/all`, {
-        headers: {
-          "x-api-key":
-            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        },
-      });
-      setAddressList(res?.data?.data || []);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getOfferData = async () => {
-    try {
-      const res = await api.get(`/v2/giftreward`, {
-        headers: {
-          "x-api-key":
-            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        },
-      });
-      setOfferData(res?.data?.data || []);
-    } catch (error) {
-      console.error(error);
     }
   };
 

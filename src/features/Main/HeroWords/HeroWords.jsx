@@ -23,11 +23,18 @@ const colors = [
 ];
 
 export default function HeroWords() {
-  useEffect(() => {
-    const tracks = ["track-1", "track-2", "track-3", "track-4"];
+  const shuffle = (arr) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
 
-    tracks.forEach((id) => fillTrack(id));
-  }, []);
+  const setRandomColor = (el) => {
+    el.style.backgroundColor =
+      colors[Math.floor(Math.random() * colors.length)];
+  };
 
   const fillTrack = (trackId) => {
     const track = document.getElementById(trackId);
@@ -49,18 +56,11 @@ export default function HeroWords() {
     });
   };
 
-  const setRandomColor = (el) => {
-    el.style.backgroundColor =
-      colors[Math.floor(Math.random() * colors.length)];
-  };
+  useEffect(() => {
+    const tracks = ["track-1", "track-2", "track-3", "track-4"];
 
-  const shuffle = (arr) => {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  };
+    tracks.forEach((id) => fillTrack(id));
+  }, []);
 
   return (
     <section className={styles.wrapper}>
