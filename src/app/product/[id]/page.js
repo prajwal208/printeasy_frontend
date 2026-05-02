@@ -1,8 +1,16 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Plus, Minus, Heart, ChevronLeft } from "lucide-react";
+import {
+  Plus,
+  Minus,
+  Heart,
+  ChevronLeft,
+  Truck,
+  Gift,
+  Percent,
+} from "lucide-react";
 import Image from "next/image";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,6 +30,12 @@ import { load } from "@cashfreepayments/cashfree-js";
 import DynamicModal from "@/component/Modal/Modal";
 import AddToBagLoader from "@/component/AddToBagLoader/AddToBagLoader";
 import { createSlug } from "@/app/helper";
+import {
+  getNextUnlockableOffer,
+  getOfferVisualUrl,
+  offerMinOrderAmount,
+  sumCartBagTotal,
+} from "@/lib/price";
 import ProductSchema from "@/component/seo/ProductSchema";
 import ProductPixel from "@/component/seo/ProductPixel";
 import YouMayLikeSection from "@/component/YouMayLikeSection/YouMayLikeSection";
@@ -61,6 +75,12 @@ const ProductDetails = () => {
   const [collectionId, setCollectionId] = useState("");
   const [offers, setOffers] = useState([]);
   const [showOfferSheet, setShowOfferSheet] = useState(false);
+  const [cartBagTotal, setCartBagTotal] = useState(0);
+
+  const refreshCartBagTotal = useCallback(async () => {
+    const items = await db.cart.toArray();
+    setCartBagTotal(sumCartBagTotal(items));
+  }, []);
 
   useEffect(() => {
     if (product) {
@@ -90,6 +110,40 @@ const ProductDetails = () => {
       getOfferData();
     }
   }, [product]);
+
+  useEffect(() => {
+    refreshCartBagTotal();
+  }, [cartCount, id, refreshCartBagTotal]);
+
+  const nextUnlock = getNextUnlockableOffer(offers, cartBagTotal);
+  const nextOffer = nextUnlock.nextOffer;
+
+  /** Offer whose icon we show in `freeDeliveryIconCircle` (API-driven image). */
+  const circleOffer =
+    nextOffer ??
+    (offers?.length && nextUnlock.allUnlocked
+      ? [...offers]
+          .filter((o) => !Number.isNaN(offerMinOrderAmount(o)))
+          .sort((a, b) => offerMinOrderAmount(b) - offerMinOrderAmount(a))[0] ??
+        offers[0]
+      : null);
+
+  const freeDeliveryCircleIconUrl =
+    getOfferVisualUrl(circleOffer) ??
+    (offers?.length ? getOfferVisualUrl(offers[0]) : null);
+
+  const nextGiftType = nextOffer?.giftType ?? nextOffer?.gift_type;
+  const circleGiftType =
+    circleOffer?.giftType ?? circleOffer?.gift_type ?? nextGiftType;
+
+  const nextOfferHeadline = (() => {
+    const raw = nextOffer?.title?.trim();
+    if (raw) return raw;
+    if (!nextOffer) return null;
+    if (nextGiftType === "freeDelivery") return "Free delivery";
+    if (nextGiftType === "discount") return "Order discount";
+    return "Reward";
+  })();
 
   console.log(sizeInfo, "sosospopopo");
 
@@ -212,6 +266,7 @@ const ProductDetails = () => {
 
       const updatedCartItems = await db.cart.toArray();
       updateCart(updatedCartItems.length);
+      setCartBagTotal(sumCartBagTotal(updatedCartItems));
       setShowSuccessCart(true);
 
       console.log("✅ Item added to cart successfully");
@@ -634,7 +689,7 @@ const ProductDetails = () => {
             )}
 
             <div className={styles.button_wrapper}>
-              <button className={styles.buyit_btn} onClick={handlePayNow}>
+              {/* <button className={styles.buyit_btn} onClick={handlePayNow}>
                 {"BUY IT NOW"}
                 <p>(click to select size)</p>
                 <div
@@ -646,6 +701,83 @@ const ProductDetails = () => {
                 >
                   <div className={styles.offerIcon}>
                     Offers <ChevronUp size={14} />
+                  </div>
+                </div>
+              </button> */}
+
+              <button
+                type="button"
+                className={styles.freeDeliveryCard}
+                onClick={() => setShowOfferSheet(true)}
+              >
+                <span className={styles.freeDeliveryTab}>
+                  Offers <ChevronUp size={14} strokeWidth={2.5} />
+                </span>
+                <div className={styles.freeDeliveryCardInner}>
+                  <div className={styles.freeDeliveryIconCircle} aria-hidden>
+                    {freeDeliveryCircleIconUrl ? (
+                      <Image
+                        src={freeDeliveryCircleIconUrl}
+                        alt=""
+                        width={44}
+                        height={44}
+                        className={styles.nextOfferIconImg}
+                        unoptimized
+                      />
+                    ) : (
+                      <span className={styles.nextOfferIconFallback}>
+                        {nextUnlock.allUnlocked ? (
+                          <Gift size={22} strokeWidth={2} />
+                        ) : circleGiftType === "freeDelivery" ? (
+                          <Truck size={22} strokeWidth={2} />
+                        ) : circleGiftType === "discount" ? (
+                          <Percent size={22} strokeWidth={2} />
+                        ) : (
+                          <Gift size={22} strokeWidth={2} />
+                        )}
+                      </span>
+                    )}
+                  </div>
+                  <div className={styles.freeDeliveryTextCol}>
+                    <p
+                      className={`${styles.freeDeliveryTitle} ${styles.nextOfferTitleClamp}`}
+                    >
+                      {nextOfferHeadline
+                        ? nextOfferHeadline
+                        : nextUnlock.allUnlocked && nextUnlock.hasAnyOffer
+                          ? "All rewards unlocked"
+                          : nextUnlock.hasAnyOffer
+                            ? "Unlock your next reward"
+                            : "Offers on your bag"}
+                    </p>
+                    {nextOffer &&
+                    nextUnlock.amountMore != null &&
+                    !nextUnlock.allUnlocked ? (
+                      <p className={styles.freeDeliverySub}>
+                        <span className={styles.freeDeliverySubMuted}>
+                          Shop for{" "}
+                        </span>
+                        <span className={styles.freeDeliverySubStrong}>
+                          ₹{nextUnlock.amountMore}
+                        </span>
+                        <span className={styles.freeDeliverySubMuted}>
+                          {" "}
+                          more to unlock
+                        </span>
+                      </p>
+                    ) : nextUnlock.allUnlocked && nextUnlock.hasAnyOffer ? (
+                      <p className={styles.freeDeliverySub}>
+                        <span className={styles.freeDeliverySubMuted}>
+                          Your bag meets every offer tier
+                        </span>
+                      </p>
+                    ) : (
+                      <p className={styles.freeDeliverySub}>
+                        <span className={styles.freeDeliverySubMuted}>
+                          Tap to view available offers
+                        </span>
+                      </p>
+                    )}
                   </div>
                 </div>
               </button>
@@ -737,19 +869,36 @@ const ProductDetails = () => {
               <div className={styles.offerSheet}>
                 <h3>Available Offers</h3>
 
-                {offers?.map((item) => (
-                  <div key={item.id} className={styles.offerCard}>
-                    {/* <div className={styles.offerEmoji}>🎁</div> */}
+                {offers?.map((item) => {
+                  const sheetImg = getOfferVisualUrl(item);
+                  return (
+                    <div key={item.id} className={styles.offerCard}>
+                      {sheetImg ? (
+                        <div className={styles.offerSheetThumb}>
+                          <Image
+                            src={sheetImg}
+                            alt=""
+                            width={52}
+                            height={52}
+                            className={styles.offerSheetThumbImg}
+                          />
+                        </div>
+                      ) : null}
+                      <div className={styles.offerCardBody}>
+                        <div className={styles.offerlist}>
+                          <p className={styles.offerCardTitle}>{item.title}</p>
 
-                    <div className={styles.offerlist}>
-                      <p className={styles.offerCardTitle}>{item.title}</p>
-
-                      <span className={styles.offerMin}>
-                        <strong>Min Order ₹{item.minOrderAmount}</strong>
-                      </span>
+                          <span className={styles.offerMin}>
+                            <strong>
+                              Min Order ₹
+                              {item.minOrderAmount ?? item.min_order_amount}
+                            </strong>
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </BottomSheet>
           </div>
