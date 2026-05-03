@@ -76,11 +76,27 @@ const ProductDetails = () => {
   const [offers, setOffers] = useState([]);
   const [showOfferSheet, setShowOfferSheet] = useState(false);
   const [cartBagTotal, setCartBagTotal] = useState(0);
+  const [cartProductQty, setCartProductQty] = useState(0);
+  const [cartProductRowId, setCartProductRowId] = useState(null);
 
   const refreshCartBagTotal = useCallback(async () => {
     const items = await db.cart.toArray();
     setCartBagTotal(sumCartBagTotal(items));
   }, []);
+
+  const refreshProductCartState = useCallback(async () => {
+    if (!product?.id) return;
+    const rows = await db.cart.where("productId").equals(product.id).toArray();
+    if (!rows?.length) {
+      setCartProductQty(0);
+      setCartProductRowId(null);
+      return;
+    }
+
+    const qty = rows.reduce((n, r) => n + (Number(r.quantity) || 1), 0);
+    setCartProductQty(qty);
+    setCartProductRowId(rows[0].id);
+  }, [product?.id]);
 
   useEffect(() => {
     if (product) {
@@ -114,6 +130,10 @@ const ProductDetails = () => {
   useEffect(() => {
     refreshCartBagTotal();
   }, [cartCount, id, refreshCartBagTotal]);
+
+  useEffect(() => {
+    refreshProductCartState();
+  }, [cartCount, id, product?.id, refreshProductCartState]);
 
   const nextUnlock = getNextUnlockableOffer(offers, cartBagTotal);
   const nextOffer = nextUnlock.nextOffer;
@@ -267,6 +287,7 @@ const ProductDetails = () => {
       const updatedCartItems = await db.cart.toArray();
       updateCart(updatedCartItems.length);
       setCartBagTotal(sumCartBagTotal(updatedCartItems));
+      await refreshProductCartState();
       setShowSuccessCart(true);
 
       console.log("✅ Item added to cart successfully");
@@ -276,6 +297,52 @@ const ProductDetails = () => {
     } finally {
       setLoader(false);
     }
+  };
+
+  const updateCartCountAndProductState = useCallback(async () => {
+    const items = await db.cart.toArray();
+    updateCart(items.length);
+    setCartBagTotal(sumCartBagTotal(items));
+    await refreshProductCartState();
+  }, [refreshProductCartState, updateCart]);
+
+  const incrementProductQty = async () => {
+    if (!product?.id) return;
+    const row = cartProductRowId
+      ? await db.cart.get(cartProductRowId)
+      : await db.cart.where("productId").equals(product.id).first();
+    if (!row) return;
+
+    const nextQty = (Number(row.quantity) || 1) + 1;
+    const unitPrice = Number(row.discountPrice ?? row.basePrice) || 0;
+    await db.cart.update(row.id, {
+      quantity: nextQty,
+      totalPrice: unitPrice * nextQty,
+    });
+    await updateCartCountAndProductState();
+  };
+
+  const decrementProductQty = async () => {
+    if (!product?.id) return;
+    const row = cartProductRowId
+      ? await db.cart.get(cartProductRowId)
+      : await db.cart.where("productId").equals(product.id).first();
+    if (!row) return;
+
+    const currQty = Number(row.quantity) || 1;
+    const nextQty = currQty - 1;
+    if (nextQty <= 0) {
+      await db.cart.delete(row.id);
+      await updateCartCountAndProductState();
+      return;
+    }
+
+    const unitPrice = Number(row.discountPrice ?? row.basePrice) || 0;
+    await db.cart.update(row.id, {
+      quantity: nextQty,
+      totalPrice: unitPrice * nextQty,
+    });
+    await updateCartCountAndProductState();
   };
   const handleWishlistClick = async () => {
     if (!accessToken) {
@@ -688,108 +755,84 @@ const ProductDetails = () => {
               </div>
             )}
 
-            <div className={styles.button_wrapper}>
-              {/* <button className={styles.buyit_btn} onClick={handlePayNow}>
-                {"BUY IT NOW"}
-                <p>(click to select size)</p>
-                <div
-                  className={styles.offerBanner}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowOfferSheet(true);
-                  }}
-                >
-                  <div className={styles.offerIcon}>
-                    Offers <ChevronUp size={14} />
-                  </div>
-                </div>
-              </button> */}
+            <div className={styles.cartActionBar}>
+              {cartProductQty > 0 ? (
+                <>
+                  <button
+                    type="button"
+                    className={styles.viewCartBtn}
+                    onClick={() => router.push("/cart")}
+                  >
+                    <span className={styles.cartIconMini}>
+                      {cartCount > 0 && (
+                        <span className={styles.cartBadge}>{cartCount}</span>
+                      )}
+                      <Image src={bag} alt="bag" />
+                    </span>
+                    <span>View Cart</span>
+                  </button>
 
-              <button
-                type="button"
-                className={styles.freeDeliveryCard}
-                onClick={() => setShowOfferSheet(true)}
-              >
-                <span className={styles.freeDeliveryTab}>
-                  Offers <ChevronUp size={14} strokeWidth={2.5} />
-                </span>
-                <div className={styles.freeDeliveryCardInner}>
-                  <div className={styles.freeDeliveryIconCircle} aria-hidden>
-                    {freeDeliveryCircleIconUrl ? (
-                      <Image
-                        src={freeDeliveryCircleIconUrl}
-                        alt=""
-                        width={44}
-                        height={44}
-                        className={styles.nextOfferIconImg}
-                        unoptimized
-                      />
-                    ) : (
-                      <span className={styles.nextOfferIconFallback}>
-                        {nextUnlock.allUnlocked ? (
-                          <Gift size={22} strokeWidth={2} />
-                        ) : circleGiftType === "freeDelivery" ? (
-                          <Truck size={22} strokeWidth={2} />
-                        ) : circleGiftType === "discount" ? (
-                          <Percent size={22} strokeWidth={2} />
-                        ) : (
-                          <Gift size={22} strokeWidth={2} />
-                        )}
-                      </span>
-                    )}
-                  </div>
-                  <div className={styles.freeDeliveryTextCol}>
-                    <p
-                      className={`${styles.freeDeliveryTitle} ${styles.nextOfferTitleClamp}`}
+                  <div className={styles.qtyStepper} aria-label="Quantity">
+                    <button
+                      type="button"
+                      className={styles.qtyBtn}
+                      onClick={decrementProductQty}
+                      aria-label="Decrease quantity"
                     >
-                      {nextOfferHeadline
-                        ? nextOfferHeadline
-                        : nextUnlock.allUnlocked && nextUnlock.hasAnyOffer
-                          ? "All rewards unlocked"
-                          : nextUnlock.hasAnyOffer
-                            ? "Unlock your next reward"
-                            : "Offers on your bag"}
-                    </p>
-                    {nextOffer &&
-                    nextUnlock.amountMore != null &&
-                    !nextUnlock.allUnlocked ? (
-                      <p className={styles.freeDeliverySub}>
-                        <span className={styles.freeDeliverySubMuted}>
-                          Shop for{" "}
-                        </span>
-                        <span className={styles.freeDeliverySubStrong}>
-                          ₹{nextUnlock.amountMore}
-                        </span>
-                        <span className={styles.freeDeliverySubMuted}>
-                          {" "}
-                          more to unlock
-                        </span>
-                      </p>
-                    ) : nextUnlock.allUnlocked && nextUnlock.hasAnyOffer ? (
-                      <p className={styles.freeDeliverySub}>
-                        <span className={styles.freeDeliverySubMuted}>
-                          Your bag meets every offer tier
-                        </span>
-                      </p>
-                    ) : (
-                      <p className={styles.freeDeliverySub}>
-                        <span className={styles.freeDeliverySubMuted}>
-                          Tap to view available offers
-                        </span>
-                      </p>
-                    )}
+                      <Minus size={16} />
+                    </button>
+                    <div className={styles.qtyValue}>{cartProductQty}</div>
+                    <button
+                      type="button"
+                      className={styles.qtyBtn}
+                      onClick={incrementProductQty}
+                      aria-label="Increase quantity"
+                    >
+                      <Plus size={16} />
+                    </button>
                   </div>
-                </div>
-              </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className={styles.cartIconBtn}
+                    onClick={() => router.push("/cart")}
+                    aria-label="Open cart"
+                  >
+                    {cartCount > 0 && (
+                      <span className={styles.cartBadge}>{cartCount}</span>
+                    )}
+                    <Image src={bag} alt="bag" />
+                  </button>
 
-              <button
-                className={styles.addToCart}
-                onClick={addToCart}
-                disabled={loader}
-              >
-                {loader ? "ADDING..." : "ADD TO BAG"}
-                <p>(click to select size)</p>
-              </button>
+                  <button
+                    type="button"
+                    className={styles.addToCartMain}
+                    onClick={addToCart}
+                    disabled={loader}
+                  >
+                    {loader ? "Adding..." : "Add to cart"}
+                    <span
+                      className={styles.offerPill}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowOfferSheet(true);
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setShowOfferSheet(true);
+                        }
+                      }}
+                    >
+                      Offers <ChevronUp size={14} strokeWidth={2.5} />
+                    </span>
+                  </button>
+                </>
+              )}
             </div>
             
             {/* Details Accordion */}

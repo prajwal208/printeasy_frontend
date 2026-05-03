@@ -1,0 +1,273 @@
+.dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999999999;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0));
+  pointer-events: none;
+
+  * {
+    pointer-events: auto;
+  }
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 8px 2px;
+  letter-spacing: -0.02em;
+}
+
+.row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.dockOfferCard {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  background: #ff7a00;
+  color: #fff;
+  border-radius: 16px;
+  padding: 1.25rem 0.75rem 0.85rem;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  appearance: none;
+  box-sizing: border-box;
+}
+
+.offerTab {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -42%);
+  background: #fff;
+  color: #000;
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+
+  svg {
+    color: #000;
+  }
+}
+
+.cardInner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iconCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #252a36;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+  overflow: hidden;
+}
+
+.iconImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.iconFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.textCol {
+  min-width: 0;
+}
+
+.title {
+  margin: 0 0 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.25;
+}
+
+.titleClamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.sub {
+  margin: 0;
+  font-size: 0.6rem;
+  line-height: 1.35;
+}
+
+.subMuted {
+  color: #fff;
+}
+
+.subStrong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.ringWrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+}
+
+.ringSvg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.ringInner {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.cartPill {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background:#fff;
+  color: #ff7a00;
+  border-radius: 14px;
+  padding: 10px 12px;
+  min-width: 118px;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
+}
+
+.cartThumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+
+.cartThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cartThumbPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.cartMeta {
+  min-width: 0;
+}
+
+.cartLabel {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.cartCount {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  opacity: 0.95;
+}
+
+.offerSheet {
+  padding: 1rem;
+
+  h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+  }
+}
+
+.sheetOfferRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.offerSheetThumb {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.offerSheetThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.offerCardBody {
+  min-width: 0;
+  flex: 1;
+}
+
+.offerCardTitle {
+  margin: 0 0 4px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.offerMin {
+  font-size: 0.85rem;
+  color: #555;
+}

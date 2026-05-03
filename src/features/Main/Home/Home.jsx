@@ -1,14 +1,12 @@
-
-
 import React from "react";
 import CustomCarousel from "@/component/CustomCarousel/CustomCarousel";
 import CategoryGrid from "../CategoryGrid/CategoryGrid";
 import HeroWords from "../HeroWords/HeroWords";
 import ProductSection from "../ProductSection/ProductSection";
 import OfferMarquee from "@/component/OfferMarquee/OfferMarquee";
+import HomeOfferDock from "@/component/HomeOfferDock/HomeOfferDock";
 
 import styles from "./home.module.scss";
-
 
 const Home = () => {
   // const [showOffer, setShowOffer] = useState(false);
@@ -21,17 +19,19 @@ const Home = () => {
   // }, []);
 
   return (
-    <main className={styles.homeContainer}>
-      <div className={styles.offerCarouselWrapper}>
-        { <OfferMarquee />}
-        <CustomCarousel />
-      </div>
+    <>
+      <main className={styles.homeContainer}>
+        <div className={styles.offerCarouselWrapper}>
+          <OfferMarquee />
+          <CustomCarousel />
+        </div>
 
-      <CategoryGrid />
-      <HeroWords />
-      <ProductSection />
-       
-    </main>
+        <CategoryGrid />
+        <HeroWords />
+        <ProductSection />
+      </main>
+      <HomeOfferDock />
+    </>
   );
 };
 

@@ -389,173 +389,144 @@
     }
   }
 
-  .button_wrapper {
+  .cartActionBar {
     display: flex;
+    align-items: center;
+    gap: 10px;
     width: 100%;
-    gap: 8px;
-    align-items: stretch;
+    margin-top: 1.5rem;
+  }
 
-    .freeDeliveryCard {
-      margin-top: 1.5rem;
-      position: relative;
-      flex: 1;
-      min-width: 0;
-      background: #14171f;
-      border-radius: 16px;
-      padding: 1.35rem 0.75rem 0.85rem;
-      cursor: pointer;
-      box-sizing: border-box;
-      text-align: left;
-      border: none;
-      font-family: inherit;
-      appearance: none;
-    }
+  .cartIconBtn {
+    width: 54px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 
-    .freeDeliveryTab {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translate(-50%, -42%);
-      background: #fff;
-      color: #c026d3;
-      border-radius: 999px;
-      padding: 0.2rem 0.65rem;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-      pointer-events: none;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-
-      svg {
-        color: #c026d3;
-      }
-    }
-
-    .freeDeliveryCardInner {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .freeDeliveryIconCircle {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #252a36;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      color: #fff;
-      overflow: hidden;
-    }
-
-    .nextOfferIconImg {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-
-    .nextOfferIconFallback {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-    }
-
-    .nextOfferTitleClamp {
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      word-break: break-word;
-    }
-
-    .freeDeliveryTextCol {
-      min-width: 0;
-    }
-
-    .freeDeliveryTitle {
-      margin: 0 0 4px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.25;
-    }
-
-    .freeDeliverySub {
-      margin: 0;
-      font-size: 0.78rem;
-      line-height: 1.35;
-    }
-
-    .freeDeliverySubMuted {
-      color: #9ca3af;
-    }
-
-    .freeDeliverySubStrong {
-      color: #fff;
-      font-weight: 700;
-    }
-
-    .addToCart {
-      margin-top: 1.5rem;
-      background: #fff;
-      color: #ff6b00;
-      border: none;
-      padding: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-      flex: 1;
-      min-width: 0;
-      width: auto;
-      letter-spacing: 0.5px;
-      border: 2px solid #ff6b00;
-    }
-
-    .buyit_btn {
-      margin-top: 1.5rem;
-      background: #ff6b00;
-      color: #fff;
-      border: none;
-      padding: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-      width: 100%;
-      letter-spacing: 0.5px;
-      border: 2px solid #ff6b00;
-      position: relative;
-    }
-
-    .offerBanner {
-      position: absolute;
-      top: -15;
-      left: 50%;
-    
-      transform: translateX(-50%);
-      // background-color: #9a9696;
-      padding: 0.2rem 0.4rem;
-      background-color: #fff;
-      color: #ff6b00;
-      border-radius: 0.5rem;
-      font-size: 0.75rem;
-
-      .offerIcon{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
+    img {
+      width: 22px;
+      height: 22px;
     }
   }
 
+  .cartBadge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+    border-radius: 999px;
+    padding: 4px 6px;
+    min-width: 18px;
+    text-align: center;
+    border: 2px solid #fff;
+  }
+
+  .addToCartMain {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #ff7a00;
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .offerPill {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    color: #000;
+    border-radius: 999px;
+    padding: 0.18rem 0.55rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  }
+
+  .viewCartBtn {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 800;
+    color: #111;
+  }
+
+  .cartIconMini {
+    position: relative;
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .qtyStepper {
+    width: 50%;
+    height: 44px;
+    border-radius: 12px;
+    background: #ff7b00;
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .qtyBtn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qtyValue {
+    color: #fff;
+    font-weight: 900;
+    text-align: center;
+    font-size: 1rem;
+  }
+
   @media (max-width: 450px) {
-    .button_wrapper {
+    .cartActionBar {
       position: fixed;
       bottom: 0;
       left: 0;
@@ -569,45 +540,9 @@
       justify-content: center;
       align-items: center;
 
-      .addToCart,
-      .freeDeliveryCard {
-        width: 49.5%;
-        max-width: 300px;
-        margin-top: 0px;
-        padding: 0.75rem;
-      }
+      padding: 0 10px;
 
-      .freeDeliveryCard {
-        padding: 1.1rem 0.45rem 0.55rem;
-        border-radius: 12px;
-      }
-
-      .freeDeliveryTitle {
-        font-size: 0.72rem;
-      }
-
-      .freeDeliverySub {
-        font-size: 0.62rem;
-      }
-
-      .freeDeliveryIconCircle {
-        width: 34px;
-        height: 34px;
-      }
-
-      .nextOfferIconFallback svg {
-        width: 18px;
-        height: 18px;
-      }
-
-      .freeDeliveryTab {
-        font-size: 0.62rem;
-        padding: 0.12rem 0.45rem;
-      }
-
-      .addToCart p {
-        font-size: 0.5rem;
-      }
+      margin-top: 0;
     }
   }
 
