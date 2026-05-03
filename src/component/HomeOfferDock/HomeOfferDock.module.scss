@@ -47,6 +47,22 @@
   box-sizing: border-box;
 }
 
+/* Desktop/webview: keep offer card compact */
+@media (min-width: 769px) {
+  .inner {
+    max-width: 1200px;
+  }
+
+  .row {
+    justify-content: center;
+  }
+
+  .dockOfferCard {
+    flex: 0 1 500px;
+    max-width: 500px;
+  }
+}
+
 .offerTab {
   position: absolute;
   top: 0;
