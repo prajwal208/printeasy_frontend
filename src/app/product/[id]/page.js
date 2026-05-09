@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   Plus,
@@ -41,6 +47,86 @@ import ProductPixel from "@/component/seo/ProductPixel";
 import YouMayLikeSection from "@/component/YouMayLikeSection/YouMayLikeSection";
 import { ChevronUp } from "lucide-react";
 import OfferMarquee from "@/component/OfferMarquee/OfferMarquee";
+
+const OUT_OF_STOCK_VALUES = new Set(["out_of_stock", "out of stock", "oos"]);
+
+function normalizeSizeKey(str) {
+  if (str == null || str === "") return "";
+  return String(str).trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+/** Extra key so "4-6 Y" and "4-6Y" match the same availability row. */
+function compactSizeKey(str) {
+  const n = normalizeSizeKey(str);
+  return n.replace(/\s+/g, "");
+}
+
+/** Map normalized label/value keys → availability string from API `sizeAvailability`. */
+function buildSizeAvailabilityMap(sizeAvailability) {
+  const map = new Map();
+  if (sizeAvailability == null) return map;
+
+  if (Array.isArray(sizeAvailability)) {
+    for (const entry of sizeAvailability) {
+      if (!entry || typeof entry !== "object") continue;
+      const rawStatus =
+        entry.status ??
+        entry.availability ??
+        entry.stock ??
+        entry.state ??
+        entry.sizeAvailability;
+      const status =
+        typeof rawStatus === "string" ? rawStatus : rawStatus?.toString?.();
+      if (!status) continue;
+      const keys = [
+        entry.label,
+        entry.value,
+        entry.size,
+        entry.optionLabel,
+        entry.optionValue,
+        entry.name,
+      ];
+      for (const k of keys) {
+        if (k != null && k !== "") {
+          const nk = normalizeSizeKey(k);
+          map.set(nk, status);
+          map.set(compactSizeKey(k), status);
+        }
+      }
+    }
+    return map;
+  }
+
+  if (typeof sizeAvailability === "object") {
+    for (const [key, val] of Object.entries(sizeAvailability)) {
+      const status =
+        typeof val === "string"
+          ? val
+          : val?.status ?? val?.availability ?? val?.stock;
+      if (status != null) {
+        const s = String(status);
+        const nk = normalizeSizeKey(key);
+        map.set(nk, s);
+        map.set(compactSizeKey(key), s);
+      }
+    }
+  }
+
+  return map;
+}
+
+function isSizeOptionOutOfStock(option, availabilityMap) {
+  if (!option || !(availabilityMap instanceof Map) || availabilityMap.size === 0) {
+    return false;
+  }
+  const status =
+    availabilityMap.get(normalizeSizeKey(option.label)) ??
+    availabilityMap.get(normalizeSizeKey(option.value)) ??
+    availabilityMap.get(compactSizeKey(option.label)) ??
+    availabilityMap.get(compactSizeKey(option.value));
+  if (status == null) return false;
+  return OUT_OF_STOCK_VALUES.has(String(status).trim().toLowerCase());
+}
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -164,6 +250,11 @@ const ProductDetails = () => {
     if (nextGiftType === "discount") return "Order discount";
     return "Reward";
   })();
+
+  const sizeAvailabilityMap = useMemo(
+    () => buildSizeAvailabilityMap(product?.sizeAvailability),
+    [product?.sizeAvailability]
+  );
 
   console.log(sizeInfo, "sosospopopo");
 
@@ -376,7 +467,22 @@ const ProductDetails = () => {
 
   useEffect(() => {
     setEditorReady(false);
+    setSelectedSizeYear("");
+    setSizeInfo(null);
   }, [id]);
+
+  useEffect(() => {
+    if (!product?.configuration?.[0]?.options?.length || !selectedSizeYear) {
+      return;
+    }
+    const opt = product.configuration[0].options.find(
+      (o) => o.value === selectedSizeYear
+    );
+    if (opt && isSizeOptionOutOfStock(opt, sizeAvailabilityMap)) {
+      setSelectedSizeYear("");
+      setSizeInfo(null);
+    }
+  }, [product, selectedSizeYear, sizeAvailabilityMap]);
 
   const handleShare = async () => {
     if (!product?.name) return;
@@ -740,17 +846,30 @@ const ProductDetails = () => {
                 )}
 
                 <div className={styles.sizeOptions}>
-                  {product?.configuration[0].options.map((s) => (
-                    <button
-                      key={s.value}
-                      onClick={() => handleSizeSelect(s.value)}
-                      className={`${styles.sizeBtn} ${
-                        selectedSizeYear === s.value ? styles.activeSize : ""
-                      }`}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
+                  {product?.configuration[0].options.map((s) => {
+                    const outOfStock = isSizeOptionOutOfStock(
+                      s,
+                      sizeAvailabilityMap
+                    );
+                    return (
+                      <button
+                        type="button"
+                        key={s.value}
+                        disabled={outOfStock}
+                        onClick={() => handleSizeSelect(s.value)}
+                        className={`${styles.sizeBtn} ${
+                          selectedSizeYear === s.value ? styles.activeSize : ""
+                        } ${outOfStock ? styles.sizeBtnOutOfStock : ""}`}
+                      >
+                        <span className={styles.sizeBtnLabel}>{s.label}</span>
+                        {outOfStock ? (
+                          <span className={styles.sizeBtnStockLabel}>
+                            Out of stock
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -876,17 +995,30 @@ const ProductDetails = () => {
                 SELECT A SIZE
               </h3>
               <div className={styles.sizeOptionsSheet}>
-                {product?.configuration?.[0]?.options.map((s) => (
-                  <button
-                    key={s.value}
-                    onClick={() => handleSizeSelect(s.value)}
-                    className={`${styles.sizeBtn} ${
-                      selectedSize === s.value ? styles.activeSize : ""
-                    }`}
-                  >
-                    {s.label}
-                  </button>
-                ))}
+                {product?.configuration?.[0]?.options.map((s) => {
+                  const outOfStock = isSizeOptionOutOfStock(
+                    s,
+                    sizeAvailabilityMap
+                  );
+                  return (
+                    <button
+                      type="button"
+                      key={s.value}
+                      disabled={outOfStock}
+                      onClick={() => handleSizeSelect(s.value)}
+                      className={`${styles.sizeBtn} ${
+                        selectedSizeYear === s.value ? styles.activeSize : ""
+                      } ${outOfStock ? styles.sizeBtnOutOfStock : ""}`}
+                    >
+                      <span className={styles.sizeBtnLabel}>{s.label}</span>
+                      {outOfStock ? (
+                        <span className={styles.sizeBtnStockLabel}>
+                          Out of stock
+                        </span>
+                      ) : null}
+                    </button>
+                  );
+                })}
               </div>
             </BottomSheet>
 

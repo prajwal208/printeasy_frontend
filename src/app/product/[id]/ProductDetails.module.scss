@@ -321,6 +321,7 @@
       gap: 0.7rem;
       flex-wrap: wrap;
       justify-content: flex-start;
+      align-items: stretch;
 
       @media (max-width: 600px) {
         justify-content: center;
@@ -328,6 +329,7 @@
     }
 
     .sizeBtn {
+      box-sizing: border-box;
       border: 1px solid #000;
       background: #fff;
       padding: 0.5rem 1rem;
@@ -335,21 +337,67 @@
       transition: 0.2s;
       font-size: 0.9rem;
       border-radius: 4px;
-      white-space: noWrap;
+      white-space: nowrap;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      line-height: 1.2;
+      /* Same height whether label is one line or label + “Out of stock” */
+      min-height: 2.5rem;
 
-      &:hover {
+      &:hover:not(:disabled) {
         background: #f8f8f8;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.72;
       }
 
       @media (max-width: 480px) {
         padding: 0.4rem 0.8rem;
         font-size: 0.85rem;
+        height: 0.75rem;
       }
+    }
+
+    .sizeBtnOutOfStock {
+      border-style: dashed;
+      border-color: #9ca3af;
+      color: #6b7280;
+    }
+
+    .sizeBtnLabel {
+      font-size: inherit;
+    }
+
+    .sizeBtnStockLabel {
+      font-size: 0.3rem;
+      font-weight: 600;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      white-space: nowrap;
     }
 
     .activeSize {
       border: 2px solid #c55f17;
       background: #fff4ec;
+      /* Keep same outer height as 1px default buttons */
+      padding: calc(0.5rem - 1px) calc(1rem - 1px);
+
+      @media (max-width: 480px) {
+        padding: calc(0.4rem - 1px) calc(0.8rem - 1px);
+      }
+    }
+
+    .activeSize.sizeBtnOutOfStock {
+      border: 2px dashed #9ca3af;
+      background: #f9fafb;
+      color: #6b7280;
     }
   }
   .buttonsWrapper {
@@ -582,8 +630,9 @@
     margin-top: 10px;
 
     .sizeBtn {
+      box-sizing: border-box;
       width: 100%;
-      padding: 12px 0;
+      padding: 12px 8px;
       border: 1px solid #dcdcdc;
       border-radius: 6px;
       font-size: 16px;
@@ -591,10 +640,42 @@
       cursor: pointer;
       transition: all 0.25s ease;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      line-height: 1.2;
+      min-height: 4.25rem;
 
-      &:hover {
+      &:hover:not(:disabled) {
         border-color: #000;
       }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.72;
+      }
+    }
+
+    .sizeBtnOutOfStock {
+      border-style: dashed;
+      border-color: #9ca3af;
+      color: #6b7280;
+    }
+
+    .sizeBtnLabel {
+      font-size: inherit;
+    }
+
+    .sizeBtnStockLabel {
+      font-size: 0.5rem;
+      font-weight: 600;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      white-space: nowrap;
     }
 
     .activeSize {
@@ -602,6 +683,20 @@
       background: #000;
       color: #fff;
       font-weight: 600;
+
+      .sizeBtnStockLabel {
+        color: rgba(255, 255, 255, 0.75);
+      }
+    }
+
+    .activeSize.sizeBtnOutOfStock {
+      border-color: #9ca3af;
+      background: #f3f4f6;
+      color: #6b7280;
+
+      .sizeBtnStockLabel {
+        color: #9ca3af;
+      }
     }
   }
 
