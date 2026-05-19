@@ -164,6 +164,7 @@ const ProductDetails = () => {
   const [cartBagTotal, setCartBagTotal] = useState(0);
   const [cartProductQty, setCartProductQty] = useState(0);
   const [cartProductRowId, setCartProductRowId] = useState(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const refreshCartBagTotal = useCallback(async () => {
     const items = await db.cart.toArray();
@@ -469,7 +470,13 @@ const ProductDetails = () => {
     setEditorReady(false);
     setSelectedSizeYear("");
     setSizeInfo(null);
+    setSelectedImageIndex(0);
   }, [id]);
+
+  const productImages = product?.productImages ?? [];
+  const showProductImageGallery = productImages.length > 2;
+  const activeProductImageUrl =
+    productImages[selectedImageIndex] ?? productImages[0];
 
   useEffect(() => {
     if (!product?.configuration?.[0]?.options?.length || !selectedSizeYear) {
@@ -761,7 +768,7 @@ const ProductDetails = () => {
             </>
           ) : (
             <Image
-              src={product?.productImages[0]}
+              src={activeProductImageUrl}
               alt="product"
               width={500}
               height={600}
@@ -771,8 +778,38 @@ const ProductDetails = () => {
             />
           )}
           <div className={styles.mobview}>
-                <OfferMarquee />
-                </div>
+            <OfferMarquee />
+          </div>
+
+          {showProductImageGallery && (
+            <div
+              className={styles.productImageGallery}
+              aria-label="Product images"
+            >
+              {productImages.map((src, index) => (
+                <button
+                  type="button"
+                  key={`${src}-${index}`}
+                  className={`${styles.productImageThumb} ${
+                    selectedImageIndex === index
+                      ? styles.productImageThumbActive
+                      : ""
+                  }`}
+                  onClick={() => setSelectedImageIndex(index)}
+                  aria-label={`View product image ${index + 1}`}
+                  aria-pressed={selectedImageIndex === index}
+                >
+                  <Image
+                    src={src}
+                    alt=""
+                    width={72}
+                    height={72}
+                    className={styles.productImageThumbImg}
+                  />
+                </button>
+              ))}
+            </div>
+          )}
           
           <div
             className={`${styles.infoSection} ${
