@@ -473,10 +473,20 @@ const ProductDetails = () => {
     setSelectedImageIndex(0);
   }, [id]);
 
+  useEffect(() => {
+    if (selectedImageIndex > 0) {
+      setIsEditing(false);
+    }
+  }, [selectedImageIndex]);
+
   const productImages = product?.productImages ?? [];
   const showProductImageGallery = productImages.length > 2;
+  const isCanvasPrimaryView = selectedImageIndex === 0;
   const activeProductImageUrl =
     productImages[selectedImageIndex] ?? productImages[0];
+  const editorShirtImageSrc = isCanvasPrimaryView
+    ? product?.canvasImage
+    : productImages[selectedImageIndex];
 
   useEffect(() => {
     if (!product?.configuration?.[0]?.options?.length || !selectedSizeYear) {
@@ -752,6 +762,8 @@ const ProductDetails = () => {
             <>
               <ShirtEditor
                 product={product}
+                shirtImageSrc={editorShirtImageSrc}
+                hideTextOverlay={!isCanvasPrimaryView}
                 ref={editorRef}
                 isEditing={isEditing}
                 setIsEditing={setIsEditing}

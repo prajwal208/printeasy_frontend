@@ -34,6 +34,8 @@ const ShirtEditor = forwardRef(
       text,
       setText,
       onReady,
+      shirtImageSrc,
+      hideTextOverlay = false,
     },
     ref,
   ) => {
@@ -52,6 +54,8 @@ const ShirtEditor = forwardRef(
     const viewRef = useRef(null);
     const editorRef = useRef(null);
 
+    const displayImageSrc = shirtImageSrc || product?.canvasImage;
+
     /* ================= NOTIFY PARENT WHEN EDITOR IS READY ================= */
     useEffect(() => {
       if (imageLoaded && fontsLoaded) onReady?.();
@@ -66,7 +70,11 @@ const ShirtEditor = forwardRef(
 
     /* ================= IMAGE LOAD & CONVERT TO BASE64 ================= */
     useEffect(() => {
-      if (!product?.canvasImage) return;
+      if (!displayImageSrc) return;
+
+      setImageLoaded(false);
+      setImageError(false);
+      setImageDataUrl(null);
 
       const loadAndConvertImage = async () => {
         try {
@@ -91,19 +99,19 @@ const ShirtEditor = forwardRef(
               }
             };
             img.onerror = reject;
-            img.src = `${product.canvasImage}?_t=${Date.now()}`;
+            img.src = `${displayImageSrc}?_t=${Date.now()}`;
           });
 
           await loadPromise;
         } catch {
-          setImageDataUrl(product.canvasImage);
+          setImageDataUrl(displayImageSrc);
           setImageLoaded(true);
           setImageError(false);
         }
       };
 
       loadAndConvertImage();
-    }, [product?.canvasImage]);
+    }, [displayImageSrc]);
 
     const injectFontCSS = (fontFamily, fontUrl) => {
       if (document.querySelector(`style[data-font="${fontFamily}"]`)) return;
@@ -326,7 +334,7 @@ const ShirtEditor = forwardRef(
                   marginBottom: "15px",
                 }}
               >
-                {product?.canvasImage?.substring(0, 60)}...
+                {displayImageSrc?.substring(0, 60)}...
               </p>
               <button
                 onClick={() => window.location.reload()}
@@ -364,7 +372,7 @@ const ShirtEditor = forwardRef(
             />
           )}
 
-          {product && imageLoaded && (
+          {product && imageLoaded && !hideTextOverlay && (
             <>
               {isEditing ? (
                 <textarea
@@ -412,7 +420,7 @@ const ShirtEditor = forwardRef(
             </>
           )}
 
-          {isEditing && (
+          {isEditing && !hideTextOverlay && (
             <div
               className={styles.floatingToolbar}
               tabIndex="-1"
