@@ -128,6 +128,45 @@ function isSizeOptionOutOfStock(option, availabilityMap) {
   return OUT_OF_STOCK_VALUES.has(String(status).trim().toLowerCase());
 }
 
+function normalizeProductImages(product) {
+  const raw = product?.productImages ?? product?.product_images;
+  if (raw == null) return [];
+
+  const toUrl = (entry) => {
+    if (typeof entry === "string") return entry.trim();
+    if (entry && typeof entry === "object") {
+      return (entry.url ?? entry.src ?? entry.image ?? "").trim();
+    }
+    return "";
+  };
+
+  if (Array.isArray(raw)) {
+    return raw.map(toUrl).filter(Boolean);
+  }
+
+  if (typeof raw === "object") {
+    return Object.values(raw).map(toUrl).filter(Boolean);
+  }
+
+  if (typeof raw === "string") {
+    const trimmed = raw.trim();
+    if (!trimmed) return [];
+    if (trimmed.startsWith("[")) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) {
+          return parsed.map(toUrl).filter(Boolean);
+        }
+      } catch {
+        /* use as single URL */
+      }
+    }
+    return [trimmed];
+  }
+
+  return [];
+}
+
 const ProductDetails = () => {
   const { id } = useParams();
   const router = useRouter();
@@ -464,7 +503,7 @@ const ProductDetails = () => {
     }
   };
 
-  console.log(product?.configuration[0].options, "sososppyyttttt");
+  console.log(product?.configuration?.[0]?.options, "sososppyyttttt");
 
   useEffect(() => {
     setEditorReady(false);
@@ -478,15 +517,6 @@ const ProductDetails = () => {
       setIsEditing(false);
     }
   }, [selectedImageIndex]);
-
-  const productImages = product?.productImages ?? [];
-  const showProductImageGallery = productImages.length > 2;
-  const isCanvasPrimaryView = selectedImageIndex === 0;
-  const activeProductImageUrl =
-    productImages[selectedImageIndex] ?? productImages[0];
-  const editorShirtImageSrc = isCanvasPrimaryView
-    ? product?.canvasImage
-    : productImages[selectedImageIndex];
 
   useEffect(() => {
     if (!product?.configuration?.[0]?.options?.length || !selectedSizeYear) {
@@ -597,6 +627,15 @@ const ProductDetails = () => {
   if (loading) {
     return <ProductDetailsShimmer />;
   }
+
+  const productImages = normalizeProductImages(product);
+  const showProductImageGallery = productImages.length > 1;
+  const isCanvasPrimaryView = selectedImageIndex === 0;
+  const activeProductImageUrl =
+    productImages[selectedImageIndex] ?? productImages[0];
+  const editorShirtImageSrc = isCanvasPrimaryView
+    ? product?.canvasImage
+    : productImages[selectedImageIndex];
 
   const uploadImagePayload = {
     printText: text,
@@ -758,8 +797,8 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {product?.isCustomizable ? (
-            <>
+          <div className={styles.productMediaColumn}>
+            {product?.isCustomizable ? (
               <ShirtEditor
                 product={product}
                 shirtImageSrc={editorShirtImageSrc}
@@ -777,52 +816,53 @@ const ProductDetails = () => {
                 setSelectedSize={setSelectedSize}
                 onReady={() => setEditorReady(true)}
               />
-            </>
-          ) : (
-            <Image
-              src={activeProductImageUrl}
-              alt="product"
-              width={500}
-              height={600}
-              className={styles.mainImage}
-              priority
-              onLoad={() => setEditorReady(true)}
-            />
-          )}
-          <div className={styles.mobview}>
-            <OfferMarquee />
+            ) : (
+              <Image
+                src={activeProductImageUrl}
+                alt="product"
+                width={500}
+                height={600}
+                className={styles.mainImage}
+                priority
+                onLoad={() => setEditorReady(true)}
+              />
+            )}
+
+            <div className={styles.mobview}>
+              <OfferMarquee />
+            </div>
+
+            {showProductImageGallery && (
+              <div
+                className={styles.productImageGallery}
+                aria-label="Product images"
+              >
+                {productImages.map((src, index) => (
+                  <button
+                    type="button"
+                    key={`${src}-${index}`}
+                    className={`${styles.productImageThumb} ${
+                      selectedImageIndex === index
+                        ? styles.productImageThumbActive
+                        : ""
+                    }`}
+                    onClick={() => setSelectedImageIndex(index)}
+                    aria-label={`View product image ${index + 1}`}
+                    aria-pressed={selectedImageIndex === index}
+                  >
+                    <Image
+                      src={src}
+                      alt=""
+                      width={72}
+                      height={72}
+                      className={styles.productImageThumbImg}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {showProductImageGallery && (
-            <div
-              className={styles.productImageGallery}
-              aria-label="Product images"
-            >
-              {productImages.map((src, index) => (
-                <button
-                  type="button"
-                  key={`${src}-${index}`}
-                  className={`${styles.productImageThumb} ${
-                    selectedImageIndex === index
-                      ? styles.productImageThumbActive
-                      : ""
-                  }`}
-                  onClick={() => setSelectedImageIndex(index)}
-                  aria-label={`View product image ${index + 1}`}
-                  aria-pressed={selectedImageIndex === index}
-                >
-                  <Image
-                    src={src}
-                    alt=""
-                    width={72}
-                    height={72}
-                    className={styles.productImageThumbImg}
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-          
           <div
             className={`${styles.infoSection} ${
               !isCustomizable && styles.infoSection_img
