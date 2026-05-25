@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Heart } from "lucide-react";
 import styles from "./cartMobile.module.scss";
 import FOMO_USERS, { pickUsers, randomUser } from "@/data/fomoUsers";
 import { getApplicableRewards } from "@/lib/price";
@@ -469,7 +469,8 @@ const CartMobile = ({
                   className={styles.ciWish}
                   onClick={() => onWishlist(item.productId)}
                 >
-                  ♡ Wishlist
+                  <Heart size={14} fill="#ff4500" strokeWidth={0} />
+                  Wishlist
                 </button>
                 <button
                   type="button"
@@ -613,7 +614,6 @@ const CartMobile = ({
               </div>
               <div className={styles.piSub}>
                 ₹{partial.advanceAmount} now + ₹{codBalance} cash on delivery
-                <br />
                 <span className={styles.piCod}>
                   + ₹{COD_FEE} COD convenience fee included
                 </span>

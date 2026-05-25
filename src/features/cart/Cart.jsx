@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Trash2, ChevronLeft } from "lucide-react";
+import { Trash2, ChevronLeft, Heart } from "lucide-react";
 import styles from "./cart.module.scss";
 import NoResult from "@/component/NoResult/NoResult";
 import { useRouter } from "next/navigation";
@@ -340,7 +340,8 @@ const Cart = () => {
                             className={styles.wishlistBtn}
                             onClick={() => addToWishlist(item?.productId)}
                           >
-                            MOVE TO WISHLIST
+                            <Heart size={16} fill="#ff4500" strokeWidth={0} />
+                            <span>MOVE TO WISHLIST</span>
                           </button>
                           <span className={styles.itemPrice}>
                             <span className={styles.strikeValue}>

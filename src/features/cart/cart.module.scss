@@ -215,6 +215,9 @@
   letter-spacing: 0.5px;
   transition: opacity 0.3s;
   color: #ff4500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 
   &:hover {
     opacity: 0.7;

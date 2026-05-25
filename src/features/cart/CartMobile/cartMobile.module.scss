@@ -522,30 +522,25 @@
 /* CTA */
 .fcCta {
   width: 100%;
-  background: linear-gradient(135deg, var(--orange), #ff6a00);
-  border-radius: 13px;
-  padding: 13px 16px;
+  background: #ff4500 !important;
+  border: none;
+  border-radius: 14px;
+  padding: 1rem !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(255, 69, 0, 0.4);
+  transition: background 0.15s, transform 0.15s;
 
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent
-    );
-    animation: shimmer 2s infinite;
+  &:hover:not(:disabled) {
+    background: #f54100;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
   }
 }
 
@@ -838,7 +833,7 @@
 .ciWish {
   font-size: 11px;
   font-weight: 700;
-  color: var(--orange);
+  color: var(--orange) !important;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -847,12 +842,12 @@
 .ciDel {
   width: 28px;
   height: 28px;
-  background: var(--ol);
+  background: var(--ol) !important;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--orange);
+  color: var(--orange) !important;
 }
 
 .ciQty {
@@ -986,32 +981,33 @@
 }
 
 .payOpts {
-  padding: 8px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 16px;
 }
 
 .payOpt {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px;
-  border: 2px solid var(--border);
-  border-radius: 14px;
-  transition: border-color 0.18s, background 0.18s;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 16px 18px !important;
+  border: 2px solid var(--border) !important;
+  border-radius: 16px;
+  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
   background: var(--white);
   width: 100%;
   text-align: left;
 }
 
 .payOptSel {
-  border-color: var(--orange);
+  border-color: var(--orange) !important;
   background: #fffaf7;
+  box-shadow: 0 4px 14px rgba(255, 69, 0, 0.08);
 
   .pr {
-    border-color: var(--orange);
-    background: var(--orange);
+    border-color: var(--orange) !important;
+    background: var(--orange) !important;
   }
 
   .prDot {
@@ -1029,6 +1025,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.18s;
+  margin-top: 12px;
 }
 
 .prDot {
@@ -1041,14 +1038,15 @@
 }
 
 .piWrap {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 22px;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .piWrapOn {
@@ -1062,63 +1060,71 @@
 .pi {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 
 .piRow {
   display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-bottom: 3px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
 }
 
 .piName {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
   color: var(--ink);
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .piSave {
   background: var(--orange);
   color: #fff;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
-  padding: 3px 7px;
-  border-radius: 6px;
+  padding: 4px 10px;
+  border-radius: 7px;
   white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
 .piPop {
   background: var(--green);
   color: #fff;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
-  padding: 3px 7px;
-  border-radius: 6px;
+  padding: 4px 12px;
+  border-radius: 7px;
+  letter-spacing: 0.04em;
 }
 
 .piSub {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.5;
 }
 
 .piCod {
-  display: inline-block;
-  margin-top: 2px;
-  font-size: 10px;
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
   color: var(--orange);
   font-weight: 700;
+  line-height: 1.4;
 }
 
 .piPrice {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 800;
   color: var(--ink);
   letter-spacing: -0.5px;
   flex-shrink: 0;
+  align-self: center;
 }
 
 /* ── COD BREAKDOWN ── */
@@ -1480,16 +1486,22 @@
 
 .coBtn {
   width: 100%;
-  background: linear-gradient(135deg, var(--orange), #ff6a00);
-  border-radius: 18px;
-  padding: 17px 20px;
+  background: #ff4500 !important;
+  border: none;
+  border-radius: 20px;
+  padding: 14px 22px !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 8px 24px rgba(255, 69, 0, 0.35);
-  transition: transform 0.15s;
+  gap: 12px;
+  box-shadow: 0 10px 28px rgba(255, 69, 0, 0.35);
+  transition: transform 0.15s, background 0.15s;
   position: relative;
   overflow: hidden;
+
+  &:hover:not(:disabled) {
+    background: #f54100;
+  }
 
   &:active:not(:disabled) {
     transform: scale(0.98);
@@ -1499,67 +1511,62 @@
     opacity: 0.7;
     cursor: not-allowed;
   }
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.15),
-      transparent
-    );
-    animation: shimmer 2.5s infinite;
-  }
 }
 
 .coL {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  align-items: flex-start;
+  gap: 3px;
   text-align: left;
+  position: relative;
+  z-index: 1;
 }
 
 .coSub {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
   font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
 }
 
 .coAmt {
   font-family: "Bebas Neue", "Plus Jakarta Sans", sans-serif;
-  font-size: 26px;
+  font-size: 34px;
   color: #fff;
   letter-spacing: 0.04em;
   line-height: 1;
+  font-weight: 600;
 }
 
 .coR {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
 }
 
 .coLbl {
-  font-size: 15px;
+  font-size: 22px;
   font-weight: 800;
   color: #fff;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 
 .coArr {
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.22);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 16px;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .spacer {

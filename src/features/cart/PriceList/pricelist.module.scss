@@ -193,38 +193,43 @@
 .svPill {
   display: flex;
   justify-content: center;
-  margin: 18px 0 10px;
+  margin: 18px 0 12px;
 }
 
 .svPillIn {
   background: #e6f9f2;
   border: 1px solid #a8e6c8;
-  border-radius: 20px;
-  padding: 6px 16px;
-  font-size: 12px;
+  border-radius: 22px;
+  padding: 7px 18px;
+  font-size: 13px;
   font-weight: 700;
   color: #00a86b;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .coBtn {
   margin-top: 4px;
   width: 100%;
-  background: linear-gradient(135deg, #ff4500, #ff6a00);
+  background: #ff4500;
   border: none;
-  border-radius: 18px;
-  padding: 17px 22px;
+  border-radius: 20px;
+  padding: 18px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(255, 69, 0, 0.35);
-  transition: transform 0.15s;
+  box-shadow: 0 10px 28px rgba(255, 69, 0, 0.35);
+  transition: transform 0.15s, background 0.15s;
   position: relative;
   overflow: hidden;
   color: #fff;
+
+  &:hover:not(:disabled) {
+    background: #f54100;
+  }
 
   &:active:not(:disabled) {
     transform: scale(0.98);
@@ -234,49 +239,29 @@
     opacity: 0.7;
     cursor: not-allowed;
   }
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.15),
-      transparent
-    );
-    animation: coShimmer 2.5s infinite;
-  }
-}
-
-@keyframes coShimmer {
-  0% { left: -100%; }
-  100% { left: 200%; }
 }
 
 .coL {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: 3px;
   text-align: left;
   position: relative;
   z-index: 1;
 }
 
 .coSub {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
   font-weight: 500;
   letter-spacing: 0.01em;
+  line-height: 1.2;
 }
 
 .coAmt {
   font-family: "Bebas Neue", "Plus Jakarta Sans", sans-serif;
-  font-size: 28px;
+  font-size: 34px;
   color: #fff;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -286,27 +271,28 @@
 .coR {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   position: relative;
   z-index: 1;
 }
 
 .coLbl {
-  font-size: 16px;
+  font-size: 22px;
   font-weight: 800;
   color: #fff;
   letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 
 .coArr {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   background: rgba(255, 255, 255, 0.22);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
 }
