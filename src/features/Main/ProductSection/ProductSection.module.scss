@@ -84,6 +84,15 @@
   border: 1px solid #e8e3dc;
   background: #fff;
   color: #9a9490;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.ymalFilterActive {
+  background: #0f0e0c;
+  color: #fff;
+  border-color: #0f0e0c;
 }
 
 .filters {
@@ -150,9 +159,13 @@
     width: 100%;
   }
 
+  .ymalHeader {
+    padding: 14px 12px 0;
+  }
+
   .cardGrid {
     width: 100%;
-    padding: 0 !important;
+    padding: 0 0.4rem!important;
     margin: 0 !important;
     grid-template-columns: repeat(2, 1fr);
     row-gap: 1.5rem !important;

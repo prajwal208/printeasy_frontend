@@ -29,7 +29,6 @@ import api from "@/axiosInstance/axiosInstance";
 import BottomSheet from "@/component/BottomSheet/BottomSheet";
 import AddToCartSuccessSheet from "@/component/AddToCartSuccessSheet/AddToCartSuccessSheet";
 import ProductDetailsShimmer from "@/component/ProductDetailsShimmer/ProductDetailsShimmer";
-import Suggested from "@/component/Suggested/Suggested";
 import { useCart } from "@/context/CartContext";
 import bag from "../../../assessts/bag.svg";
 import share from "../../../assessts/share.svg";
@@ -1488,11 +1487,7 @@ const ProductDetails = () => {
           </div>
 
           <section className={styles.relatedSection}>
-            {collectionId ? (
-              <YouMayLikeSection categoryId={collectionId} />
-            ) : (
-              <Suggested relatedData={relatedData} />
-            )}
+            <YouMayLikeSection initialCollectionId={collectionId} />
           </section>
         </div>
       </>

@@ -113,21 +113,28 @@ const ProductSection = () => {
 
   return (
     <div className={styles.wrapper}>
-      <h2 className={styles.heading}>NEW AND POPULAR</h2>
+      <div className={styles.ymalHeader}>
+        <div className={styles.ymalEyebrow}>CURATED FOR YOU</div>
+        <div className={styles.ymalTitleRow}>
+          <h2 className={styles.ymalTitle}>NEW AND POPULAR</h2>
+        </div>
 
-      {/* FILTERS */}
-      <div className={styles.filters}>
-        {filter?.map((cat) => (
-          <button
-            key={cat.id}
-            className={`${styles.filterBtn} ${
-              selectedCategory === cat.id ? styles.active : ""
-            }`}
-            onClick={() => handleCategoryChange(cat.id)}
-          >
-            {cat.name}
-          </button>
-        ))}
+        {filter.length > 0 ? (
+          <div className={styles.ymalFilters}>
+            {filter.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`${styles.ymalFilter} ${
+                  selectedCategory === cat.id ? styles.ymalFilterActive : ""
+                }`}
+                onClick={() => handleCategoryChange(cat.id)}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       {/* PRODUCTS */}

@@ -1,17 +1,25 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import styles from "../../features/Main/ProductSection/ProductSection.module.scss";
 import ProductCard from "@/component/ProductCard/ProductCard";
 import ProductCardShimmer from "@/component/ProductShimmer/ProductShimmer";
 import api from "@/axiosInstance/axiosInstance";
 
-
+const DEFAULT_COLLECTION_ID = "KjYkkJYBXXwIBXnpIgCg";
+const API_KEY =
+  "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10";
+const STORE_CATEGORY_ID = "H8SZ4VfsFXa4C9cUeonB";
 
 const YouMayLikeSection = ({
-  categoryId,
+  initialCollectionId,
   heading = "YOU MAY ALSO LIKE",
 }) => {
+  const [filters, setFilters] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(
+    initialCollectionId || DEFAULT_COLLECTION_ID
+  );
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -19,25 +27,23 @@ const YouMayLikeSection = ({
 
   const loadMoreRef = useRef(null);
   const limit = 20;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  /* ---------------- FETCH DATA ---------------- */
-  const fetchProducts = async (pageNumber = 1) => {
-    if (loading || !hasMore || !categoryId) return;
+  const fetchProducts = async (categoryId, pageNumber = 1) => {
+    if (!categoryId || loading) return;
+    if (pageNumber > 1 && !hasMore) return;
 
     try {
       setLoading(true);
 
       const res = await api.get(`/v2/product/collections`, {
         params: {
-          categoryId: "H8SZ4VfsFXa4C9cUeonB",
+          categoryId: STORE_CATEGORY_ID,
           identifier: categoryId,
           page: pageNumber,
           limit,
         },
-        headers: {
-          "x-api-key":
-            "454ccaf106998a71760f6729e7f9edaf1df17055b297b3008ff8b65a5efd7c10",
-        },
+        headers: { "x-api-key": API_KEY },
       });
 
       const newProducts = res?.data?.data || [];
@@ -46,10 +52,7 @@ const YouMayLikeSection = ({
         pageNumber === 1 ? newProducts : [...prev, ...newProducts]
       );
 
-      if (newProducts.length < limit) {
-        setHasMore(false);
-      }
-
+      setHasMore(newProducts.length >= limit);
       setPage(pageNumber);
     } catch (err) {
       console.error("Error fetching you may like products:", err);
@@ -58,34 +61,53 @@ const YouMayLikeSection = ({
     }
   };
 
-  /* ---------------- RESET ON CATEGORY CHANGE ---------------- */
-  useEffect(() => {
+  const getFilters = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/v1/categories/all`, {
+        headers: { "x-api-key": API_KEY },
+      });
+      setFilters(res?.data?.data?.[0]?.collections || []);
+    } catch (err) {
+      console.error("Error fetching collection filters:", err);
+    }
+  };
+
+  const handleCategoryChange = (id) => {
+    setSelectedCategory(id);
     setProducts([]);
     setPage(1);
     setHasMore(true);
+    fetchProducts(id, 1);
+  };
 
-    if (categoryId) {
-      fetchProducts(1);
-    }
-  }, [categoryId]);
+  useEffect(() => {
+    getFilters();
+  }, []);
 
-  /* ---------------- INTERSECTION OBSERVER ---------------- */
+  useEffect(() => {
+    const id = initialCollectionId || DEFAULT_COLLECTION_ID;
+    setSelectedCategory(id);
+    setProducts([]);
+    setPage(1);
+    setHasMore(true);
+    fetchProducts(id, 1);
+  }, [initialCollectionId]);
+
   useEffect(() => {
     if (!loadMoreRef.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading) {
-          fetchProducts(page + 1);
+          fetchProducts(selectedCategory, page + 1);
         }
       },
       { threshold: 1 }
     );
 
     observer.observe(loadMoreRef.current);
-
     return () => observer.disconnect();
-  }, [page, hasMore, loading]);
+  }, [page, hasMore, loading, selectedCategory]);
 
   return (
     <div className={styles.wrapper}>
@@ -93,17 +115,24 @@ const YouMayLikeSection = ({
         <div className={styles.ymalEyebrow}>CURATED FOR YOU</div>
         <div className={styles.ymalTitleRow}>
           <h2 className={styles.ymalTitle}>{heading}</h2>
-          <button type="button" className={styles.ymalSeeAll}>
-            See all →
-          </button>
         </div>
-        <div className={styles.ymalFilters}>
-          {["All", "Animals", "Heroes", "Funny", "Anime"].map((t) => (
-            <span key={t} className={styles.ymalFilter}>
-              {t}
-            </span>
-          ))}
-        </div>
+
+        {filters.length > 0 ? (
+          <div className={styles.ymalFilters}>
+            {filters.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`${styles.ymalFilter} ${
+                  selectedCategory === cat.id ? styles.ymalFilterActive : ""
+                }`}
+                onClick={() => handleCategoryChange(cat.id)}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <div className={styles.cardGrid}>
