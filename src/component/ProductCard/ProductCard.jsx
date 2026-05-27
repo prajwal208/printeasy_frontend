@@ -8,7 +8,6 @@ import { usePathname, useRouter } from "next/navigation";
 import api from "@/axiosInstance/axiosInstance";
 
 const ProductCard = ({ item, getwishList }) => {
-  console.log(item,"dsnkdnsknduuiiiii")
   const [liked, setLiked] = useState(false);
   const router = useRouter();
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -35,7 +34,7 @@ const ProductCard = ({ item, getwishList }) => {
 
       fetchWishlistStatus();
     }
-  }, [item.id, pathname]);
+  }, [apiUrl, item.id, pathname]);
 
   const toggleWishlist = async () => {
     try {
@@ -68,44 +67,86 @@ const ProductCard = ({ item, getwishList }) => {
     }
   };
 
-  const discountPercentage = Math.round(
-    ((item?.basePrice - item?.discountedPrice) / item?.basePrice) * 100
-  );
+  const discountPercentage =
+    item?.basePrice && item?.discountedPrice
+      ? Math.round(((item.basePrice - item.discountedPrice) / item.basePrice) * 100)
+      : 0;
+
+  const cardImageSrc =
+    item?.productImages?.[1] ??
+    item?.productImages?.[0] ??
+    item?.productImageUrl ??
+    item?.imageUrl ??
+    item?.image ??
+    "";
 
   return (
-    <div className={styles.card} onClick={handleClick}>
-      <div className={styles.imageContainer}>
+    <article className={styles.card} onClick={handleClick} role="button" tabIndex={0}>
+      <div className={styles.media}>
         <Image
-          src={item?.productImages[0]}
+          src={cardImageSrc}
           alt={item?.name}
-          className={styles.productImg}
+          className={styles.mediaImg}
           fill
         />
-        {pathname === "/wishlist" && (
-          <span
-            className={`${styles.favorite} ${liked ? styles.liked : ""}`}
+
+        <div className={styles.badges}>
+          {item?.isTrending ? (
+            <span className={`${styles.badge} ${styles.badgeHot}`}>🔥 TRENDING</span>
+          ) : null}
+          {discountPercentage > 0 ? (
+            <span className={`${styles.badge} ${styles.badgeOff}`}>
+              {discountPercentage}% OFF
+            </span>
+          ) : null}
+        </div>
+
+        {pathname === "/wishlist" ? (
+          <button
+            type="button"
+            className={`${styles.wishBtn} ${liked ? styles.wishBtnLiked : ""}`}
             onClick={(e) => {
               e.stopPropagation();
               toggleWishlist();
             }}
+            aria-label={liked ? "Remove from wishlist" : "Add to wishlist"}
           >
             <Heart
-              size={22}
-              fill={liked ? "red" : "none"}
-              stroke={liked ? "red" : "currentColor"}
+              size={16}
+              fill={liked ? "#ff4500" : "none"}
+              stroke={liked ? "#ff4500" : "#ffffff"}
+              strokeWidth={2}
             />
-          </span>
-        )}
+          </button>
+        ) : null}
       </div>
-      
-      <h3>{item?.name}</h3>
-      <p>
-        ₹ {item?.discountedPrice}{" "}
-        <span className={styles.basePrice}>₹ {item?.basePrice}</span>{" "}
-        <span className={styles.discount}>{discountPercentage}% off</span>
-      </p>
-      <p>Incl all taxes</p>
-    </div>
+
+      <div className={styles.body}>
+        <h3 className={styles.name}>{item?.name}</h3>
+
+        <div className={styles.metaRow}>
+          {item?.rating ? (
+            <>
+              <span className={styles.stars}>★★★★★</span>
+              <span className={styles.ratingNum}>{item.rating}</span>
+              {item?.ratingCount ? (
+                <span className={styles.ratingCnt}>({item.ratingCount})</span>
+              ) : null}
+            </>
+          ) : null}
+        </div>
+
+        <div className={styles.priceRow}>
+          <span className={styles.price}>₹{item?.discountedPrice}</span>
+          {item?.basePrice > item?.discountedPrice ? (
+            <span className={styles.basePrice}>₹{item?.basePrice}</span>
+          ) : null}
+          {discountPercentage > 0 ? (
+            <span className={styles.offPill}>{discountPercentage}% OFF</span>
+          ) : null}
+        </div>
+      </div>
+    </article>
   );
 };
 

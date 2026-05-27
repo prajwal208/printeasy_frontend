@@ -13,6 +13,8 @@ import {
   Minus,
   Heart,
   ChevronLeft,
+  ChevronRight,
+  Search,
   Truck,
   Gift,
   Percent,
@@ -54,6 +56,7 @@ import ProductPixel from "@/component/seo/ProductPixel";
 import YouMayLikeSection from "@/component/YouMayLikeSection/YouMayLikeSection";
 import { ChevronUp } from "lucide-react";
 import OfferMarquee from "@/component/OfferMarquee/OfferMarquee";
+import { getReviewStats, productReviews } from "@/data/productReviews";
 
 const OUT_OF_STOCK_VALUES = new Set(["out_of_stock", "out of stock", "oos"]);
 
@@ -211,6 +214,7 @@ const ProductDetails = () => {
   const [cartProductQty, setCartProductQty] = useState(0);
   const [cartProductRowId, setCartProductRowId] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [reviewFilter, setReviewFilter] = useState("ALL");
 
   const refreshCartBagTotal = useCallback(async () => {
     const items = await db.cart.toArray();
@@ -631,6 +635,24 @@ const ProductDetails = () => {
     }
   }, [relatedId]);
 
+  const reviewStats = useMemo(() => getReviewStats(productReviews), []);
+
+  const filteredReviews = useMemo(() => {
+    const all = productReviews;
+    if (reviewFilter === "PHOTOS") return all.filter((r) => r.hasPhotos);
+    if (reviewFilter === "5") return all.filter((r) => Number(r.rating) === 5);
+    if (reviewFilter === "4") return all.filter((r) => Number(r.rating) === 4);
+    return all;
+  }, [reviewFilter]);
+
+  const reviewPhotoThumbs = useMemo(() => {
+    const thumbs = [];
+    for (const r of productReviews) {
+      for (const p of r.photos || []) thumbs.push(p);
+    }
+    return thumbs.slice(0, 5);
+  }, []);
+
   if (loading) {
     return <ProductDetailsShimmer />;
   }
@@ -643,6 +665,18 @@ const ProductDetails = () => {
   const editorShirtImageSrc = isCanvasPrimaryView
     ? product?.canvasImage
     : productImages[selectedImageIndex];
+
+  const discountPercent =
+    product?.discountedPrice && product?.basePrice
+      ? Math.round(
+          ((product.basePrice - product.discountedPrice) / product.basePrice) *
+            100
+        )
+      : 0;
+
+  const stickyLineTotal =
+    (product?.discountedPrice || product?.basePrice || 0) *
+    (cartProductQty > 0 ? cartProductQty : 1);
 
   const uploadImagePayload = {
     printText: text,
@@ -736,318 +770,562 @@ const ProductDetails = () => {
       <ProductPixel product={product} />
 
       <>
-        <div className={styles.container}>
+        <div className={styles.pageRoot}>
           <ToastContainer position="top-right" autoClose={2000} />
 
-          {/* Header Icons */}
-          <div className={styles.back} onClick={() => router.back()}>
-            <ChevronLeft size={30} />
-          </div>
-          <div className={styles.mobileIconsContainer}>
-            <div className={styles.mobileIconsRight}>
+          <div className={styles.productTopNav}>
+            <button
+              type="button"
+              className={styles.tnavBack}
+              onClick={() => router.back()}
+              aria-label="Go back"
+            >
+              <ChevronLeft size={17} strokeWidth={2.5} />
+            </button>
+            <button
+              type="button"
+              className={styles.tnavLogo}
+              onClick={() => router.push("/")}
+            >
+              <span>ON</span>RISE
+            </button>
+            <div className={styles.tnavRight}>
               <button
-                className={styles.mobileIcon}
+                type="button"
+                className={styles.tnavBtn}
+                onClick={() => router.push("/search")}
+                aria-label="Search"
+              >
+                <Search size={16} strokeWidth={2} />
+              </button>
+              <button
+                type="button"
+                className={styles.tnavBtn}
+                onClick={handleShare}
+                aria-label="Share product"
+              >
+                <Image src={share} alt="" width={16} height={16} />
+              </button>
+              <button
+                type="button"
+                className={styles.tnavBtn}
                 onClick={() => router.push("/cart")}
+                aria-label="Open cart"
               >
+                <Image src={bag} alt="" width={16} height={16} />
                 {cartCount > 0 && (
-                  <span className={styles.badge}>{cartCount}</span>
+                  <span className={styles.tnavBadge}>{cartCount}</span>
                 )}
-                <Image src={bag} alt="bag" />
-              </button>
-              <button
-                className={styles.mobileIcon}
-                onClick={handleWishlistClick}
-              >
-                <Heart
-                  size={40}
-                  stroke={isWishlisted ? "red" : "black"}
-                  fill={isWishlisted ? "red" : "transparent"}
-                />
-              </button>
-              <button className={styles.mobileIcon} onClick={handleShare}>
-                <Image src={share} alt="share" />
               </button>
             </div>
           </div>
 
-          <div className={styles.productMediaColumn}>
-            {product?.isCustomizable ? (
-              <ShirtEditor
-                product={product}
-                shirtImageSrc={editorShirtImageSrc}
-                hideTextOverlay={!isCanvasPrimaryView}
-                ref={editorRef}
-                isEditing={isEditing}
-                setIsEditing={setIsEditing}
-                text={text}
-                setText={setText}
-                selectedSize={selectedSize}
-                selectedFont={selectedFont}
-                selectedColor={selectedColor}
-                setSelectedColor={setSelectedColor}
-                setSelectedFont={setSelectedFont}
-                setSelectedSize={setSelectedSize}
-                onReady={() => setEditorReady(true)}
-              />
-            ) : (
-              <Image
-                src={activeProductImageUrl}
-                alt="product"
-                width={500}
-                height={600}
-                className={styles.mainImage}
-                priority
-                onLoad={() => setEditorReady(true)}
-              />
-            )}
-
-            <div className={styles.mobview}>
-              <OfferMarquee />
-            </div>
-
-            {showProductImageGallery && (
-              <div
-                className={styles.productImageGallery}
-                aria-label="Product images"
-              >
-                {productImages.map((src, index) => (
+          <div className={styles.container}>
+            <div className={styles.productMediaColumn}>
+              <div className={styles.mediaHero}>
+                <div className={styles.mediaHeroTop}>
+                  {discountPercent > 0 && (
+                    <span className={styles.mediaOffBadge}>
+                      {discountPercent}% OFF
+                    </span>
+                  )}
                   <button
                     type="button"
-                    key={`${src}-${index}`}
-                    className={`${styles.productImageThumb} ${
-                      selectedImageIndex === index
-                        ? styles.productImageThumbActive
-                        : ""
+                    className={`${styles.mediaWishBtn} ${
+                      isWishlisted ? styles.mediaWishBtnLiked : ""
                     }`}
-                    onClick={() => setSelectedImageIndex(index)}
-                    aria-label={`View product image ${index + 1}`}
-                    aria-pressed={selectedImageIndex === index}
+                    onClick={handleWishlistClick}
+                    aria-label={
+                      isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+                    }
                   >
-                    <Image
-                      src={src}
-                      alt=""
-                      width={72}
-                      height={72}
-                      className={styles.productImageThumbImg}
+                    <Heart
+                      size={15}
+                      stroke="#fff"
+                      strokeWidth={2}
+                      fill={isWishlisted ? "#ff4500" : "transparent"}
                     />
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
 
-          <div
-            className={`${styles.infoSection} ${
-              !isCustomizable && styles.infoSection_img
-            }`}
-          >
-            <div className={styles.priceSection}>
-              <h1>{product?.name}</h1>
-            </div>
-            <div className={styles.dis_price}>
-              <p className={styles.discountedPrice}>
-                ₹ {product?.discountedPrice}
-              </p>
-              <p className={styles.basePrice}>₹ {product?.basePrice}</p>
-              {product?.discountedPrice && product?.basePrice && (
-                <span className={styles.offerTag}>
-                  {Math.round(
-                    ((product.basePrice - product.discountedPrice) /
-                      product.basePrice) *
-                      100
+                <div className={styles.mediaHeroMain}>
+                  {product?.isCustomizable ? (
+                    <ShirtEditor
+                      product={product}
+                      shirtImageSrc={editorShirtImageSrc}
+                      hideTextOverlay={!isCanvasPrimaryView}
+                      ref={editorRef}
+                      isEditing={isEditing}
+                      setIsEditing={setIsEditing}
+                      text={text}
+                      setText={setText}
+                      selectedSize={selectedSize}
+                      selectedFont={selectedFont}
+                      selectedColor={selectedColor}
+                      setSelectedColor={setSelectedColor}
+                      setSelectedFont={setSelectedFont}
+                      setSelectedSize={setSelectedSize}
+                      onReady={() => setEditorReady(true)}
+                    />
+                  ) : (
+                    <Image
+                      src={activeProductImageUrl}
+                      alt="product"
+                      width={500}
+                      height={600}
+                      className={styles.mainImage}
+                      priority
+                      onLoad={() => setEditorReady(true)}
+                    />
                   )}
-                  % OFF
-                </span>
-              )}
-            </div>
-            
+                </div>
 
-            {/* Size Selection */}
-            {product?.configuration?.[0]?.options?.length > 0 && (
-              <div className={styles.sizes}>
-                <h4>SELECT SIZE</h4>
-                {sizeInfo && (
-                  <div className={styles.sizeDetailsBox}>
-                    {sizeInfo.options?.find((opt) => opt.label === "Chest")
-                      ?.value && (
-                      <span>
-                        Chest:{" "}
-                        {
-                          sizeInfo.options.find((opt) => opt.label === "Chest")
-                            .value
-                        }{" "}
-                        cm
-                      </span>
-                    )}
-
-                    {sizeInfo.options?.find((opt) => opt.label === "Length")
-                      ?.value && (
-                      <span>
-                        Length:{" "}
-                        {
-                          sizeInfo.options.find((opt) => opt.label === "Length")
-                            .value
-                        }{" "}
-                        cm
-                      </span>
-                    )}
-
-                    {sizeInfo.options?.find((opt) => opt.label === "Sleeves")
-                      ?.value && (
-                      <span>
-                        Sleeves:{" "}
-                        {
-                          sizeInfo.options.find(
-                            (opt) => opt.label === "Sleeves"
-                          ).value
-                        }{" "}
-                        cm
-                      </span>
-                    )}
-                  </div>
+                {product?.isCustomizable && (
+                  <button
+                    type="button"
+                    className={styles.tapHint}
+                    onClick={() => setIsEditing(true)}
+                  >
+                    <span className={styles.tapHintEmoji}>👆</span>
+                    <span className={styles.tapHintTxt}>
+                      Tap to personalise
+                    </span>
+                  </button>
                 )}
 
-                <div className={styles.sizeOptions}>
-                  {product?.configuration[0].options.map((s) => {
-                    const outOfStock = isSizeOptionOutOfStock(
-                      s,
-                      sizeAvailabilityMap
-                    );
-                    return (
+                {productImages.length > 1 && (
+                  <div className={styles.mediaDots} role="tablist">
+                    {productImages.map((_, index) => (
                       <button
                         type="button"
-                        key={s.value}
-                        disabled={outOfStock}
-                        onClick={() => handleSizeSelect(s.value)}
-                        className={`${styles.sizeBtn} ${
-                          selectedSizeYear === s.value ? styles.activeSize : ""
-                        } ${outOfStock ? styles.sizeBtnOutOfStock : ""}`}
-                      >
-                        <span className={styles.sizeBtnLabel}>{s.label}</span>
-                        {outOfStock ? (
-                          <span className={styles.sizeBtnStockLabel}>
-                            Out of stock
-                          </span>
-                        ) : null}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            <div className={styles.cartActionBar}>
-              {cartProductQty > 0 ? (
-                <>
-                  <button
-                    type="button"
-                    className={styles.viewCartBtn}
-                    onClick={() => router.push("/cart")}
-                  >
-                    <span className={styles.cartIconMini}>
-                      {cartCount > 0 && (
-                        <span className={styles.cartBadge}>{cartCount}</span>
-                      )}
-                      <Image src={bag} alt="bag" />
-                    </span>
-                    <span>View Cart</span>
-                  </button>
-
-                  <div className={styles.qtyStepper} aria-label="Quantity">
-                    <button
-                      type="button"
-                      className={styles.qtyBtn}
-                      onClick={decrementProductQty}
-                      aria-label="Decrease quantity"
-                    >
-                      <Minus size={16} />
-                    </button>
-                    <div className={styles.qtyValue}>{cartProductQty}</div>
-                    <button
-                      type="button"
-                      className={styles.qtyBtn}
-                      onClick={incrementProductQty}
-                      aria-label="Increase quantity"
-                    >
-                      <Plus size={16} />
-                    </button>
+                        key={index}
+                        role="tab"
+                        aria-selected={selectedImageIndex === index}
+                        aria-label={`Show image ${index + 1}`}
+                        className={`${styles.mediaDot} ${
+                          selectedImageIndex === index
+                            ? styles.mediaDotActive
+                            : ""
+                        }`}
+                        onClick={() => setSelectedImageIndex(index)}
+                      />
+                    ))}
                   </div>
-                </>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className={styles.cartIconBtn}
-                    onClick={() => router.push("/cart")}
-                    aria-label="Open cart"
-                  >
-                    {cartCount > 0 && (
-                      <span className={styles.cartBadge}>{cartCount}</span>
-                    )}
-                    <Image src={bag} alt="bag" />
-                  </button>
+                )}
+              </div>
 
-                  <button
-                    type="button"
-                    className={styles.addToCartMain}
-                    onClick={addToCart}
-                    disabled={loader}
-                  >
-                    {loader ? "Adding..." : "Add to cart"}
-                    <span
-                      className={styles.offerPill}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowOfferSheet(true);
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          setShowOfferSheet(true);
-                        }
-                      }}
+              <div className={styles.mobview}>
+                <OfferMarquee />
+              </div>
+
+              {showProductImageGallery && (
+                <div
+                  className={styles.productImageGallery}
+                  aria-label="Product images"
+                >
+                  {productImages.map((src, index) => (
+                    <button
+                      type="button"
+                      key={`${src}-${index}`}
+                      className={`${styles.productImageThumb} ${
+                        selectedImageIndex === index
+                          ? styles.productImageThumbActive
+                          : ""
+                      }`}
+                      onClick={() => setSelectedImageIndex(index)}
+                      aria-label={`View product image ${index + 1}`}
+                      aria-pressed={selectedImageIndex === index}
                     >
-                      Offers <ChevronUp size={14} strokeWidth={2.5} />
-                    </span>
-                  </button>
-                </>
+                      <Image
+                        src={src}
+                        alt=""
+                        width={72}
+                        height={72}
+                        className={styles.productImageThumbImg}
+                      />
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
-            
-            {/* Details Accordion */}
-            <div className={styles.accordion}>
-              {[
-                { title: "DETAILS", content: product?.description },
-                { title: "CARE", content: product?.care },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className={styles.accordionItem}
-                  onClick={() =>
-                    setActiveSection(activeSection === i ? null : i)
-                  }
-                >
-                  <div className={styles.accordionHeader}>
-                    <h3>{item.title}</h3>
-                    {activeSection === i ? (
-                      <Minus size={20} />
-                    ) : (
-                      <Plus size={20} />
-                    )}
-                  </div>
-                  <div
-                    className={`${styles.accordionContent} ${
-                      activeSection === i ? styles.active : ""
-                    }`}
+
+            <div
+              className={`${styles.infoSection} ${
+                !isCustomizable ? styles.infoSection_img : ""
+              }`}
+            >
+              <div className={styles.prodInfo}>
+                <h1 className={styles.prodName}>{product?.name}</h1>
+                <div className={styles.priceRow}>
+                  <span className={styles.priceMain}>
+                    ₹{product?.discountedPrice}
+                  </span>
+                  {product?.basePrice > product?.discountedPrice && (
+                    <span className={styles.priceOld}>₹{product?.basePrice}</span>
+                  )}
+                  {discountPercent > 0 && (
+                    <span className={styles.priceOffBadge}>
+                      {discountPercent}% OFF
+                    </span>
+                  )}
+                </div>
+                {product?.isCustomizable && (
+                  <button
+                    type="button"
+                    className={styles.persBar}
+                    onClick={() => setIsEditing(true)}
                   >
-                    <p>{item.content}</p>
+                    <span className={styles.persIcon}>✏️</span>
+                    <span className={styles.persTxt}>
+                      Tap the text on shirt to personalise your child&apos;s
+                      name FREE
+                    </span>
+                    <ChevronRight size={14} className={styles.persArrow} />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className={styles.offersLink}
+                  onClick={() => setShowOfferSheet(true)}
+                >
+                  View available offers <ChevronUp size={14} strokeWidth={2.5} />
+                </button>
+              </div>
+
+              {product?.configuration?.[0]?.options?.length > 0 && (
+                <>
+                  <div className={styles.secGap} />
+                  <div className={styles.sizeSec}>
+                    <h4 className={styles.sizeTitle}>Select Size</h4>
+                    {sizeInfo && (
+                      <div className={styles.sizeDetailsBox}>
+                        {sizeInfo.options?.find((opt) => opt.label === "Chest")
+                          ?.value && (
+                          <span>
+                            Chest:{" "}
+                            {
+                              sizeInfo.options.find(
+                                (opt) => opt.label === "Chest"
+                              ).value
+                            }{" "}
+                            cm
+                          </span>
+                        )}
+                        {sizeInfo.options?.find((opt) => opt.label === "Length")
+                          ?.value && (
+                          <span>
+                            Length:{" "}
+                            {
+                              sizeInfo.options.find(
+                                (opt) => opt.label === "Length"
+                              ).value
+                            }{" "}
+                            cm
+                          </span>
+                        )}
+                        {sizeInfo.options?.find((opt) => opt.label === "Sleeves")
+                          ?.value && (
+                          <span>
+                            Sleeves:{" "}
+                            {
+                              sizeInfo.options.find(
+                                (opt) => opt.label === "Sleeves"
+                              ).value
+                            }{" "}
+                            cm
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <div className={styles.sizeOptions}>
+                      {product?.configuration[0].options.map((s) => {
+                        const outOfStock = isSizeOptionOutOfStock(
+                          s,
+                          sizeAvailabilityMap
+                        );
+                        return (
+                          <button
+                            type="button"
+                            key={s.value}
+                            disabled={outOfStock}
+                            onClick={() => handleSizeSelect(s.value)}
+                            className={`${styles.sizeBtn} ${
+                              selectedSizeYear === s.value
+                                ? styles.activeSize
+                                : ""
+                            } ${outOfStock ? styles.sizeBtnOutOfStock : ""}`}
+                          >
+                            <span className={styles.sizeBtnLabel}>
+                              {s.label}
+                            </span>
+                            {outOfStock ? (
+                              <span className={styles.sizeBtnStockLabel}>
+                                Out of stock
+                              </span>
+                            ) : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div className={styles.secGap} />
+              <div className={styles.revSec} id="revSec">
+                <div className={styles.secHdr}>
+                  <div className={styles.secTitle}>Customer Reviews</div>
+                  <button
+                    type="button"
+                    className={styles.secLink}
+                    onClick={() => {
+                      const el = document.getElementById("revSec");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    See all {reviewStats.total} →
+                  </button>
+                </div>
+
+                <div className={styles.ratingSummary}>
+                  <div className={styles.rbBig}>
+                    <div className={styles.rbBigNum}>{reviewStats.avg}</div>
+                    <div className={styles.rbBigStars} aria-label="Rating">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <span
+                          key={i}
+                          className={`${styles.rbBigS} ${
+                            i < Math.round(reviewStats.avg)
+                              ? ""
+                              : styles.rbBigSEmpty
+                          }`}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                    <div className={styles.rbBigCnt}>
+                      {reviewStats.total} reviews
+                    </div>
+                  </div>
+                  <div className={styles.rbBars}>
+                    {[5, 4, 3, 2, 1].map((star) => {
+                      const count = reviewStats.byStar[star] || 0;
+                      const pct =
+                        reviewStats.total > 0
+                          ? Math.round((count / reviewStats.total) * 100)
+                          : 0;
+                      return (
+                        <div key={star} className={styles.rbRow}>
+                          <div className={styles.rbLbl}>{star}</div>
+                          <div className={styles.rbTrack}>
+                            <div
+                              className={styles.rbFill}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <div className={styles.rbCnt}>{count}</div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              ))}
-            </div>
-              
+
+                <div className={styles.revFilters}>
+                  <button
+                    type="button"
+                    className={`${styles.rf} ${
+                      reviewFilter === "ALL" ? styles.rfOn : styles.rfOff
+                    }`}
+                    onClick={() => setReviewFilter("ALL")}
+                  >
+                    All ({reviewStats.total})
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.rf} ${
+                      reviewFilter === "PHOTOS" ? styles.rfOn : styles.rfOff
+                    }`}
+                    onClick={() => setReviewFilter("PHOTOS")}
+                  >
+                    With Photos ({reviewStats.withPhotos})
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.rf} ${
+                      reviewFilter === "5" ? styles.rfOn : styles.rfOff
+                    }`}
+                    onClick={() => setReviewFilter("5")}
+                  >
+                    5 ★ ({reviewStats.byStar[5] || 0})
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.rf} ${
+                      reviewFilter === "4" ? styles.rfOn : styles.rfOff
+                    }`}
+                    onClick={() => setReviewFilter("4")}
+                  >
+                    4 ★ ({reviewStats.byStar[4] || 0})
+                  </button>
+                </div>
+
+                <div className={styles.photoRow}>
+                  {reviewPhotoThumbs.map((p, idx) => (
+                    <button
+                      key={`${p}-${idx}`}
+                      type="button"
+                      className={styles.phThumb}
+                      aria-label="Review photo"
+                    >
+                      {p}
+                    </button>
+                  ))}
+                  {productReviews.reduce((n, r) => n + (r.photos?.length || 0), 0) >
+                  reviewPhotoThumbs.length ? (
+                    <button
+                      type="button"
+                      className={styles.phThumb}
+                      aria-label="More photos"
+                    >
+                      <span>👧</span>
+                      <span className={styles.phMore}>
+                        +
+                        {Math.max(
+                          0,
+                          productReviews.reduce(
+                            (n, r) => n + (r.photos?.length || 0),
+                            0
+                          ) - reviewPhotoThumbs.length
+                        )}
+                      </span>
+                    </button>
+                  ) : null}
+                </div>
+
+                <div className={styles.revCards}>
+                  {filteredReviews.map((r) => (
+                    <div key={r.id} className={styles.revCard}>
+                      <div className={styles.rcTop}>
+                        <div className={styles.rcUser}>
+                          <div
+                            className={styles.rcAv}
+                            style={{ background: r.color }}
+                          >
+                            {r.initial}
+                          </div>
+                          <div>
+                            <div className={styles.rcName}>{r.name}</div>
+                            <div className={styles.rcDate}>
+                              {r.date} · {r.location}
+                            </div>
+                            <div className={styles.rcVer}>
+                              Verified Purchase
+                            </div>
+                          </div>
+                        </div>
+                        <div className={styles.rcStars} aria-label="Stars">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <span
+                              key={i}
+                              className={`${styles.rcS} ${
+                                i < r.rating ? "" : styles.rcSEmpty
+                              }`}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className={styles.rcTitle}>{r.title}</div>
+                      <div className={styles.rcText}>{r.text}</div>
+                      {r.photos?.length ? (
+                        <div className={styles.rcImgs}>
+                          {r.photos.slice(0, 2).map((p, idx) => (
+                            <div key={idx} className={styles.rcImg}>
+                              {p}
+                            </div>
+                          ))}
+                        </div>
+                      ) : null}
+                      {r.tags?.length ? (
+                        <div className={styles.rcTags}>
+                          {r.tags.map((t) => (
+                            <span key={t} className={styles.rcTag}>
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                      <div className={styles.rcBtm}>
+                        <div className={styles.rcHelpfulTxt}>
+                          {r.helpfulCount} people found this helpful
+                        </div>
+                        <button
+                          type="button"
+                          className={styles.rcHelpfulBtn}
+                          onClick={() => toast("Thanks for your feedback!")}
+                        >
+                          Helpful
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    className={styles.writeRev}
+                    onClick={() => toast("Review flow coming soon")}
+                  >
+                    <span className={styles.wrIcon}>✍️</span>
+                    <span className={styles.wrTxtWrap}>
+                      <span className={styles.wrTitle}>
+                        Bought this? Write a review
+                      </span>
+                      <span className={styles.wrSub}>
+                        Help other parents make the right choice
+                      </span>
+                    </span>
+                    <span className={styles.wrArr}>›</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.secGap} />
+              <div className={styles.accSec}>
+                {[
+                  { title: "DETAILS", content: product?.description },
+                  { title: "CARE", content: product?.care },
+                ].map((item, i) => (
+                  <div key={i} className={styles.accItem}>
+                    <button
+                      type="button"
+                      className={styles.accHdr}
+                      onClick={() =>
+                        setActiveSection(activeSection === i ? null : i)
+                      }
+                      aria-expanded={activeSection === i}
+                    >
+                      <span className={styles.accTitle}>{item.title}</span>
+                      <span
+                        className={`${styles.accIcon} ${
+                          activeSection === i ? styles.accIconOpen : ""
+                        }`}
+                      >
+                        +
+                      </span>
+                    </button>
+                    <div
+                      className={`${styles.accBody} ${
+                        activeSection === i ? styles.accBodyOpen : ""
+                      }`}
+                    >
+                      <p>{item.content}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
             {/* Size Selection Sheet (Triggered if no size selected) */}
             <BottomSheet
               open={showSizeSheet}
@@ -1138,21 +1416,85 @@ const ProductDetails = () => {
                 })}
               </div>
             </BottomSheet>
+            </div>
           </div>
-        </div>
-                <div className={styles.webview}>
-                <OfferMarquee />
-                </div>
 
-        <section
-          style={{ width: "100%", overflowX: "auto", marginTop: "16px" }}
-        >
-          {collectionId ? (
-            <YouMayLikeSection categoryId={collectionId} />
-          ) : (
-            <Suggested relatedData={relatedData} />
-          )}
-        </section>
+          <div className={styles.webview}>
+            <OfferMarquee />
+          </div>
+
+          <div className={styles.pageSpacer} aria-hidden />
+
+          <div className={styles.stickyBar}>
+            {cartProductQty > 0 ? (
+              <>
+                <button
+                  type="button"
+                  className={styles.vcBtn}
+                  onClick={() => router.push("/cart")}
+                >
+                  {cartCount > 0 && (
+                    <span className={styles.vcBadge}>{cartCount}</span>
+                  )}
+                  <Image src={bag} alt="" width={17} height={17} />
+                  <span className={styles.vcTxt}>View Cart</span>
+                </button>
+                <div className={styles.qtyStepper} aria-label="Quantity">
+                  <button
+                    type="button"
+                    className={styles.qtyBtn}
+                    onClick={decrementProductQty}
+                    aria-label="Decrease quantity"
+                  >
+                    <Minus size={16} />
+                  </button>
+                  <div className={styles.qtyValue}>{cartProductQty}</div>
+                  <button
+                    type="button"
+                    className={styles.qtyBtn}
+                    onClick={incrementProductQty}
+                    aria-label="Increase quantity"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className={styles.vcBtn}
+                  onClick={() => router.push("/cart")}
+                >
+                  {cartCount > 0 && (
+                    <span className={styles.vcBadge}>{cartCount}</span>
+                  )}
+                  <Image src={bag} alt="" width={17} height={17} />
+                  <span className={styles.vcTxt}>View Cart</span>
+                </button>
+                <button
+                  type="button"
+                  className={styles.addBtn}
+                  onClick={addToCart}
+                  disabled={loader}
+                >
+                  <span className={styles.addBtnLabel}>
+                    {loader ? "ADDING..." : "ADD TO CART"}
+                  </span>
+                  <span className={styles.addBtnAmt}>₹{stickyLineTotal}</span>
+                </button>
+              </>
+            )}
+          </div>
+
+          <section className={styles.relatedSection}>
+            {collectionId ? (
+              <YouMayLikeSection categoryId={collectionId} />
+            ) : (
+              <Suggested relatedData={relatedData} />
+            )}
+          </section>
+        </div>
       </>
     </>
   );

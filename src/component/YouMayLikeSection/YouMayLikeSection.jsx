@@ -89,7 +89,22 @@ const YouMayLikeSection = ({
 
   return (
     <div className={styles.wrapper}>
-      <h2 className={styles.heading}>{heading}</h2>
+      <div className={styles.ymalHeader}>
+        <div className={styles.ymalEyebrow}>CURATED FOR YOU</div>
+        <div className={styles.ymalTitleRow}>
+          <h2 className={styles.ymalTitle}>{heading}</h2>
+          <button type="button" className={styles.ymalSeeAll}>
+            See all →
+          </button>
+        </div>
+        <div className={styles.ymalFilters}>
+          {["All", "Animals", "Heroes", "Funny", "Anime"].map((t) => (
+            <span key={t} className={styles.ymalFilter}>
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
 
       <div className={styles.cardGrid}>
         {products.length > 0

@@ -2,12 +2,88 @@
   text-align: center;
   margin: 3rem auto;
   padding: 2rem;
+  background: #f7f4ef;
 }
 
 .heading {
   font-size: 1.5rem;
   font-weight: 500;
   margin-top: 1.5rem;
+}
+
+.ymalHeader {
+  text-align: left;
+  margin: 0 auto 14px;
+  max-width: 1200px;
+}
+
+.ymalEyebrow {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #ff4500;
+  margin-bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  &::before {
+    content: "";
+    width: 18px;
+    height: 2px;
+    background: #ff4500;
+    border-radius: 2px;
+  }
+}
+
+.ymalTitleRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.ymalTitle {
+  font-family: "Bebas Neue", "Plus Jakarta Sans", sans-serif;
+  font-size: 32px;
+  letter-spacing: 0.04em;
+  color: #0f0e0c;
+  margin: 0;
+  line-height: 1;
+}
+
+.ymalSeeAll {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ff4500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 2px;
+}
+
+.ymalFilters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.ymalFilter {
+  white-space: nowrap;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid #e8e3dc;
+  background: #fff;
+  color: #9a9490;
 }
 
 .filters {
@@ -70,7 +146,7 @@
 @media screen and (max-width: 760px) {
   .wrapper {
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 14px 12px 18px !important;
     width: 100vw;
   }
 
@@ -85,6 +161,10 @@
 
   .cardGrid > * {
     width: 100% !important;
+  }
+
+  .ymalTitle {
+    font-size: 26px;
   }
 }
 
