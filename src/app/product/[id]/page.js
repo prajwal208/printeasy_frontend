@@ -1272,7 +1272,7 @@ const ProductDetails = () => {
                     </div>
                   ))}
 
-                  <button
+                  {/* <button
                     type="button"
                     className={styles.writeRev}
                     onClick={() => toast("Review flow coming soon")}
@@ -1287,7 +1287,7 @@ const ProductDetails = () => {
                       </span>
                     </span>
                     <span className={styles.wrArr}>›</span>
-                  </button>
+                  </button> */}
                 </div>
               </div>
 

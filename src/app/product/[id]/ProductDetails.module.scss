@@ -230,6 +230,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
+  display: none;
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(8px);
   padding: 5px 10px;
@@ -843,9 +844,7 @@
   padding: 16px 15px;
 
   @media (min-width: 769px) {
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 12px var(--shadow);
+    display: none;
   }
 }
 

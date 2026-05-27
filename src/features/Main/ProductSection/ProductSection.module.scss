@@ -146,16 +146,17 @@
 @media screen and (max-width: 760px) {
   .wrapper {
     margin: 0 !important;
-    padding: 14px 12px 18px !important;
-    width: 100vw;
+    padding: 0 !important;
+    width: 100%;
   }
 
   .cardGrid {
-    width: 100vw;
+    width: 100%;
     padding: 0 !important;
     margin: 0 !important;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px !important;
+    row-gap: 1.5rem !important;
+    column-gap: 0.5rem !important;
     justify-items: stretch;
   }
 
