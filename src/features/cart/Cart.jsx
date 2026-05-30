@@ -24,7 +24,6 @@ import {
 import DynamicModal from "@/component/Modal/Modal";
 import LoginForm from "../signup/LogIn/LoginForm";
 import AddToBagLoader from "@/component/AddToBagLoader/AddToBagLoader";
-import ProductSection from "../Main/ProductSection/ProductSection";
 import CartSuggestion from "@/component/CartSuggetion/CartSuggestion";
 import CartMobile from "./CartMobile/CartMobile";
 
