@@ -217,6 +217,9 @@ const ProductDetails = () => {
   const [cartProductRowId, setCartProductRowId] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [reviewFilter, setReviewFilter] = useState("ALL");
+  const [heroImageLoading, setHeroImageLoading] = useState(false);
+  const mediaHeroMainRef = useRef(null);
+  const preservedHeroHeightRef = useRef(null);
 
   const refreshCartBagTotal = useCallback(async () => {
     const items = await db.cart.toArray();
@@ -520,6 +523,8 @@ const ProductDetails = () => {
 
   useEffect(() => {
     setEditorReady(false);
+    setHeroImageLoading(false);
+    preservedHeroHeightRef.current = null;
     setSelectedSizeYear("");
     setSizeInfo(null);
     setSelectedImageIndex(0);
@@ -530,6 +535,28 @@ const ProductDetails = () => {
       setIsEditing(false);
     }
   }, [selectedImageIndex]);
+
+  const handleHeroImageReady = useCallback(() => {
+    setEditorReady(true);
+    setHeroImageLoading(false);
+    preservedHeroHeightRef.current = null;
+  }, []);
+
+  const handleSelectProductImage = useCallback(
+    (index) => {
+      if (index === selectedImageIndex) return;
+
+      if (mediaHeroMainRef.current) {
+        const height = mediaHeroMainRef.current.getBoundingClientRect().height;
+        if (height > 0) preservedHeroHeightRef.current = height;
+      }
+
+      setHeroImageLoading(true);
+      setEditorReady(false);
+      setSelectedImageIndex(index);
+    },
+    [selectedImageIndex]
+  );
 
   useEffect(() => {
     if (!product?.configuration?.[0]?.options?.length || !selectedSizeYear) {
@@ -777,7 +804,32 @@ const ProductDetails = () => {
                   </button>
                 </div>
 
-                <div className={styles.mediaHeroMain}>
+                <div
+                  ref={mediaHeroMainRef}
+                  className={`${styles.mediaHeroMain} ${
+                    heroImageLoading ? styles.mediaHeroMainLoading : ""
+                  }`}
+                  style={
+                    heroImageLoading && preservedHeroHeightRef.current
+                      ? { minHeight: preservedHeroHeightRef.current }
+                      : undefined
+                  }
+                >
+                  {heroImageLoading ? (
+                    <div
+                      className={styles.mediaHeroShimmer}
+                      aria-hidden="true"
+                      aria-busy="true"
+                    >
+                      <div className={styles.mediaHeroShimmerBar} />
+                    </div>
+                  ) : null}
+
+                  <div
+                    className={
+                      heroImageLoading ? styles.mediaHeroContentHidden : ""
+                    }
+                  >
                   {product?.isCustomizable ? (
                     <ShirtEditor
                       product={product}
@@ -794,7 +846,7 @@ const ProductDetails = () => {
                       setSelectedColor={setSelectedColor}
                       setSelectedFont={setSelectedFont}
                       setSelectedSize={setSelectedSize}
-                      onReady={() => setEditorReady(true)}
+                      onReady={handleHeroImageReady}
                     />
                   ) : (
                     <Image
@@ -804,9 +856,10 @@ const ProductDetails = () => {
                       height={600}
                       className={styles.mainImage}
                       priority
-                      onLoad={() => setEditorReady(true)}
+                      onLoad={handleHeroImageReady}
                     />
                   )}
+                  </div>
                 </div>
 
                 {product?.isCustomizable && (
@@ -836,7 +889,7 @@ const ProductDetails = () => {
                             ? styles.mediaDotActive
                             : ""
                         }`}
-                        onClick={() => setSelectedImageIndex(index)}
+                        onClick={() => handleSelectProductImage(index)}
                       />
                     ))}
                   </div>
@@ -861,7 +914,7 @@ const ProductDetails = () => {
                           ? styles.productImageThumbActive
                           : ""
                       }`}
-                      onClick={() => setSelectedImageIndex(index)}
+                      onClick={() => handleSelectProductImage(index)}
                       aria-label={`View product image ${index + 1}`}
                       aria-pressed={selectedImageIndex === index}
                     >
