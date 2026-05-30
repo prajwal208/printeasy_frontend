@@ -365,9 +365,7 @@ const ShirtEditor = forwardRef(
                 opacity: imageLoaded ? 1 : 0,
                 transition: "opacity 0.3s ease",
                 width: "100%",
-                maxWidth: "500px",
                 display: "block",
-                margin: "0 auto",
               }}
             />
           )}

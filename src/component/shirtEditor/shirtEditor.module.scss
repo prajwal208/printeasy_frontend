@@ -1,17 +1,19 @@
 .img_main_wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block;
+  width: 100%;
 }
 
 .img_wrap {
   position: relative;
-  
+  width: 100%;
 }
+
 .mainImage {
   object-fit: contain;
-  width: 500;
-  height: 600;
+  width: 100%;
+  height: auto;
+  display: block;
+  max-width: none;
 }
 
 .shimmerWrapper {
@@ -480,14 +482,14 @@
 @media screen and (max-width: 700px) {
   .mainImage {
     width: 100%;
-    height: 100%;
+    height: auto;
+    max-width: none;
   }
 }
 
-@media screen and (max-width:700px){
+@media screen and (max-width: 700px) {
   .img_wrap {
-  position: relative;
-  width: max-content;
-  height: 500;
-}
+    position: relative;
+    width: 100%;
+  }
 }
