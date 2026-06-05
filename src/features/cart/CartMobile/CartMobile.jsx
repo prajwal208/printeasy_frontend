@@ -7,6 +7,7 @@ import styles from "./cartMobile.module.scss";
 import FOMO_USERS, { pickUsers, randomUser } from "@/data/fomoUsers";
 import { getApplicableRewards } from "@/lib/price";
 import { PAYMENT_METHOD, estimatePartialCodAmounts } from "@/lib/payment";
+import { getCartItemAttributeTags } from "@/lib/cartItemMeta";
 
 const COD_FEE = 49;
 
@@ -415,8 +416,8 @@ const CartMobile = ({
       </div>
 
       {cartItems.map((item) => {
-        const sizeLabel = item?.options?.[0]?.value || item?.options?.value;
         const presetText = item?.presetText;
+        const attributeTags = getCartItemAttributeTags(item);
         const basePrice = Number(item?.basePrice) || 0;
         const discPrice = Number(item?.discountPrice) || basePrice;
         const save = Math.max(0, basePrice - discPrice) * (item.quantity || 1);
@@ -444,14 +445,15 @@ const CartMobile = ({
                     </span>
                   </div>
                 )}
-                <div className={styles.ciTags}>
-                  {item.isCustomizable && (
-                    <span className={styles.ciTag}>Custom Print</span>
-                  )}
-                  {sizeLabel && (
-                    <span className={styles.ciTag}>Size: {sizeLabel}</span>
-                  )}
-                </div>
+                {attributeTags.length > 0 ? (
+                  <div className={styles.ciTags}>
+                    {attributeTags.map((tag) => (
+                      <span key={tag.key} className={styles.ciTag}>
+                        {tag.label}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
               </div>
               <div className={styles.ciR}>
                 {basePrice > discPrice && (
@@ -617,7 +619,7 @@ const CartMobile = ({
               <div className={styles.piSub}>
                 ₹{partial.advanceAmount} now + ₹{codBalance} cash on delivery
                 <span className={styles.piCod}>
-                  + ₹{COD_FEE} COD convenience fee included
+                  + ₹{COD_FEE} convenience fee included
                 </span>
               </div>
             </div>
@@ -694,7 +696,7 @@ const CartMobile = ({
             <div className={styles.codRow}>
               <div className={styles.codRl}>
                 <span className={styles.codDt} />
-                COD convenience fee
+                convenience fee
               </div>
               <div className={`${styles.codRv} ${styles.codRvOr}`}>
                 + ₹{COD_FEE}

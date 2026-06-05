@@ -7,6 +7,8 @@ import ProductCard from "@/component/ProductCard/ProductCard";
 import api from "@/axiosInstance/axiosInstance";
 import Header from "@/component/header/Header";
 import ProductCardShimmer from "@/component/ProductShimmer/ProductShimmer";
+import OfferMarquee from "@/component/OfferMarquee/OfferMarquee";
+import HomeOfferDock from "@/component/HomeOfferDock/HomeOfferDock";
 
 const LIMIT = 20;
 
@@ -83,29 +85,35 @@ const SelectedCategory = () => {
 
   return (
     <>
-      {/* Mobile Header */}
       <div className={styles.mobileHeader}>
         <Header />
       </div>
 
-      <div className={styles.cardGrid}>
-        {categoryList.map((item, index) => {
-          if (index === categoryList.length - 1) {
-            return (
-              <div ref={lastProductRef} key={item.id}>
-                <ProductCard item={item} />
-              </div>
-            );
-          }
-          return <ProductCard key={item.id} item={item} />;
-        })}
-
-        {/* 🔹 Shimmer Loader */}
-        {loading &&
-          Array.from({ length: 4 }).map((_, index) => (
-            <ProductCardShimmer key={`shimmer-${index}`} />
-          ))}
+      <div className={styles.mobileOffer}>
+        <OfferMarquee />
       </div>
+
+      <div className={styles.pageWrap}>
+        <div className={styles.cardGrid}>
+          {categoryList.map((item, index) => {
+            if (index === categoryList.length - 1) {
+              return (
+                <div ref={lastProductRef} key={item.id}>
+                  <ProductCard item={item} />
+                </div>
+              );
+            }
+            return <ProductCard key={item.id} item={item} />;
+          })}
+
+          {loading &&
+            Array.from({ length: 4 }).map((_, index) => (
+              <ProductCardShimmer key={`shimmer-${index}`} />
+            ))}
+        </div>
+      </div>
+
+      <HomeOfferDock />
     </>
   );
 };

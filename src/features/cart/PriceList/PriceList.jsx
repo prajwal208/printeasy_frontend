@@ -144,7 +144,7 @@ const PriceList = ({
               <div className={styles.piSub}>
                 ₹{partial.advanceAmount} now + ₹{codBalance} cash on delivery
                 <span className={styles.piCod}>
-                  + ₹{COD_FEE} COD convenience fee included
+                  + ₹{COD_FEE} convenience fee included
                 </span>
               </div>
             </div>
@@ -223,7 +223,7 @@ const PriceList = ({
             <div className={styles.codRow}>
               <div className={styles.codRl}>
                 <span className={styles.codDt} />
-                COD convenience fee
+                convenience fee
               </div>
               <div className={`${styles.codRv} ${styles.codRvOr}`}>
                 + ₹{COD_FEE}

@@ -9,24 +9,24 @@ const DefaultAddress = ({ addressList = [], onChange }) => {
   );
 
   // 🟠 No default address → Show Add Address
-  if (!defaultAddress) {
-    return (
-      <div className={styles.addressBox}>
-        <div className={styles.addressContent}>
-          <MapPin size={16} className={styles.icon} />
-          <div className={styles.text}>
-            <p className={styles.addressLine}>No address added</p>
-            <p className={styles.cityState}>
-              Please add a delivery address to continue
-            </p>
-          </div>
-          <button className={styles.changeBtn} onClick={onChange}>
-            Add Address
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // if (!defaultAddress) {
+  //   return (
+  //     <div className={styles.addressBox}>
+  //       <div className={styles.addressContent}>
+  //         <MapPin size={16} className={styles.icon} />
+  //         <div className={styles.text}>
+  //           <p className={styles.addressLine}>No address added</p>
+  //           <p className={styles.cityState}>
+  //             Please add a delivery address to continue
+  //           </p>
+  //         </div>
+  //         <button className={styles.changeBtn} onClick={onChange}>
+  //           Add Address
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // 🟢 Default address exists
   return (

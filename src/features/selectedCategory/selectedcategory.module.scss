@@ -4,16 +4,36 @@
   gap: 4rem;
   justify-items: center;
   animation: fadeIn 0.5s ease;
-  margin-bottom: 2rem;
-  padding: 2rem;
+}
+
+.pageWrap {
+  width: 100%;
+  padding-bottom: 120px;
+
+  @media (min-width: 769px) {
+    padding: 2rem 2rem 100px;
+  }
 }
 
 .mobileHeader {
   display: none;
 }
 
+.mobileOffer {
+  display: none;
+}
+
 /* Mobile Layout */
 @media (max-width: 768px) {
+  .pageWrap {
+    padding-bottom: 120px;
+  }
+
+  .mobileOffer {
+    display: block;
+    width: 100%;
+  }
+
  .cardGrid {
     width: 100vw;
     padding: 0 !important;

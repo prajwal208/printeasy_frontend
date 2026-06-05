@@ -337,7 +337,7 @@ const ProductDetails = () => {
 
     if (pendingAction === "ADD_TO_CART") {
       setPendingAction(null);
-      processAddToCart(size); // for ADD_TO_CART you can pass sizeInfo if needed
+      processAddToCart(match);
     }
   };
 
@@ -350,10 +350,10 @@ const ProductDetails = () => {
       return;
     }
 
-    await processAddToCart(selectedSize);
+    await processAddToCart();
   };
 
-  const processAddToCart = async (sizeInfo) => {
+  const processAddToCart = async (sizeOption) => {
     setLoader(true);
     let capturedImageUrl = "";
 
@@ -404,7 +404,13 @@ const ProductDetails = () => {
         height: product.dimension?.height || 0,
         weight: product.dimension?.weight || 0,
       },
-      options: selectedSizeYear || sizeInfo,
+      options:
+        sizeOption ||
+        sizeInfo ||
+        product?.configuration?.[0]?.options?.find(
+          (o) => o.value === selectedSizeYear
+        ) ||
+        selectedSizeYear,
       addedAt: new Date().toISOString(),
       presetText: text,
       textColor: selectedColor,
@@ -413,6 +419,17 @@ const ProductDetails = () => {
       canvasImage: product.canvasImage,
       illustrationImage: product.illustrationImage,
       fullProductUrl: product.productImages[0],
+      productColor:
+        product.color ||
+        product.productColor ||
+        product.shirtColor ||
+        product.colour ||
+        "",
+      printType:
+        product.printType ||
+        product.printMethod ||
+        product.print_type ||
+        (product.isCustomizable ? "DTF Print" : ""),
     };
 
     try {

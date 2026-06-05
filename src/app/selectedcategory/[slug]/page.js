@@ -4,11 +4,9 @@ import React from 'react'
 const SelectedCategorypage = () => {
   return (
     <>
-      <div style={{marginBottom:"2rem"}}>
-      <SelectedCategory/>
-      </div>
+      <SelectedCategory />
     </>
-  )
-}
+  );
+};
 
 export default SelectedCategorypage

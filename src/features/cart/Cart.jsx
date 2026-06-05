@@ -26,6 +26,7 @@ import LoginForm from "../signup/LogIn/LoginForm";
 import AddToBagLoader from "@/component/AddToBagLoader/AddToBagLoader";
 import CartSuggestion from "@/component/CartSuggetion/CartSuggestion";
 import CartMobile from "./CartMobile/CartMobile";
+import { getCartItemAttributeTags } from "@/lib/cartItemMeta";
 
 const Cart = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -316,8 +317,8 @@ const Cart = () => {
                   </div>
 
                   {cartItems.map((item) => {
-                    const sizeLabel = item?.options?.[0]?.value;
                     const presetText = item?.presetText;
+                    const attributeTags = getCartItemAttributeTags(item);
                     const basePrice = Number(item?.basePrice) || 0;
                     const discPrice =
                       Number(item?.discountPrice) || basePrice;
@@ -356,18 +357,15 @@ const Cart = () => {
                                   </span>
                                 </div>
                               )}
-                            <div className={styles.ciTags}>
-                              {item.isCustomizable && (
-                                <span className={styles.ciTag}>
-                                  Custom Print
-                                </span>
-                              )}
-                              {sizeLabel && (
-                                <span className={styles.ciTag}>
-                                  Size: {sizeLabel}
-                                </span>
-                              )}
-                            </div>
+                            {attributeTags.length > 0 ? (
+                              <div className={styles.ciTags}>
+                                {attributeTags.map((tag) => (
+                                  <span key={tag.key} className={styles.ciTag}>
+                                    {tag.label}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : null}
                           </div>
                           <div className={styles.ciR}>
                             {basePrice > discPrice && (
@@ -451,10 +449,10 @@ const Cart = () => {
                 </div>
 
                 <div className={styles.rightSection}>
-                  <DefaultAddress
+                  {/* <DefaultAddress
                     addressList={addressList}
                     onChange={() => router.push("/address")}
-                  />
+                  /> */}
                   <PriceList
                     bagTotal={bagTotal}
                     grandTotal={grandTotal}
