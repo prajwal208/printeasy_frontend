@@ -29,7 +29,7 @@ const CategoryGridPage = async () => {
       <h3 className={styles.featured_cat}>FEATURED CATEGORIES</h3>
       <section className={styles.gridWrapper}>
         {categories.map((item) => (
-          <Link key={item?.id} href={`/selectedcategory/${item?.id}`} passHref>
+          <Link key={item?.id} href={`/selectedcategory/${item?.slug}`} passHref>
             <CategoryCard image={item.image} title={item.name} />
           </Link>
         ))}
