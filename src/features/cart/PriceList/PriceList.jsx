@@ -153,29 +153,7 @@ const PriceList = ({
             </div>
           </button>
 
-          {!hasCustomizable && (
-            <button
-              type="button"
-              className={`${styles.payOpt} ${
-                paymentMethod === PAYMENT_METHOD.COD ? styles.payOptSel : ""
-              }`}
-              onClick={() => onPaymentMethodChange(PAYMENT_METHOD.COD)}
-            >
-              <div className={styles.pr}>
-                <div className={styles.prDot} />
-              </div>
-              <div className={`${styles.piWrap} ${styles.piWrapCo}`}>💵</div>
-              <div className={styles.pi}>
-                <div className={styles.piRow}>
-                  <div className={styles.piName}>Cash on Delivery</div>
-                </div>
-                <div className={styles.piSub}>
-                  Pay the full amount when your order arrives.
-                </div>
-              </div>
-              <div className={styles.piPrice}>{formatINR(finalPayable)}</div>
-            </button>
-          )}
+         
         </div>
       </div>
 
